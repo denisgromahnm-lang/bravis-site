@@ -52,13 +52,20 @@ jobs:
           assert c['yandexMapsUrl']=='https://yandex.ru/maps/org/bravis/120928769508/'
           assert c['twoGisUrl']=='https://2gis.ru/moscow/firm/70000001098229175'
           assert c['yandexEdaRestaurantUrl']=='https://eda.yandex.ru/r/bravis?placeSlug=bravis'
-          assert c['loonaJoinUrl']=='', 'Do not publish invented loyalty sign-up links'
+          loona='https://app.loona.ai/4992/create/register?source=qr&tag=none'
+          assert c['loonaJoinUrl']==loona, 'Loona must use the owner-provided URL verbatim'
           index=(base/'dist/index.html').read_text(encoding='utf8')
           assert 'id="delivery"' in index and 'id="loyalty"' in index
           assert 'href="https://eda.yandex.ru/r/bravis?placeSlug=bravis"' in index
           assert 'data-track="delivery_click"' in index
-          assert 'data-track="loona_signup_click"' not in index, 'Never show signup until owner URL provided'
-          assert 'Онлайн-регистрация скоро появится' in index
+          from html import unescape
+          assert loona in unescape(index), 'Loona registration URL missing or rewritten'
+          assert 'data-track="loona_signup_click"' in index, 'Loona signup metric missing'
+          assert 'loona-register.svg' in index, 'Self-hosted QR missing in loyalty block'
+          assert 'Онлайн-регистрация скоро появится' not in index
+          qr=(base/'dist/assets/loona-register.svg').read_text(encoding='utf8')
+          assert loona in unescape(qr), 'QR must describe owner-provided Loona registration URL'
+          assert 'viewBox="0 0 41 41"' in qr and qr.count('h-')>=250, 'QR SVG missing matrix geometry'
           assert 'приветственные бонусы сразу после регистрации' in index
           assert 'href="/#delivery"' in index and 'href="/#loyalty"' in index
           twogis=c['twoGisUrl']
