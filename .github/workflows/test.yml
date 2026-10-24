@@ -29,13 +29,13 @@ jobs:
           from pathlib import Path
           base=Path('site')
           c=json.loads((base/'site.config.json').read_text(encoding='utf8'))
-          assert c['public'] is False and c['smartReserveId']=='503266819'
+          assert c['public'] is False and c['smartReserveId']=='5b1e469e-871a-4eb8-bd2a-787ec2d011c3'
           assert not c['yandexMetrikaId'] and not c['ga4Id']
           assert c['restaurantName']=='BRAVIS'
           assert c['phoneE164']=='+79895719977'
           h=(base/'dist/menu/index.html').read_text(encoding='utf8')
           assert 'noindex' in h and 'tel:+79895719977' in h
-          booking='https://reservation.yandex.ru/partner-reserve/forms/503266819'
+          booking='https://reservation.yandex.ru/partner-reserve/forms/5b1e469e-871a-4eb8-bd2a-787ec2d011c3'
           for path in ('index.html','menu/index.html','banquets/index.html','contacts/index.html','privacy/index.html'):
               page=(base/'dist'/path).read_text(encoding='utf8')
               assert booking in page, f'Missing booking link on {path}'
