@@ -45,7 +45,9 @@
   if (saved === 'yes') { loadAnalytics(); }
   if (saved === null) {
     const banner=document.createElement('div');banner.className='cookie-banner';banner.setAttribute('role','dialog');banner.setAttribute('aria-label','Настройки аналитики');
-    banner.innerHTML='<p>Для улучшения сайта мы используем необязательную аналитику. <a href="/privacy/">Подробнее</a></p><div><button type="button" data-consent="no">Без аналитики</button><button type="button" data-consent="yes">Разрешить</button></div>';
+    // Reuse the actual page link, including the /bravis-site/ GitHub Pages prefix.
+    const privacyHref = document.querySelector('.footer-bottom a[href$="/privacy/"]')?.getAttribute('href') || '/privacy/';
+    banner.innerHTML='<p>Для улучшения сайта мы используем необязательную аналитику. <a href="'+privacyHref+'">Подробнее</a></p><div><button type="button" data-consent="no">Без аналитики</button><button type="button" data-consent="yes">Разрешить</button></div>';
     document.body.appendChild(banner);
     banner.querySelectorAll('[data-consent]').forEach(b => b.addEventListener('click',()=>{
       localStorage.setItem(consentKey,b.dataset.consent);
