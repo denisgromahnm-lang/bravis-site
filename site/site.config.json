@@ -20,5 +20,8 @@
   "socialLinks": {
     "telegram": "",
     "vk": ""
-  }
+  },
+  "menuPricesApproved": false,
+  "legalPolicyApproved": false,
+  "productionReleaseApproved": false
 }
