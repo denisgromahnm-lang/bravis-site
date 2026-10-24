@@ -1,4 +1,4 @@
-name: Publish private-stage BRAVIS preview to GitHub Pages
+name: Publish noindex BRAVIS preview to GitHub Pages
 # No production domain, no real reservation ID, no analytics IDs, noindex.
 on:
   workflow_dispatch:
