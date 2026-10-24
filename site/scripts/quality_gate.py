@@ -43,6 +43,11 @@ def audit():
         assert len(doc.h1)==1,f"One H1 per page: {p} has {len(doc.h1)}"
         assert len(doc.structured)>=1,"Structured data missing "+p
         assert any(s.get('@type')=='Restaurant' for s in doc.structured),"Restaurant JSON-LD missing "+p
+        restaurants=[schema for schema in doc.structured if schema.get('@type')=='Restaurant']
+        hours=restaurants[0].get('openingHoursSpecification',{})
+        assert hours.get('opens')=='11:00' and hours.get('closes')=='23:00', 'Structured daily hours wrong: '+p
+        assert set(hours.get('dayOfWeek',[]))=={'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'}, 'Missing days of week: '+p
+        assert 'Ежедневно, 11:00–23:00' in content,'Display hours missing: '+p
         assert re.search(r'<meta name="robots" content="noindex',content),"Preview accidentally indexable "+p
         assert re.search(r'<meta name="viewport"',content),"Mobile viewport missing "+p
         assert re.search(r'<meta name="description"',content),"SEO description missing "+p
