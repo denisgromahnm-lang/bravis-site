@@ -101,6 +101,16 @@ def head(title, desc, route, body_class):
 {f'<meta property="og:url" content="{h(canonical)}"><link rel="canonical" href="{h(canonical)}">' if canonical else ''}
 {verification}'''
     schema={"@context":"https://schema.org","@type":"Restaurant","name":"BRAVIS","description":"Армянская и европейская кухня, вино и атмосфера для встреч с близкими","telephone":CONFIG.get('phoneE164',''),"address":{"@type":"PostalAddress","streetAddress":"улица Расковой, 20","addressLocality":"Москва","addressCountry":"RU"},"servesCuisine":["Армянская","Европейская"],"hasMenu":site_url('/menu/') or '/menu/'}
+    # Search engines receive exactly the same owner-confirmed opening hours
+    # that are displayed in the footer and contact section.
+    schedule=CONFIG.get('openingHours') or {}
+    if schedule:
+        schema['openingHoursSpecification']={
+            '@type':'OpeningHoursSpecification',
+            'dayOfWeek':schedule.get('days',[]),
+            'opens':schedule.get('opens',''),
+            'closes':schedule.get('closes','')
+        }
     if domain:schema['url']=site_url('/')
     analytics = {"ymId": str(CONFIG.get('yandexMetrikaId','')).strip(), "ga4Id": str(CONFIG.get('ga4Id','')).strip()}
     analytics_js = json.dumps(analytics, ensure_ascii=False).replace('<', '\u003c')
