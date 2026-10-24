@@ -75,6 +75,9 @@ try:
         expect(dialog).to_be_visible()
         expect(page.locator('#menu-lightbox-image')).to_be_visible()
         assert loaded(page.locator('#menu-lightbox-image')),'Menu full-screen image missing'
+        assert 'menu-lightbox--single' in dialog.get_attribute('class'), 'Single-page menus should use the wider viewer'
+        expect(page.locator('#menu-lightbox-prev')).to_be_hidden()
+        expect(page.locator('#menu-lightbox-next')).to_be_hidden()
         page.locator('#menu-lightbox-close').click()
         expect(dialog).not_to_be_visible()
         page.screenshot(path=str(REPORT/'menu-desktop.png'),full_page=True)
@@ -96,6 +99,13 @@ try:
         mp.locator('.mobile-nav a[href="/menu/"]').click()
         expect(mp.locator('.print-card')).to_have_count(5)
         expect(mp.locator('.menu-items .dish img')).to_have_count(0)
+        mp.locator('.print-card').first.click()
+        expect(mp.locator('#menu-lightbox')).to_be_visible()
+        expect(mp.locator('#menu-lightbox-prev')).to_be_hidden()
+        expect(mp.locator('#menu-lightbox-next')).to_be_hidden()
+        img_width=mp.locator('#menu-lightbox-image').bounding_box()['width']
+        assert img_width >= 350, f'Mobile single-page menu image too narrow: {img_width}'
+        mp.locator('#menu-lightbox-close').click()
         assert mp.evaluate('document.documentElement.scrollWidth <= window.innerWidth + 2'), 'Horizontal scroll on mobile menu'
         mp.screenshot(path=str(REPORT/'menu-mobile.png'),full_page=True)
         mp.goto(base+'/',wait_until='networkidle')
