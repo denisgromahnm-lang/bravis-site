@@ -1,0 +1,56 @@
+{
+  "selection": "owner-approved-print-menu",
+  "source": "https://disk.yandex.ru/d/mM7bPzFGD0o2WA",
+  "files": [
+    {
+      "group": "seasonal",
+      "title": "Сезонное меню",
+      "format": "images",
+      "url": "/menu-media/seasonal.jpg",
+      "pages": [
+        "/menu-media/seasonal.jpg"
+      ],
+      "source_name": "Bravis_Меню сезонное_осень_превью.jpg"
+    },
+    {
+      "group": "main-front",
+      "title": "Основное меню",
+      "format": "images",
+      "url": "/menu-media/main-front.jpg",
+      "pages": [
+        "/menu-media/main-front.jpg"
+      ],
+      "source_name": "Меню Основное_А3_печатный.pdf"
+    },
+    {
+      "group": "main-back",
+      "title": "Бар и напитки",
+      "format": "images",
+      "url": "/menu-media/main-back.jpg",
+      "pages": [
+        "/menu-media/main-back.jpg"
+      ],
+      "source_name": "Меню Основное_А3_превью-оборот.jpg"
+    },
+    {
+      "group": "business",
+      "title": "Бизнес-ланч",
+      "format": "images",
+      "url": "/menu-media/business.jpg",
+      "pages": [
+        "/menu-media/business.jpg"
+      ],
+      "source_name": "Меню бизнес-ланч_печатный.pdf"
+    },
+    {
+      "group": "children",
+      "title": "Детское меню",
+      "format": "images",
+      "url": "/menu-media/children.jpg",
+      "pages": [
+        "/menu-media/children.jpg"
+      ],
+      "source_name": "меню детское.pdf"
+    }
+  ]
+}

@@ -1,7 +1,15 @@
 {
-  "hero": "",
-  "interior": "",
+  "hero": "/uploads/bravis-interior-01.jpg",
+  "interior": "/uploads/bravis-interior-02.jpg",
+  "events": "/uploads/bravis-interior-03.jpg",
   "food": "",
-  "events": "",
-  "gallery": []
+  "gallery": [
+    "/uploads/bravis-interior-04.jpg",
+    "/uploads/bravis-interior-05.jpg",
+    "/uploads/bravis-interior-06.jpg",
+    "/uploads/bravis-interior-07.jpg",
+    "/uploads/bravis-interior-08.jpg",
+    "/uploads/bravis-interior-09.jpg",
+    "/uploads/bravis-interior-10.jpg"
+  ]
 }
