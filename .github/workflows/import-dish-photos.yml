@@ -1,4 +1,5 @@
 name: BRAVIS import old menu dish photos
+# Retry transient upstream 500 responses for missing photographs; previously imported files are reused.
 on:
   push:
     paths:
