@@ -1,0 +1,37 @@
+name: BRAVIS browser acceptance
+on:
+  push:
+    paths:
+      - '.github/workflows/browser-qa.yml'
+      - 'site/scripts/browser_smoke.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare browser test environment
+        run: |
+          python3 -m pip install --user --disable-pip-version-check playwright==1.56.0
+          python3 -m playwright install --with-deps chromium
+      - name: Generate static BRAVIS website
+        run: |
+          cd site
+          python3 src/build.py
+          python3 scripts/render_menu_gallery.py
+          python3 verify.py
+          python3 scripts/quality_gate.py
+      - name: Run browser acceptance for desktop and mobile
+        run: |
+          python3 site/scripts/browser_smoke.py
+      - name: Preserve screenshots for owner review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bravis-desktop-mobile-screenshots
+          path: site/browser-report/
+          if-no-files-found: warn
+          retention-days: 21
