@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Report BRAVIS launch blockers without modifying files or credentials."""
 import argparse,json,os,re
+from html import unescape
+from urllib.parse import urlsplit
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 c=json.loads((ROOT/'site.config.json').read_text(encoding='utf8'))
@@ -19,7 +21,20 @@ check('Real hours verified',bool(c.get('hoursText','').strip() and 'уточня
 check('Real Yandex SmartReserve ID',bool(re.fullmatch(r'[A-Za-z0-9_-]{3,120}',str(c.get('smartReserveId','')))))
 check('Yandex Metrika ID',str(c.get('yandexMetrikaId','')).isdigit() and int(c.get('yandexMetrikaId') or 0)>0)
 check('Yandex verification token',bool(c.get('verificationYandex','').strip()))
-check('Google Search Console verification token',bool(c.get('verificationGoogle','').strip()))
+# Google Search Console is useful but optional and must not prevent a Yandex-first launch.
+google_ready=bool(c.get('verificationGoogle','').strip())
+print(('OPTIONAL READY ' if google_ready else 'OPTIONAL PENDING ')+'Google Search Console verification token')
+loona_url=str(c.get('loonaJoinUrl','')).strip()
+delivery_url=str(c.get('yandexEdaRestaurantUrl','')).strip()
+loona_parts=urlsplit(loona_url)
+delivery_parts=urlsplit(delivery_url)
+check('Owner-provided Loona signup destination',
+      loona_parts.scheme=='https' and loona_parts.hostname=='app.loona.ai' and loona_parts.path=='/4992/create/register')
+check('Owner-provided Yandex Eda restaurant destination',
+      delivery_parts.scheme=='https' and delivery_parts.hostname=='eda.yandex.ru' and delivery_parts.path=='/r/bravis')
+qr=ROOT/'public/assets/loona-register.svg'
+check('Loona registration QR is linked to the same destination',
+      qr.is_file() and loona_url in unescape(qr.read_text(encoding='utf8')))
 media=ROOT/'content/menu_media.json'
 if media.exists():
     m=json.loads(media.read_text(encoding='utf8'))
