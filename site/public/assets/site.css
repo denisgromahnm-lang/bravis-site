@@ -54,3 +54,12 @@
 .loyalty-art__caption{position:absolute;bottom:1px;font-size:10px;letter-spacing:.23em;color:#7c685d}
 @media(max-width:900px){.loyalty-section{padding:73px 0}.loyalty-grid{grid-template-columns:1fr;gap:22px}.loyalty-art{min-height:340px}.loyalty-art:before{width:390px;height:390px}.loyalty-art:after{width:300px;height:300px}}
 @media(max-width:560px){.loyalty-section{padding:65px 0}.loyalty-copy h2{font-size:clamp(43px,10vw,58px);margin:23px 0}.loyalty-copy>p:not(.loyalty-pending){font-size:16px;line-height:1.55}.loyalty-copy .loyalty-subtext{font-size:14px!important}.loyalty-action{display:flex;width:100%;gap:12px;padding:16px;font-size:11px}.loyalty-art{min-height:250px}.loyalty-art:before{width:310px;height:310px}.loyalty-art:after{width:250px;height:250px}.loyalty-card{width:min(92%,335px);height:206px;padding:25px}.loyalty-card__top{font-size:17px}.loyalty-card__center{font-size:75px}.loyalty-card__bottom{font-size:7px}.loyalty-art__caption{bottom:0;font-size:8px}}
+
+/* QR is a self-hosted, static code; the browser does not fetch third-party QR imagery. */
+.loyalty-registration{display:flex;align-items:center;flex-wrap:wrap;gap:22px;margin-top:23px}
+.loyalty-registration .loyalty-action{margin-top:0}
+.loyalty-qr{display:flex;align-items:center;gap:15px;max-width:335px;text-decoration:none}
+.loyalty-qr img{width:156px;height:156px;padding:6px;border:1px solid #dbcabb;background:#fff;object-fit:contain;flex:0 0 156px}
+.loyalty-qr span{color:#75645b;font-size:12px;line-height:1.5;max-width:146px}
+.loyalty-qr:hover span{text-decoration:underline;text-underline-offset:3px}
+@media(max-width:560px){.loyalty-registration{gap:16px}.loyalty-qr{display:none}}
