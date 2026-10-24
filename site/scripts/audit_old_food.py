@@ -6,8 +6,17 @@ ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('source',ROOT/'scripts/sync_media.py')
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 results={}
-for label,share in [('interiors',m.FIRST),('additional',m.SECOND)]:
-    files=m.scan(share)
+for label,share in [('additional',m.SECOND),('interiors',m.FIRST)]:
+    files=None
+    for attempt in (1,2):
+        try:
+            files=m.scan(share)
+            break
+        except Exception as exc:
+            print('Yandex public API unavailable',label,'attempt',attempt,':',str(exc)[:200])
+    if files is None:
+        results[label]={'error':'Public API temporarily unavailable; do not infer photo categories','folder_sizes':{},'old_food_candidates':[],'file_count':0}
+        continue
     directories=collections.Counter(str(Path(f.get('path','')).parent) for f in files)
     food=[]
     for f in files:
