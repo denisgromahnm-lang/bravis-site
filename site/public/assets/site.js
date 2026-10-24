@@ -22,6 +22,13 @@
     if (typeof window.gtag === 'function' && conf.ga4Id) window.gtag('event', eventName);
   };
   document.querySelectorAll('[data-track]').forEach(a => a.addEventListener('click', () => track(a.dataset.track)));
+  // Aggregate goals include every menu entry point and every phone link,
+  // while retaining detailed per-button goals for diagnostics.
+  document.querySelectorAll('a[href]').forEach(a => a.addEventListener('click', () => {
+    const href = a.getAttribute('href') || '';
+    if (href.startsWith('tel:')) track('phone_click');
+    if (/^\/(?:bravis-site\/)?menu\/(?:[#?].*)?$/.test(href)) track('menu_open');
+  }));
   if (!conf.ymId && !conf.ga4Id) return;
   function loadAnalytics() {
     if (conf.ymId) {
