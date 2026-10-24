@@ -59,9 +59,14 @@ def audit():
             href=a.get('href','')
             assert not href.startswith('http://'),"Insecure hyperlink "+p
             if href.startswith('/'):
-                target=DIST/href.split('?',1)[0].split('#',1)[0].lstrip('/')
-                if href.endswith('/'):target=target/'index.html'
+                # Resolve URL path independently of query and hash; "/#delivery"
+                # points to the root HTML document, not an empty directory.
+                path_part=href.split('?',1)[0].split('#',1)[0]
+                target=DIST/path_part.lstrip('/')
+                if path_part.endswith('/'):target=target/'index.html'
                 assert target.is_file(),f'Broken link {p} -> {href}'
+                if href=='/#delivery':
+                    assert 'id="delivery"' in (DIST/'index.html').read_text(encoding='utf8'), 'Delivery anchor missing'
     page=(DIST/'menu/index.html').read_text(encoding='utf8')
     assert page.count('data-menu-index=')==5,"Five menu cards required"
     assert 'id="menu-lightbox"' in page,"Fullscreen accessible menu viewer missing"
