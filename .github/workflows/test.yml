@@ -34,11 +34,17 @@ jobs:
           assert c['restaurantName']=='BRAVIS'
           assert c['operatorLegalName']=='Общество с ограниченной ответственностью «Инвойс»'
           assert c['operatorInn']=='7723860392' and c['operatorOgrn']=='1137746040981'
-          assert c['operatorContactEmail']=='in.vois@mail.ru'
+          assert c['operatorContactEmail']=='bravis.msk@mail.ru'
+          contacts_html=(base/'dist/contacts/index.html').read_text(encoding='utf8')
+          homepage_html=(base/'dist/index.html').read_text(encoding='utf8')
+          assert 'mailto:bravis.msk@mail.ru' in contacts_html
+          assert 'mailto:bravis.msk@mail.ru' in homepage_html
+          assert '"email": "bravis.msk@mail.ru"' in homepage_html
+          assert 'in.vois@mail.ru' not in contacts_html and 'in.vois@mail.ru' not in homepage_html
           assert c['operatorPostalAddress']=='115446, г. Москва, ул. Академика Миллионщикова, д. 35, к. 4'
           assert c['legalPolicyApproved'] is False and c['productionReleaseApproved'] is False
           policy=(base/'dist/privacy/index.html').read_text(encoding='utf8')
-          for item in ('Общество с ограниченной ответственностью «Инвойс»','7723860392','1137746040981','in.vois@mail.ru',
+          for item in ('Общество с ограниченной ответственностью «Инвойс»','7723860392','1137746040981','bravis.msk@mail.ru',
                        'ул. Академика Миллионщикова','Проект документа','Яндекс Метрика','Настройки cookie','Яндекс СмартРезерв'):
               assert item in policy, f'Missing privacy disclosure: {item}'
           assert '40702810500000320283' not in policy,'Bank account should not be published'
