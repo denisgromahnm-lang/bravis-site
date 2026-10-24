@@ -32,8 +32,10 @@
 
 | Название в Метрике | Идентификатор |
 |---|---|
-| Переход к бронированию стола | `reserve_click` |
-| Открытие меню с главной | `menu_from_hero` |
+| Переход к бронированию стола (все кнопки, включая мобильную) | `reserve_click` |
+| Открытие страницы меню (все ссылки сайта) | `menu_open` |
+| Нажатие на любой телефонный номер | `phone_click` |
+| Открытие меню с главной (детальная цель, необязательно) | `menu_from_hero` |
 | Просмотр сезонного меню | `menu_open_seasonal` |
 | Просмотр основного меню | `menu_open_main_front` |
 | Просмотр барной карты | `menu_open_main_back` |
@@ -52,10 +54,10 @@
 ## Яндекс Метрика
 Счётчик уже создан для `https://bravisrest.ru` в аккаунте владельца. Числовой ID `113768615` уже внесён в `site/site.config.json` → `yandexMetrikaId`. Сайт загружает код счётчика только после согласия посетителя на аналитику (кнопки «Без аналитики» / «Разрешить»).
 
-События, уже предусмотренные в HTML/JS: 
-- `reserve_phone_click`, `reserve_mobile_click` — нажали на телефон или кнопку резерва;
+События, уже предусмотренные в HTML/JS (включая общие `menu_open` и `phone_click` для всех точек входа): 
+- `reserve_phone_click` — телефонный резерв, только если Яндекс СмартРезерв недоступен; мобильное бронирование при подключённом СмартРезерве отправляет `reserve_click`; 
 - `reserve_click` — открыли внешнюю форму СмартРезерва;
-- `header_phone_click`, `footer_phone_click`, `contacts_phone_click` — клики по номеру;
+- `phone_click` — общая цель для любого телефонного номера; `header_phone_click`, `footer_phone_click`, `contacts_phone_click` — детальные источники;
 - `menu_from_hero`, `menu_from_feature` — открытие меню из главной страницы;
 - `menu_open_seasonal`, `menu_open_main_front`, `menu_open_main_back`, `menu_open_business`, `menu_open_children` — просмотр каждого утверждённого раздела меню;
 - `banquet_phone_click` — обращение по банкету.
