@@ -49,6 +49,13 @@ jobs:
               assert 'data-track="reserve_click"' in page, f'Missing booking analytics on {path}'
               assert 'noindex' in page, f'Preview unexpectedly indexable: {path}'
           assert 'target="_blank" rel="noopener noreferrer"' in h
+          assert 'data-track="reserve_click"' in (base/'dist/index.html').read_text(encoding='utf8')
+          home=(base/'dist/index.html').read_text(encoding='utf8')
+          assert 'class="mobile-bottom-cta__primary"' in home
+          assert re.search(r'class="mobile-bottom-cta__primary"[^>]*data-track="reserve_click"',home), 'Mobile CTA must count in main reservation goal'
+          js=(base/'dist/assets/site.js').read_text(encoding='utf8')
+          assert "track('phone_click')" in js and "track('menu_open')" in js
+
           if (base/'content/menu_media.json').exists():
               f=json.loads((base/'content/menu_media.json').read_text(encoding='utf8'))['files']
               assert len(f)==5
