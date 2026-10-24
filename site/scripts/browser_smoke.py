@@ -32,6 +32,10 @@ try:
         page.goto(base+'/',wait_until='networkidle',timeout=30000)
         expect(page.locator('h1')).to_contain_text('Вкус встреч')
         expect(page.locator('.hero-photo')).to_be_visible()
+        # Official Yandex site-form integration: desktop header button points to exact restaurant.
+        reserve='https://reservation.yandex.ru/partner-reserve/forms/503266819'
+        expect(page.locator('.header-actions a[href="'+reserve+'"]')).to_be_visible()
+        assert page.locator('.header-actions a[href="'+reserve+'"]').get_attribute('target')=='_blank'
         assert loaded(page.locator('.hero-photo')),'Hero image failed to load'
         assert page.locator('html').get_attribute('lang')=='ru'
         assert 'noindex' in page.locator('meta[name="robots"]').get_attribute('content')
@@ -58,6 +62,8 @@ try:
         expect(mp.locator('.menu-toggle')).to_be_visible()
         mp.locator('.menu-toggle').click()
         expect(mp.locator('.mobile-nav')).to_be_visible()
+        assert mp.locator('.mobile-nav a[href="'+reserve+'"]').count()==1, 'Mobile reserve link missing'
+        assert mp.locator('.mobile-bottom-cta__primary[href="'+reserve+'"]').count()==1, 'Mobile booking CTA missing'
         mp.locator('.mobile-nav a[href="/menu/"]').click()
         expect(mp.locator('.print-card')).to_have_count(5)
         mp.screenshot(path=str(REPORT/'menu-mobile.png'),full_page=True)
