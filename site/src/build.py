@@ -17,6 +17,9 @@ phone = CONFIG.get('phoneDisplay','')
 phone_url = 'tel:' + re.sub(r'[^+0-9]', '', CONFIG.get('phoneE164',''))
 address = CONFIG.get('addressFull', '')
 yandex_maps_url = CONFIG.get('yandexMapsUrl','').strip() or ('https://yandex.ru/maps/?text=' + quote(address))
+two_gis_url = CONFIG.get('twoGisUrl','').strip()
+if two_gis_url and not re.fullmatch(r'https://(?:[a-z0-9-]+\\.)?(?:2gis\\.ru|2gis\\.com)/[^\\s<>"\\']+',two_gis_url,re.I):
+    raise ValueError('2GIS company URL must be verified and hosted on 2gis.ru or 2gis.com')
 domain = CONFIG.get('domain','').strip().rstrip('/')
 if domain and not domain.startswith(('https://','http://')): domain = 'https://' + domain
 published = bool(CONFIG.get('public') and domain)
@@ -112,6 +115,7 @@ def head(title, desc, route, body_class):
             'opens':schedule.get('opens',''),
             'closes':schedule.get('closes','')
         }
+    schema['sameAs']=[link for link in (yandex_maps_url,two_gis_url) if link]
     if domain:schema['url']=site_url('/')
     analytics = {"ymId": str(CONFIG.get('yandexMetrikaId','')).strip(), "ga4Id": str(CONFIG.get('ga4Id','')).strip()}
     analytics_js = json.dumps(analytics, ensure_ascii=False).replace('<', '\u003c')
@@ -165,7 +169,7 @@ banquet=f'''<section class="page-hero page-hero--dark"><div class="wrap page-her
 <section class="section"><div class="wrap two-col"><div><div class="section-label"><span class="line"></span> ВАШ ПОВОД</div><h2>Праздник —<br><em>в хорошей компании.</em></h2></div><div><p>Для небольшого семейного торжества, делового ужина или праздника с друзьями мы поможем подобрать формат. Условия, меню и доступность дат согласуются индивидуально.</p><p>Оставьте детали по телефону: команда расскажет о возможностях ресторана и ответит на вопросы.</p>{button('Позвонить в BRAVIS',phone_url,tracking='banquet_phone_click')}</div></div></section>
 <section class="banner-dark"><div class="wrap banner-inner"><div><span class="overline">BRAVIS · СОБЫТИЯ</span><h2>Давайте обсудим<br><em>ваш вечер.</em></h2></div><div>{button('Связаться с рестораном',phone_url)}</div></div></section>'''
 
-contacts=f'''<section class="page-hero page-hero--light"><div class="wrap"><div class="section-label"><span class="line"></span> КОНТАКТЫ И МАРШРУТ</div><h1>До <em>встречи.</em></h1><p>Находите время для близких. А мы найдём для вас место.</p></div></section><section class="section"><div class="wrap contacts-grid"><div class="contacts-info"><div class="contact-row"><span>АДРЕС</span><h2>{h(address)}</h2></div><div class="contact-row"><span>ТЕЛЕФОН</span><a class="contact-big" href="{h(phone_url)}" data-track="contacts_phone_click">{h(phone)}</a></div><div class="contact-row"><span>ВРЕМЯ РАБОТЫ</span><p>{h(CONFIG.get('hoursText',''))}</p></div><div class="contact-actions">{reserve_button()}{button('Открыть маршрут',yandex_maps_url,True,ext=True)}</div></div><div class="map-card"><div class="map-card__line"></div><div class="map-card__inner"><span>BRAVIS</span><p>МОСКВА</p><p class="map-card__address">РАСКОВОЙ, 20</p><div class="map-pin">⌖</div><a href="{h(yandex_maps_url)}" target="_blank" rel="noopener noreferrer">Открыть на Яндекс Картах ↗</a></div></div></div></section>'''
+contacts=f'''<section class="page-hero page-hero--light"><div class="wrap"><div class="section-label"><span class="line"></span> КОНТАКТЫ И МАРШРУТ</div><h1>До <em>встречи.</em></h1><p>Находите время для близких. А мы найдём для вас место.</p></div></section><section class="section"><div class="wrap contacts-grid"><div class="contacts-info"><div class="contact-row"><span>АДРЕС</span><h2>{h(address)}</h2></div><div class="contact-row"><span>ТЕЛЕФОН</span><a class="contact-big" href="{h(phone_url)}" data-track="contacts_phone_click">{h(phone)}</a></div><div class="contact-row"><span>ВРЕМЯ РАБОТЫ</span><p>{h(CONFIG.get('hoursText',''))}</p></div><div class="contact-actions">{reserve_button()}{button('Открыть маршрут',yandex_maps_url,True,ext=True)}{button('Карточка BRAVIS в 2ГИС',two_gis_url,True,tracking='two_gis_click',ext=True) if two_gis_url else ''}</div></div><div class="map-card"><div class="map-card__line"></div><div class="map-card__inner"><span>BRAVIS</span><p>МОСКВА</p><p class="map-card__address">РАСКОВОЙ, 20</p><div class="map-pin">⌖</div><a href="{h(yandex_maps_url)}" target="_blank" rel="noopener noreferrer">Открыть на Яндекс Картах ↗</a>{f'<a href="{h(two_gis_url)}" target="_blank" rel="noopener noreferrer" data-track="two_gis_click">Открыть в 2ГИС ↗</a>' if two_gis_url else ''}</div></div></div></section>'''
 
 privacy_title='Политика обработки персональных данных'
 operator = CONFIG.get('operatorLegalName','').strip()
