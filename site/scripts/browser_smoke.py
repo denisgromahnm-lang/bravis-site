@@ -33,7 +33,7 @@ try:
         expect(page.locator('h1')).to_contain_text('Вкус встреч')
         expect(page.locator('.hero-photo')).to_be_visible()
         # Official Yandex site-form integration: desktop header button points to exact restaurant.
-        reserve='https://reservation.yandex.ru/partner-reserve/forms/503266819'
+        reserve='https://reservation.yandex.ru/partner-reserve/forms/5b1e469e-871a-4eb8-bd2a-787ec2d011c3'
         expect(page.locator('.header-actions a[href="'+reserve+'"]')).to_be_visible()
         assert page.locator('.header-actions a[href="'+reserve+'"]').get_attribute('target')=='_blank'
         assert loaded(page.locator('.hero-photo')),'Hero image failed to load'
