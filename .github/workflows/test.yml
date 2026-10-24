@@ -115,6 +115,10 @@ jobs:
               assert 'data-menu-index' in h and 'id="menu-lightbox"' in h
           print('PASS: brand, preview-only, real menu media, phone, SEO metadata')
           PY
+      - name: Report remaining launch gates without publishing anything
+        run: |
+          cd site
+          python3 scripts/check_launch_readiness.py
       - name: Upload website artifact
         uses: actions/upload-artifact@v4
         with:
