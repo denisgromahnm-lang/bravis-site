@@ -28,3 +28,29 @@
 .delivery-visual__eyebrow i{font-style:normal;padding:0 14px;color:#e6cda9}
 @media(max-width:900px){.delivery-panel{grid-template-columns:1fr}.delivery-content{padding:58px 42px}.delivery-visual{min-height:265px}.delivery-visual__circle{width:158px;height:158px}.delivery-visual__icon{font-size:85px}.delivery-visual__arc--one{width:320px}.delivery-visual__arc--two{width:240px}.delivery-visual__eyebrow{bottom:24px}.delivery-visual:after{inset:16px}}
 @media(max-width:560px){.delivery-section{padding:0 0 65px}.delivery-content{padding:43px 22px 36px}.delivery-content h2{font-size:clamp(43px,10vw,59px);margin:23px 0}.delivery-content>p:not(.delivery-disclaimer){font-size:15px;line-height:1.55}.delivery-action{width:100%;gap:12px;padding:14px 15px;font-size:11px}.delivery-content .delivery-disclaimer{font-size:11px}.delivery-visual{min-height:232px}.delivery-visual__circle{width:145px;height:145px}.delivery-visual__icon{font-size:76px}}
+
+/* BRAVIS Loona loyalty signup, owner-verified URL only. */
+.loyalty-section{padding:100px 0 110px;background:#eee7dc;overflow:hidden}
+.loyalty-grid{display:grid;grid-template-columns:minmax(0,1.06fr) minmax(330px,.94fr);align-items:center;gap:65px}
+.loyalty-copy{max-width:690px}
+.loyalty-copy h2{font:400 clamp(48px,5.2vw,76px)/1.07 var(--serif);letter-spacing:-.032em;margin:26px 0 27px}
+.loyalty-copy h2 em{font-weight:400;color:var(--wine-light)}
+.loyalty-copy>p:not(.loyalty-pending){font-size:19px;line-height:1.65;max-width:530px;margin:0 0 15px}
+.loyalty-copy .loyalty-subtext{color:var(--muted);font-size:16px!important}
+.loyalty-action{display:inline-flex;justify-content:space-between;align-items:center;gap:54px;background:var(--wine);color:#fffdf8;min-height:56px;padding:16px 25px;font-size:12px;font-weight:700;letter-spacing:.075em;text-transform:uppercase;margin-top:23px;transition:background .2s,transform .2s}
+.loyalty-action:hover{background:#6b3645;transform:translateY(-2px)}
+.loyalty-action span{font-size:20px;font-weight:400}
+.loyalty-copy .loyalty-pending{font-size:14px;line-height:1.65;max-width:500px;padding:15px 17px;border-left:2px solid var(--gold);margin:22px 0 0;background:#f8f2e9}
+.loyalty-smallprint{display:block;font-size:11px;line-height:1.6;color:#786a62;margin-top:17px;max-width:520px}
+.loyalty-art{position:relative;display:flex;align-items:center;justify-content:center;min-height:390px}
+.loyalty-art:before{content:"";position:absolute;width:490px;height:490px;border:1px solid #d4c7b5;border-radius:50%}
+.loyalty-art:after{content:"";position:absolute;width:350px;height:350px;border:1px solid #ccbca6;border-radius:50%}
+.loyalty-card{z-index:1;display:flex;flex-direction:column;justify-content:space-between;width:min(100%,405px);height:250px;padding:30px 34px;border-radius:16px;background:linear-gradient(126deg,#603741 0%,#351e28 51%,#1c1017 100%);box-shadow:0 24px 48px rgba(41,19,29,.23);color:#e5c5a0;transform:rotate(-7deg)}
+.loyalty-card__top{display:flex;justify-content:space-between;align-items:center;font:600 21px var(--serif);letter-spacing:.17em}
+.loyalty-card__top i{font:500 11px var(--sans);letter-spacing:.18em}
+.loyalty-card__center{font:400 90px/.8 var(--serif);align-self:center}
+.loyalty-card__bottom{font-size:8px;letter-spacing:.2em}
+.loyalty-card__bottom i{margin:0 8px;font-style:normal}
+.loyalty-art__caption{position:absolute;bottom:1px;font-size:10px;letter-spacing:.23em;color:#7c685d}
+@media(max-width:900px){.loyalty-section{padding:73px 0}.loyalty-grid{grid-template-columns:1fr;gap:22px}.loyalty-art{min-height:340px}.loyalty-art:before{width:390px;height:390px}.loyalty-art:after{width:300px;height:300px}}
+@media(max-width:560px){.loyalty-section{padding:65px 0}.loyalty-copy h2{font-size:clamp(43px,10vw,58px);margin:23px 0}.loyalty-copy>p:not(.loyalty-pending){font-size:16px;line-height:1.55}.loyalty-copy .loyalty-subtext{font-size:14px!important}.loyalty-action{display:flex;width:100%;gap:12px;padding:16px;font-size:11px}.loyalty-art{min-height:250px}.loyalty-art:before{width:310px;height:310px}.loyalty-art:after{width:250px;height:250px}.loyalty-card{width:min(92%,335px);height:206px;padding:25px}.loyalty-card__top{font-size:17px}.loyalty-card__center{font-size:75px}.loyalty-card__bottom{font-size:7px}.loyalty-art__caption{bottom:0;font-size:8px}}
