@@ -35,6 +35,19 @@ for delivery_candidate in [eda_service_url] + ([eda_direct_url] if eda_direct_ur
 delivery_url = eda_direct_url or eda_service_url
 delivery_has_direct_link = bool(eda_direct_url)
 delivery_button_label = 'Заказать доставку' if delivery_has_direct_link else 'Перейти в Яндекс Еду'
+# Loona signup is enabled only with the actual, owner-verified card registration URL.
+loona_join_url = str(CONFIG.get('loonaJoinUrl', '')).strip()
+loona_program_name = str(CONFIG.get('loonaProgramName', 'Карта гостя BRAVIS')).strip()
+if loona_join_url:
+    parsed_loona = urlsplit(loona_join_url)
+    # The vendor may issue registration links on loona.ai subdomains or its
+    # authorized card delivery domain. Do not restrict to a guessed path, but
+    # reject unsafe/non-HTTPS schemes.
+    if parsed_loona.scheme != 'https' or not parsed_loona.hostname or parsed_loona.username or parsed_loona.password:
+        raise ValueError('Loona card enrollment link must be an owner-verified HTTPS URL')
+loona_registration_cta = (f'<a class="loyalty-action" href="{h(loona_join_url)}" data-track="loona_signup_click" target="_blank" rel="noopener noreferrer">Получить карту и бонусы <span aria-hidden="true">↗</span></a>' if loona_join_url else
+                          '<p class="loyalty-pending">Онлайн-регистрация скоро появится здесь. Пока оформить карту можно по QR-коду в ресторане.</p>')
+
 delivery_help_text = ('Оформление и условия доставки — в сервисе Яндекс Еда. Доступность зависит от вашего адреса.' if delivery_has_direct_link
                       else 'Выберите адрес доставки и найдите BRAVIS в Яндекс Еде. Прямой переход к меню ресторана пока уточняется.')
 domain = CONFIG.get('domain','').strip().rstrip('/')
@@ -146,10 +159,10 @@ def header(current):
 <a class="logo" href="/" aria-label="BRAVIS — главная"><span class="logo__text">BRAVIS</span><span class="logo__caption">Ресторан · Москва</span></a>
 <nav class="desktop-nav" aria-label="Основная навигация"><a href="/"{active('home',current)}>Главная</a><a href="/menu/"{active('menu',current)}>Меню</a><a href="/banquets/"{active('banquets',current)}>Банкеты</a><a href="/#delivery">Доставка</a><a href="/contacts/"{active('contacts',current)}>Контакты</a></nav>
 <div class="header-actions">{reserve_button()}<button type="button" class="menu-toggle" aria-label="Открыть меню" aria-controls="mobile-nav" aria-expanded="false"><span></span><span></span><span></span></button></div>
-</div><nav class="mobile-nav" id="mobile-nav" aria-label="Мобильная навигация" hidden><a href="/">Главная</a><a href="/menu/">Меню</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/contacts/">Контакты</a>{reserve_button()}</nav></header>'''
+</div><nav class="mobile-nav" id="mobile-nav" aria-label="Мобильная навигация" hidden><a href="/">Главная</a><a href="/menu/">Меню</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/#loyalty">Карта гостя</a><a href="/contacts/">Контакты</a>{reserve_button()}</nav></header>'''
 
 def footer():
-    return f'''<footer class="footer"><div class="wrap footer-grid"><div><a href="/" class="footer-logo">BRAVIS</a><p>Вкус встреч.<br>Тепло Bravis.</p></div><div><span class="footer-caption">Навигация</span><a href="/menu/">Меню</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/contacts/">Контакты</a></div><div><span class="footer-caption">Ждём в гости</span><p>{h(address)}</p><a href="{h(phone_url)}" data-track="footer_phone_click">{h(phone)}</a><p class="footer-schedule">{h(CONFIG.get('hoursText',''))}</p>{f'<a href="mailto:{h(official_email)}">{h(official_email)}</a>' if official_email else ''}</div><div class="footer-action">{reserve_button()}</div></div><div class="wrap footer-bottom"><span>© {date.today().year} BRAVIS. Все права защищены.</span><a href="/privacy/">Политика обработки персональных данных</a><a href="#top">Наверх ↑</a></div></footer><div class="mobile-bottom-cta"><a href="/menu/">Меню</a><a class="mobile-bottom-cta__primary" href="{h(reserve_link)}" {'target="_blank" rel="noopener noreferrer"' if reserve_id else ''} data-track="{h("reserve_click" if reserve_id else "reserve_phone_click")}">Забронировать</a></div><script src="/assets/site.js" defer></script></body></html>'''
+    return f'''<footer class="footer"><div class="wrap footer-grid"><div><a href="/" class="footer-logo">BRAVIS</a><p>Вкус встреч.<br>Тепло Bravis.</p></div><div><span class="footer-caption">Навигация</span><a href="/menu/">Меню</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/#loyalty">Карта гостя</a><a href="/contacts/">Контакты</a></div><div><span class="footer-caption">Ждём в гости</span><p>{h(address)}</p><a href="{h(phone_url)}" data-track="footer_phone_click">{h(phone)}</a><p class="footer-schedule">{h(CONFIG.get('hoursText',''))}</p>{f'<a href="mailto:{h(official_email)}">{h(official_email)}</a>' if official_email else ''}</div><div class="footer-action">{reserve_button()}</div></div><div class="wrap footer-bottom"><span>© {date.today().year} BRAVIS. Все права защищены.</span><a href="/privacy/">Политика обработки персональных данных</a><a href="#top">Наверх ↑</a></div></footer><div class="mobile-bottom-cta"><a href="/menu/">Меню</a><a class="mobile-bottom-cta__primary" href="{h(reserve_link)}" {'target="_blank" rel="noopener noreferrer"' if reserve_id else ''} data-track="{h("reserve_click" if reserve_id else "reserve_phone_click")}">Забронировать</a></div><script src="/assets/site.js" defer></script></body></html>'''
 
 def page(content, title, desc, route, current, body_class=''):
     return head(title,desc,route,body_class)+header(current)+f'<main id="main">{content}</main>'+footer()
@@ -173,6 +186,22 @@ home=f'''<section class="hero"><div class="wrap hero-grid"><div class="hero-cont
         <div class="delivery-visual__circle"><span class="delivery-visual__icon">B</span><span>ВКУС ВСТРЕЧ</span></div>
         <div class="delivery-visual__eyebrow">BRAVIS <i>×</i> ЯНДЕКС ЕДА</div>
       </div>
+    </div>
+  </div>
+</section>
+<section class="loyalty-section" id="loyalty" aria-labelledby="loyalty-heading">
+  <div class="wrap loyalty-grid">
+    <div class="loyalty-copy">
+      <div class="section-label"><span class="line"></span> BRAVIS · ПРОГРАММА ЛОЯЛЬНОСТИ</div>
+      <h2 id="loyalty-heading">Встречаемся чаще.<br><em>Бонусов больше.</em></h2>
+      <p>Оформите карту гостя BRAVIS в программе Loona и получите приветственные бонусы сразу после регистрации.</p>
+      <p class="loyalty-subtext">Карта всегда под рукой — в вашем смартфоне. Узнавайте о персональных предложениях и специальных событиях ресторана.</p>
+      {loona_registration_cta}
+      <small class="loyalty-smallprint">Начисление и использование бонусов — по действующим правилам программы лояльности BRAVIS. При регистрации действуют условия Loona.</small>
+    </div>
+    <div class="loyalty-art" aria-hidden="true">
+      <div class="loyalty-card"><span class="loyalty-card__top">BRAVIS <i>LOONA</i></span><span class="loyalty-card__center">B</span><span class="loyalty-card__bottom">КАРТА ГОСТЯ <i>•</i> PRIVILEGE CARD</span></div>
+      <span class="loyalty-art__caption">ВАШИ ВСТРЕЧИ · ВАШИ БОНУСЫ</span>
     </div>
   </div>
 </section>
