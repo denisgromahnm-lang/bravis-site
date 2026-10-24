@@ -24,6 +24,19 @@ if two_gis_url:
     parts = urlsplit(two_gis_url)
     if parts.scheme != 'https' or parts.hostname not in ('2gis.ru', 'www.2gis.ru', '2gis.com', 'www.2gis.com') or not re.fullmatch(r'/[a-z0-9_-]+/firm/[0-9]+/?', parts.path, re.I):
         raise ValueError('2GIS card must be an HTTPS URL of a known 2GIS firm')
+# Never invent a Yandex Eda restaurant link. Until the restaurant's real
+# share URL is supplied, link only to the official Yandex Eda landing page.
+eda_direct_url = str(CONFIG.get('yandexEdaRestaurantUrl', '')).strip()
+eda_service_url = str(CONFIG.get('yandexEdaServiceUrl', 'https://eda.yandex.ru/')).strip()
+for delivery_candidate in [eda_service_url] + ([eda_direct_url] if eda_direct_url else []):
+    parsed_delivery = urlsplit(delivery_candidate)
+    if parsed_delivery.scheme != 'https' or parsed_delivery.hostname != 'eda.yandex.ru' or parsed_delivery.username or parsed_delivery.password or parsed_delivery.port:
+        raise ValueError('Yandex Eda URL must use official https://eda.yandex.ru domain')
+delivery_url = eda_direct_url or eda_service_url
+delivery_has_direct_link = bool(eda_direct_url)
+delivery_button_label = 'Заказать доставку' if delivery_has_direct_link else 'Перейти в Яндекс Еду'
+delivery_help_text = ('Оформление и условия доставки — в сервисе Яндекс Еда. Доступность зависит от вашего адреса.' if delivery_has_direct_link
+                      else 'Выберите адрес доставки и найдите BRAVIS в Яндекс Еде. Прямой переход к меню ресторана пока уточняется.')
 domain = CONFIG.get('domain','').strip().rstrip('/')
 if domain and not domain.startswith(('https://','http://')): domain = 'https://' + domain
 published = bool(CONFIG.get('public') and domain)
@@ -131,12 +144,12 @@ def header(current):
 <div class="announcement"><div class="wrap announcement__inner"><span class="announcement__city"><span class="dot"></span> Москва, улица Расковой, 20</span><a href="{h(phone_url)}" data-track="header_phone_click">{h(phone)}</a></div></div>
 <header class="site-header" id="top"><div class="wrap header-inner">
 <a class="logo" href="/" aria-label="BRAVIS — главная"><span class="logo__text">BRAVIS</span><span class="logo__caption">Ресторан · Москва</span></a>
-<nav class="desktop-nav" aria-label="Основная навигация"><a href="/"{active('home',current)}>Главная</a><a href="/menu/"{active('menu',current)}>Меню</a><a href="/banquets/"{active('banquets',current)}>Банкеты</a><a href="/contacts/"{active('contacts',current)}>Контакты</a></nav>
+<nav class="desktop-nav" aria-label="Основная навигация"><a href="/"{active('home',current)}>Главная</a><a href="/menu/"{active('menu',current)}>Меню</a><a href="/banquets/"{active('banquets',current)}>Банкеты</a><a href="/#delivery">Доставка</a><a href="/contacts/"{active('contacts',current)}>Контакты</a></nav>
 <div class="header-actions">{reserve_button()}<button type="button" class="menu-toggle" aria-label="Открыть меню" aria-controls="mobile-nav" aria-expanded="false"><span></span><span></span><span></span></button></div>
-</div><nav class="mobile-nav" id="mobile-nav" aria-label="Мобильная навигация" hidden><a href="/">Главная</a><a href="/menu/">Меню</a><a href="/banquets/">Банкеты</a><a href="/contacts/">Контакты</a>{reserve_button()}</nav></header>'''
+</div><nav class="mobile-nav" id="mobile-nav" aria-label="Мобильная навигация" hidden><a href="/">Главная</a><a href="/menu/">Меню</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/contacts/">Контакты</a>{reserve_button()}</nav></header>'''
 
 def footer():
-    return f'''<footer class="footer"><div class="wrap footer-grid"><div><a href="/" class="footer-logo">BRAVIS</a><p>Вкус встреч.<br>Тепло Bravis.</p></div><div><span class="footer-caption">Навигация</span><a href="/menu/">Меню</a><a href="/banquets/">Банкеты</a><a href="/contacts/">Контакты</a></div><div><span class="footer-caption">Ждём в гости</span><p>{h(address)}</p><a href="{h(phone_url)}" data-track="footer_phone_click">{h(phone)}</a><p class="footer-schedule">{h(CONFIG.get('hoursText',''))}</p>{f'<a href="mailto:{h(official_email)}">{h(official_email)}</a>' if official_email else ''}</div><div class="footer-action">{reserve_button()}</div></div><div class="wrap footer-bottom"><span>© {date.today().year} BRAVIS. Все права защищены.</span><a href="/privacy/">Политика обработки персональных данных</a><a href="#top">Наверх ↑</a></div></footer><div class="mobile-bottom-cta"><a href="/menu/">Меню</a><a class="mobile-bottom-cta__primary" href="{h(reserve_link)}" {'target="_blank" rel="noopener noreferrer"' if reserve_id else ''} data-track="{h("reserve_click" if reserve_id else "reserve_phone_click")}">Забронировать</a></div><script src="/assets/site.js" defer></script></body></html>'''
+    return f'''<footer class="footer"><div class="wrap footer-grid"><div><a href="/" class="footer-logo">BRAVIS</a><p>Вкус встреч.<br>Тепло Bravis.</p></div><div><span class="footer-caption">Навигация</span><a href="/menu/">Меню</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/contacts/">Контакты</a></div><div><span class="footer-caption">Ждём в гости</span><p>{h(address)}</p><a href="{h(phone_url)}" data-track="footer_phone_click">{h(phone)}</a><p class="footer-schedule">{h(CONFIG.get('hoursText',''))}</p>{f'<a href="mailto:{h(official_email)}">{h(official_email)}</a>' if official_email else ''}</div><div class="footer-action">{reserve_button()}</div></div><div class="wrap footer-bottom"><span>© {date.today().year} BRAVIS. Все права защищены.</span><a href="/privacy/">Политика обработки персональных данных</a><a href="#top">Наверх ↑</a></div></footer><div class="mobile-bottom-cta"><a href="/menu/">Меню</a><a class="mobile-bottom-cta__primary" href="{h(reserve_link)}" {'target="_blank" rel="noopener noreferrer"' if reserve_id else ''} data-track="{h("reserve_click" if reserve_id else "reserve_phone_click")}">Забронировать</a></div><script src="/assets/site.js" defer></script></body></html>'''
 
 def page(content, title, desc, route, current, body_class=''):
     return head(title,desc,route,body_class)+header(current)+f'<main id="main">{content}</main>'+footer()
@@ -144,6 +157,25 @@ def page(content, title, desc, route, current, body_class=''):
 home=f'''<section class="hero"><div class="wrap hero-grid"><div class="hero-content"><div class="eyebrow"><span class="line"></span> РЕСТОРАН В СЕРДЦЕ МОСКВЫ</div><h1>Вкус встреч.<br><em>Тепло Bravis.</em></h1><p class="lead">Армянская и европейская кухня, хорошее вино и атмосфера, в которой хочется остаться чуть дольше.</p><div class="hero-actions">{reserve_button()}{button('Посмотреть меню','/menu/',True,'menu_from_hero')}</div><div class="hero-foot"><span>МОСКВА</span><span class="hero-foot__divider"></span><span>УЛИЦА РАСКОВОЙ, 20</span></div></div><div class="hero-visual"><img class="hero-photo" src="{h(img(main_photo,'/assets/wine-scene.svg'))}" alt="{('Интерьер ресторана BRAVIS' if main_photo else 'Авторская иллюстрация винного вечера в BRAVIS')}" width="800" height="940" fetchpriority="high"><div class="hero-visual__frame"></div><div class="hero-visual__stamp"><span>BRAVIS</span><small>МЕСТО ДЛЯ<br>ВАШИХ ВСТРЕЧ</small></div></div></div><div class="hero-index" aria-hidden="true">01 / BRAVIS</div></section>
 <section class="intro section" id="about"><div class="wrap intro-grid"><div class="section-label"><span class="line"></span> НАША ФИЛОСОФИЯ</div><div><h2>Не просто ужин.<br><em>Повод встретиться.</em></h2><p>Bravis — про вечера, которые складываются из мелочей: знакомых вкусов, неспешных разговоров и тёплого света. Здесь уютно вдвоём, с семьёй и большой компанией.</p><a class="text-link" href="/contacts/">Найти нас <span aria-hidden="true">↗</span></a></div></div></section>
 <section class="feature-section"><div class="wrap feature-grid"><div class="feature-photo"><img src="{h(img(food,'/assets/cuisine.svg'))}" alt="{('Блюда ресторана BRAVIS' if food else 'Авторская иллюстрация блюда')}" width="640" height="520" loading="lazy"></div><div class="feature-copy"><div class="section-label section-label--light"><span class="line"></span> КУХНЯ И ВИНО</div><h2>Вкусы, к которым<br><em>возвращаются.</em></h2><p>Армянские гастрономические традиции и европейская классика. Блюда для общего стола, бокал вина и удовольствие быть вместе.</p>{button('Открыть меню','/menu/',False,'menu_from_feature')}<div class="feature-folio">BRAVIS · FOOD & WINE</div></div></div></section>
+<section class="delivery-section" id="delivery" aria-labelledby="delivery-heading">
+  <div class="wrap">
+    <div class="delivery-panel">
+      <div class="delivery-content">
+        <div class="section-label section-label--light"><span class="line"></span> BRAVIS · ДОСТАВКА</div>
+        <h2 id="delivery-heading">BRAVIS —<br><em>у вас дома.</em></h2>
+        <p>Любимые вкусы не обязательно ждать до следующей встречи. Перейдите в Яндекс Еду, чтобы проверить возможность доставки по вашему адресу.</p>
+        <a class="delivery-action" href="{h(delivery_url)}" data-track="delivery_click" target="_blank" rel="noopener noreferrer">{h(delivery_button_label)} <span aria-hidden="true">↗</span></a>
+        <p class="delivery-disclaimer">{h(delivery_help_text)}</p>
+      </div>
+      <div class="delivery-visual" aria-hidden="true">
+        <span class="delivery-visual__arc delivery-visual__arc--one"></span>
+        <span class="delivery-visual__arc delivery-visual__arc--two"></span>
+        <div class="delivery-visual__circle"><span class="delivery-visual__icon">B</span><span>ВКУС ВСТРЕЧ</span></div>
+        <div class="delivery-visual__eyebrow">BRAVIS <i>×</i> ЯНДЕКС ЕДА</div>
+      </div>
+    </div>
+  </div>
+</section>
 <section class="section gallery-section" id="atmosphere"><div class="wrap"><div class="gallery-heading"><div><div class="section-label"><span class="line"></span> АТМОСФЕРА</div><h2>Здесь хорошо<br><em>быть вместе.</em></h2></div><p>Каждая встреча — своя история. А место для неё уже есть.</p></div><div class="gallery-grid">'''
 for i,p in enumerate(photos[:3]):
     home+=f'<div class="gallery-item gallery-item--{i+1}"><img src="{h(img(p,"/assets/ambience.svg"))}" alt="{h(("Фотография ресторана BRAVIS" if ("/uploads/" in p) else "Иллюстрация атмосферы ресторана BRAVIS")+" — "+str(i+1))}" loading="lazy" width="650" height="650"></div>'
