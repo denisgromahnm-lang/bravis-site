@@ -60,7 +60,9 @@ def main():
         if n!=1:raise RuntimeError('Cannot locate safe insertion point in /menu/')
     else:
         raise RuntimeError('Unexpected menu template, refusing to replace')
-    link='<link rel="stylesheet" href="/assets/menu-experience.css">'
+    schema={"@context":"https://schema.org","@type":"Menu","name":"Меню ресторана BRAVIS","inLanguage":"ru","hasMenuSection":[{"@type":"MenuSection","name":entry["title"]} for entry in files]}
+    schema_js=json.dumps(schema,ensure_ascii=False).replace("<","\\u003c")
+    link='<link rel="stylesheet" href="/assets/menu-experience.css"><script type="application/ld+json">'+schema_js+'</script>'
     page=page.replace('</head>',link+'</head>',1)
     script='<script type="application/json" id="bravis-menu-data">'+data+'</script><script src="/assets/menu-experience.js" defer></script>'
     page=page.replace('</body>',script+'</body>',1)
