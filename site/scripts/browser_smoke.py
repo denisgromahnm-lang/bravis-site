@@ -51,8 +51,15 @@ try:
         assert not page_errors,'JavaScript runtime errors on home: '+str(page_errors)
         assert page.locator('html').get_attribute('lang')=='ru'
         assert 'noindex' in page.locator('meta[name="robots"]').get_attribute('content')
+        # Full-page screenshots may skip lazy-loading until photos are scrolled into view.
+        # Test that real interior and event images load, then capture an accurate visual.
+        for img in page.locator('.gallery-grid img, .events-photo img').all():
+            img.scroll_into_view_if_needed()
+            img.evaluate('(e) => e.decode()')
+            assert loaded(img), 'Restaurant interior/gallery photo failed to load: '+str(img.get_attribute('src'))
+        page.locator('h1').scroll_into_view_if_needed()
         page.screenshot(path=str(REPORT/'home-desktop.png'),full_page=True)
-        print('PASS: desktop hero, image, metadata, home screenshot')
+        print('PASS: desktop hero, real gallery and event photos, no broken lazy-loaded images')
         page.goto(base+'/menu/',wait_until='networkidle')
         expect(page.locator('.print-card')).to_have_count(5)
         # The owner rejected old dish thumbnails: printed menu covers are retained,
@@ -91,6 +98,13 @@ try:
         expect(mp.locator('.menu-items .dish img')).to_have_count(0)
         assert mp.evaluate('document.documentElement.scrollWidth <= window.innerWidth + 2'), 'Horizontal scroll on mobile menu'
         mp.screenshot(path=str(REPORT/'menu-mobile.png'),full_page=True)
+        mp.goto(base+'/',wait_until='networkidle')
+        for img in mp.locator('.gallery-grid img:visible, .events-photo img:visible').all():
+            img.scroll_into_view_if_needed()
+            img.evaluate('(e) => e.decode()')
+            assert loaded(img), 'Mobile restaurant photograph failed to load'
+        mp.locator('h1').scroll_into_view_if_needed()
+        mp.screenshot(path=str(REPORT/'home-mobile.png'),full_page=True)
         print('PASS: mobile delivery navigation, no horizontal scroll or old food images; five menu cards')
         # At minimum supported phone width, content must not force sideways scrolling.
         narrow=browser.new_context(viewport={'width':320,'height':720},is_mobile=True,has_touch=True)
