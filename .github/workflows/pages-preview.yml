@@ -1,0 +1,33 @@
+name: Publish private-stage BRAVIS preview to GitHub Pages
+# No production domain, no real reservation ID, no analytics IDs, noindex.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: bravis-pages-preview
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build static BRAVIS preview
+        run: |
+          cd site
+          python3 src/build.py
+          python3 scripts/render_menu_gallery.py
+          python3 verify.py
+          python3 scripts/prepare_github_pages.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist/
+      - name: Deploy noindex preview
+        id: deployment
+        uses: actions/deploy-pages@v4
