@@ -104,6 +104,9 @@ def pdf_unique(pdf,key,folder,max_pages=32,max_unique=8):
         if finger is None:continue
         if any(similarity(finger,old)<=3 for old in fingerprints):continue
         fingerprints.append(finger);choices.append(ix)
+        # Owner confirmed the 2 main-front pages and 20 business pages are repeated.
+        # Keep one readable source page rather than displaying near-identical scans.
+        if key in ("main-front","business"): break
         if len(choices)>=max_unique:break
     if not choices:raise RuntimeError("All menu pages rendered blank: "+pdf.name)
     print("MENU",key,"PDF pages",n,"unique",len(choices))
