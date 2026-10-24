@@ -25,6 +25,10 @@
 .menu-lightbox__viewer>img{display:block;object-fit:contain;width:100%;height:100%;min-height:0;min-width:0}
 .menu-lightbox__viewer button{height:58px;min-width:44px;font-size:40px;cursor:pointer;color:#fff;background:#432b37;border:0}
 .menu-lightbox__viewer button:disabled{opacity:.15;cursor:default}
+/* Do not reserve room for inactive arrows on the single-page print menus. */
+.menu-lightbox--single .menu-lightbox__viewer{grid-template-columns:minmax(0,1fr);padding:9px 16px}
+.menu-lightbox__viewer button[hidden]{display:none}
+
 @media(max-width:920px){.print-menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:570px){
  .print-menu-grid{grid-template-columns:1fr;gap:16px}
@@ -40,5 +44,6 @@
  .menu-lightbox__header strong{font-size:17px}
  .menu-lightbox__viewer{grid-template-columns:32px minmax(0,1fr) 32px;padding:4px;gap:0}
  .menu-lightbox__viewer button{min-width:29px;width:29px;font-size:30px}
+ .menu-lightbox--single .menu-lightbox__viewer{padding:5px 8px}
 }
 @media(prefers-reduced-motion:reduce){.print-card{transition:none}}
