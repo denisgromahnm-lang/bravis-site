@@ -1,43 +1,55 @@
 #!/usr/bin/env python3
-"""Audit only public Yandex share filenames; identify folders explicitly labelled old food photos."""
+"""Catalog all files in the owner-provided old-menu food folder (public Yandex Disk).
+
+Metadata only; does not publish images or guess which dishes they depict.
+Used to prepare a manual match of dish names and filenames.
+"""
+import importlib.util
+import json
 from pathlib import Path
-import collections, importlib.util, json
+
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('source',ROOT/'scripts/sync_media.py')
-m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
-results={}
-for label,share in [('additional',m.SECOND),('interiors',m.FIRST)]:
-    files=None
-    for attempt in (1,2):
-        try:
-            files=m.scan(share)
-            break
-        except Exception as exc:
-            print('Yandex public API unavailable',label,'attempt',attempt,':',str(exc)[:200])
-    if files is None:
-        results[label]={'error':'Public API temporarily unavailable; do not infer photo categories','folder_sizes':{},'old_food_candidates':[],'file_count':0}
-        continue
-    directories=collections.Counter(str(Path(f.get('path','')).parent) for f in files)
-    food=[]
-    for f in files:
-        path=f.get('path','')
-        name=f.get('name','')
-        suffix=Path(name).suffix.lower()
-        if suffix not in {'.jpg','.jpeg','.webp','.png'}:continue
-        p=m.normalize(path)
-        old=any(word in p for word in ('стар','old','архив'))
-        dish=any(word in p for word in ('еда','блюд','кухн','food','гастрон','съёмк'))
-        if old and dish:
-            food.append({'name':name,'path':path,'bytes':f.get('size',0)})
-    results[label]={
-        'folder_sizes':dict(directories.most_common(45)),
-        'old_food_candidates':sorted(food,key=lambda x:x['path'])[:140],
-        'file_count':len(files)
-    }
-folder=ROOT/'reports';folder.mkdir(parents=True,exist_ok=True)
-(folder/'yandex-food-inventory.json').write_text(json.dumps(results,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
-print('FOOD PHOTO FOLDER INVENTORY')
-for label,entry in results.items():
-    print(label,'files',entry['file_count'],'confirmed-old-food-candidates',len(entry['old_food_candidates']))
-    for file in entry['old_food_candidates'][:22]:print('  '+file['path'])
-print('No photos have been changed or assigned to any dishes.')
+m=importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+
+FOLDER='/Фотографии еды/Старое меню фото'
+IMAGE_EXT={'.jpg','.jpeg','.png','.webp','.heic'}
+out=[]
+fail=[]
+queue=[FOLDER]
+while queue:
+    folder=queue.pop(0)
+    offset=0
+    try:
+        while True:
+            response=m.req(m.SECOND,path=folder,offset=offset)
+            if response.get('type')!='dir':
+                raise ValueError('Expected directory: '+folder)
+            embedded=response.get('_embedded',{})
+            items=embedded.get('items',[])
+            for item in items:
+                name=item.get('name','')
+                path=item.get('path','')
+                if item.get('type')=='dir':
+                    queue.append(path)
+                elif item.get('type')=='file' and Path(name).suffix.lower() in IMAGE_EXT:
+                    out.append({'name':name,'path':path,'size':item.get('size',0),
+                                'mime_type':item.get('mime_type','')})
+            offset+=len(items)
+            if not items or offset>=embedded.get('total',offset):
+                break
+    except Exception as exc:
+        fail.append({'folder':folder,'error':str(exc)[:250]})
+        print('SCAN WARNING',folder,str(exc)[:180])
+result={'source':'Second BRAVIS owner-shared Yandex Disk','share':m.SECOND,
+        'folder':FOLDER,'photos':sorted(out,key=lambda f:f['path'].casefold()),
+        'photo_count':len(out),'errors':fail}
+target=ROOT/'reports/yandex-food-inventory.json'
+target.parent.mkdir(parents=True,exist_ok=True)
+target.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+print('Old menu photos:',len(out),'errors:',len(fail))
+for file in out:
+    print('OLD FOOD:',file['path'], 'bytes',file['size'])
+if fail or not out:
+    raise SystemExit('Cannot confidently inventory old food photos.')
