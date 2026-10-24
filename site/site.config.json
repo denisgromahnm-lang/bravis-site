@@ -36,5 +36,6 @@
     ],
     "opens": "11:00",
     "closes": "23:00"
-  }
+  },
+  "yandexMapsUrl": "https://yandex.ru/maps/org/bravis/120928769508/"
 }
