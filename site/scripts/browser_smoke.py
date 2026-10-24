@@ -68,6 +68,31 @@ try:
         expect(mp.locator('.print-card')).to_have_count(5)
         mp.screenshot(path=str(REPORT/'menu-mobile.png'),full_page=True)
         print('PASS: touch-size navigation and five readable menu cards on mobile')
+        # Consent regression: no Yandex request before opt-in, including after opt-out.
+        consent=desktop.new_page()
+        metrika_requests=[]
+        consent.route('https://mc.yandex.ru/metrika/tag.js?id=113768615',lambda route: route.fulfill(status=200,content_type='application/javascript',body=''))
+        consent.on('request',lambda req: metrika_requests.append(req.url) if req.url.startswith('https://mc.yandex.ru/') else None)
+        consent.goto(base+'/',wait_until='networkidle')
+        expect(consent.locator('.cookie-banner')).to_be_visible()
+        assert not metrika_requests,'Metrika must not request external scripts before consent'
+        consent.locator('[data-consent="no"]').click()
+        consent.reload(wait_until='networkidle')
+        assert not metrika_requests,'Denied analytics must remain disabled after reload'
+        expect(consent.locator('.cookie-banner')).to_have_count(0)
+        consent.locator('.cookie-settings').click()
+        expect(consent.locator('.cookie-banner')).to_be_visible()
+        consent.locator('[data-consent="yes"]').click()
+        consent.wait_for_function("window.ym?.a?.some(x=>x[1]==='init' && x[0]===113768615)",timeout=10000)
+        assert len(metrika_requests)==1, f'Exactly one tagged script expected after consent: {metrika_requests}'
+        consent.evaluate("""() => {
+          const a=document.querySelector('[data-track="menu_from_hero"]');
+          a.addEventListener('click',event=>event.preventDefault(),{once:true});
+          a.click();
+        }""")
+        consent.wait_for_function("window.ym?.a?.some(x=>x[1]==='reachGoal' && x[2]==='menu_from_hero' && x[0]===113768615)",timeout=10000)
+        print('PASS: Yandex Metrika 113768615 loads only after opt-in, rejected opt-in stays rejected, reachGoal fires')
+        consent.close()
         desktop.close()
         mobile.close()
         browser.close()
