@@ -50,6 +50,9 @@ jobs:
           git add site/content/gallery.json site/content/menu_media.json site/content/menu-source-extract || true
           if ! git diff --cached --quiet; then
             git commit -m 'Import approved BRAVIS menus and restaurant photos from public Yandex Disk'
+            # Other GitHub commits can arrive during image/PDF processing.
+            # Rebase the media-only commit on the newest main; never force push.
+            git pull --rebase origin main
             git push
           fi
       - name: Save preview for inspection
