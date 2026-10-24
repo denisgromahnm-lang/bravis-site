@@ -18,8 +18,11 @@ phone_url = 'tel:' + re.sub(r'[^+0-9]', '', CONFIG.get('phoneE164',''))
 address = CONFIG.get('addressFull', '')
 yandex_maps_url = CONFIG.get('yandexMapsUrl','').strip() or ('https://yandex.ru/maps/?text=' + quote(address))
 two_gis_url = CONFIG.get('twoGisUrl','').strip()
-if two_gis_url and not re.fullmatch(r'https://(?:[a-z0-9-]+\\.)?(?:2gis\\.ru|2gis\\.com)/[^\\s<>"\\']+',two_gis_url,re.I):
-    raise ValueError('2GIS company URL must be verified and hosted on 2gis.ru or 2gis.com')
+from urllib.parse import urlsplit
+if two_gis_url:
+    parts = urlsplit(two_gis_url)
+    if parts.scheme != 'https' or parts.hostname not in ('2gis.ru', 'www.2gis.ru', '2gis.com', 'www.2gis.com') or not re.fullmatch(r'/[a-z0-9_-]+/firm/[0-9]+/?', parts.path, re.I):
+        raise ValueError('2GIS card must be an HTTPS URL of a known 2GIS firm')
 domain = CONFIG.get('domain','').strip().rstrip('/')
 if domain and not domain.startswith(('https://','http://')): domain = 'https://' + domain
 published = bool(CONFIG.get('public') and domain)
