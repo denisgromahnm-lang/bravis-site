@@ -30,9 +30,16 @@ jobs:
           base=Path('site')
           c=json.loads((base/'site.config.json').read_text(encoding='utf8'))
           assert c['public'] is False and c['smartReserveId']=='5b1e469e-871a-4eb8-bd2a-787ec2d011c3'
-          assert not c['yandexMetrikaId'] and not c['ga4Id']
+          assert c['yandexMetrikaId']=='113768615' and not c['ga4Id']
           assert c['restaurantName']=='BRAVIS'
           assert c['phoneE164']=='+79895719977'
+          for path in ('index.html','menu/index.html','banquets/index.html','contacts/index.html','privacy/index.html'):
+              page=(base/'dist'/path).read_text(encoding='utf8')
+              assert '"ymId": "113768615"' in page, f'Metrika ID missing on {path}'
+              assert 'mc.yandex.ru/metrika/tag.js' not in page, 'Metrika must not load before consent'
+          js=(base/'dist/assets/site.js').read_text(encoding='utf8')
+          assert "localStorage.getItem(consentKey) !== 'yes'" in js, 'Tracking must require opt-in'
+          assert "tag.js?id=" in js and "Webvisor and e-commerce remain disabled" in js
           h=(base/'dist/menu/index.html').read_text(encoding='utf8')
           assert 'noindex' in h and 'tel:+79895719977' in h
           booking='https://reservation.yandex.ru/partner-reserve/forms/5b1e469e-871a-4eb8-bd2a-787ec2d011c3'
