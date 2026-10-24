@@ -1,0 +1,57 @@
+name: BRAVIS import old menu dish photos
+on:
+  push:
+    paths:
+      - '.github/workflows/import-dish-photos.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import-food:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install free offline image optimization
+        run: python3 -m pip install --user --disable-pip-version-check 'Pillow>=10,<13'
+      - name: Match by verified filename and download only real BRAVIS dish photographs
+        run: python3 site/scripts/import_old_menu_dishes.py
+      - name: Build and validate BRAVIS menu with images
+        run: |
+          cd site
+          python3 src/build.py
+          python3 scripts/render_menu_gallery.py
+          python3 verify.py
+          python3 scripts/quality_gate.py --production-guard
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('.')
+          menu=json.loads((root/'content/menu.json').read_text(encoding='utf8'))
+          report=json.loads((root/'reports/old-menu-photo-matches.json').read_text(encoding='utf8'))
+          photographed=[(item['name'],item['image']) for section in menu['sections'] for item in section.get('items',[]) if item.get('image')]
+          assert len(photographed)==report['matched'] and len(photographed)>0
+          for name,filename in photographed:
+              assert filename.startswith('/uploads/dishes/')
+              assert (root/'dist'/filename.lstrip('/')).is_file(), f'Missing image for {name}'
+          html=(root/'dist/menu/index.html').read_text(encoding='utf8')
+          assert html.count('src="/uploads/dishes/') == len(photographed), 'Menu did not show all matched photos'
+          print('PASS matched dish photos:',len(photographed))
+          PY
+      - name: Commit optimized old dish assets, matching report and updated menu
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f site/public/uploads/dishes
+          git add site/content/menu.json site/reports/old-menu-photo-matches.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Pair verified old BRAVIS food photos with matching current menu dishes'
+            git pull --rebase origin main
+            git push
+          fi
+      - name: Upload detailed match report
+        uses: actions/upload-artifact@v4
+        with:
+          name: bravis-dish-photo-matches
+          path: site/reports/old-menu-photo-matches.json
+          retention-days: 14
