@@ -51,6 +51,16 @@ jobs:
           assert 'class="policy-warning"' in policy,'Draft policy must be visibly unapproved'
           assert c['yandexMapsUrl']=='https://yandex.ru/maps/org/bravis/120928769508/'
           assert c['twoGisUrl']=='https://2gis.ru/moscow/firm/70000001098229175'
+          assert c['yandexEdaRestaurantUrl']=='https://eda.yandex.ru/r/bravis?placeSlug=bravis'
+          assert c['loonaJoinUrl']=='', 'Do not publish invented loyalty sign-up links'
+          index=(base/'dist/index.html').read_text(encoding='utf8')
+          assert 'id="delivery"' in index and 'id="loyalty"' in index
+          assert 'href="https://eda.yandex.ru/r/bravis?placeSlug=bravis"' in index
+          assert 'data-track="delivery_click"' in index
+          assert 'data-track="loona_signup_click"' not in index, 'Never show signup until owner URL provided'
+          assert 'Онлайн-регистрация скоро появится' in index
+          assert 'приветственные бонусы сразу после регистрации' in index
+          assert 'href="/#delivery"' in index and 'href="/#loyalty"' in index
           twogis=c['twoGisUrl']
           contacts=(base/'dist/contacts/index.html').read_text(encoding='utf8')
           assert contacts.count(twogis)>=2, '2GIS link missing in contacts panel and map card'
