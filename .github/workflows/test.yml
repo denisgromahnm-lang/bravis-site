@@ -32,6 +32,12 @@ jobs:
           assert c['public'] is False and c['smartReserveId']=='5b1e469e-871a-4eb8-bd2a-787ec2d011c3'
           assert c['yandexMetrikaId']=='113768615' and not c['ga4Id']
           assert c['restaurantName']=='BRAVIS'
+          assert c['yandexMapsUrl']=='https://yandex.ru/maps/org/bravis/120928769508/'
+          listing=c['yandexMapsUrl']
+          for local in ('index.html','contacts/index.html'):
+              html=(base/'dist'/local).read_text(encoding='utf8')
+              assert listing in html, f'Business listing link missing on {local}'
+
           assert c['phoneE164']=='+79895719977'
           for path in ('index.html','menu/index.html','banquets/index.html','contacts/index.html','privacy/index.html'):
               page=(base/'dist'/path).read_text(encoding='utf8')
