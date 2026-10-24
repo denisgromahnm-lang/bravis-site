@@ -19,6 +19,10 @@
     count.textContent=(page+1)+' / '+choice.pages.length;
     image.src=choice.pages[page];
     image.alt=choice.title+', страница '+(page+1);
+    const singlePage=choice.pages.length===1;
+    dialog.classList.toggle('menu-lightbox--single', singlePage);
+    prev.hidden=singlePage;
+    next.hidden=singlePage;
     prev.disabled=page===0;
     next.disabled=page===choice.pages.length-1;
   }
