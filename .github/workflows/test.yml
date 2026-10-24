@@ -29,12 +29,19 @@ jobs:
           from pathlib import Path
           base=Path('site')
           c=json.loads((base/'site.config.json').read_text(encoding='utf8'))
-          assert c['public'] is False and not c['smartReserveId']
+          assert c['public'] is False and c['smartReserveId']=='503266819'
           assert not c['yandexMetrikaId'] and not c['ga4Id']
           assert c['restaurantName']=='BRAVIS'
           assert c['phoneE164']=='+79895719977'
           h=(base/'dist/menu/index.html').read_text(encoding='utf8')
           assert 'noindex' in h and 'tel:+79895719977' in h
+          booking='https://reservation.yandex.ru/partner-reserve/forms/503266819'
+          for path in ('index.html','menu/index.html','banquets/index.html','contacts/index.html','privacy/index.html'):
+              page=(base/'dist'/path).read_text(encoding='utf8')
+              assert booking in page, f'Missing booking link on {path}'
+              assert 'data-track="reserve_click"' in page, f'Missing booking analytics on {path}'
+              assert 'noindex' in page, f'Preview unexpectedly indexable: {path}'
+          assert 'target="_blank" rel="noopener noreferrer"' in h
           if (base/'content/menu_media.json').exists():
               f=json.loads((base/'content/menu_media.json').read_text(encoding='utf8'))['files']
               assert len(f)==5
