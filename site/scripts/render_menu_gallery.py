@@ -35,7 +35,7 @@ def main():
         title=h(entry['title']);src=h(entry['url'])
         key=h(entry['group'])
         cnt=len(entry['pages'])
-        tiles.append(f'''<a class="print-card" href="{src}" data-menu-index="{i}" aria-label="Открыть {title}">
+        tiles.append(f'''<a class="print-card" href="{src}" data-menu-index="{i}" data-track="menu_open_{key.replace('-', '_')}" aria-label="Открыть {title}">
         <div class="print-card__image"><img src="{src}" width="460" height="620" alt="Оригинальное меню BRAVIS — {title}" loading="{'eager' if i < 2 else 'lazy'}"></div>
         <div class="print-card__text"><span class="print-card__overline">BRAVIS · МЕНЮ</span>
         <h2>{title}</h2><p>{h(notes[entry['group']])}</p>
