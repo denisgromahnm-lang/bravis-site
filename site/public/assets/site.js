@@ -28,8 +28,10 @@
       window.ym=window.ym||function(){(window.ym.a=window.ym.a||[]).push(arguments)};
       window.ym.l=Date.now();
       const script=document.createElement('script');
-      script.async=true; script.src='https://mc.yandex.ru/metrika/tag.js';
+      script.async=true; script.src='https://mc.yandex.ru/metrika/tag.js?id='+encodeURIComponent(conf.ymId);
       document.head.appendChild(script);
+      // Enable privacy-friendly baseline features only after visitors accept analytics.
+      // Webvisor and e-commerce remain disabled until the owner approves their use.
       window.ym(Number(conf.ymId),'init',{clickmap:true,trackLinks:true,accurateTrackBounce:true});
     }
     if (conf.ga4Id) {
