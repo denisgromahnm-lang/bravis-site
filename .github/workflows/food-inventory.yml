@@ -1,0 +1,33 @@
+name: BRAVIS old food photo inventory
+on:
+  push:
+    paths:
+      - '.github/workflows/food-inventory.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pillow for safe public Disk scanner imports
+        run: python3 -m pip install --user --disable-pip-version-check 'Pillow>=10,<13'
+      - name: Scan only directories and file names, no images imported
+        run: python3 site/scripts/audit_old_food.py
+      - name: Store inventory report
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/reports/yandex-food-inventory.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Catalog explicitly labeled old food photos for BRAVIS review'
+            git pull --rebase origin main
+            git push
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bravis-food-folder-inventory
+          path: site/reports/yandex-food-inventory.json
+          retention-days: 14
