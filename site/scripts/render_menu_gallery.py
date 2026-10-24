@@ -58,6 +58,9 @@ def main():
     if '<div class="menu-placeholder">' in page:
         page,n=re.subn(r'<div class="menu-placeholder">.*?(?=<div class="menu-bottom-note">)',widget,page,count=1,flags=re.S)
         if n!=1:raise RuntimeError('Cannot locate safe insertion point in /menu/')
+    elif '<nav class="menu-filter"' in page:
+        # Preserve the owner-approved text menu for SEO, and put the image menus first.
+        page=page.replace('<nav class="menu-filter"', widget + '<div class="menu-structured-heading"><h2>Блюда и цены из печатного меню</h2><p>Выбор позиций ниже. Полный ассортимент — на изображениях меню выше.</p></div><nav class="menu-filter"',1)
     else:
         raise RuntimeError('Unexpected menu template, refusing to replace')
     schema={"@context":"https://schema.org","@type":"Menu","name":"Меню ресторана BRAVIS","inLanguage":"ru","hasMenuSection":[{"@type":"MenuSection","name":entry["title"]} for entry in files]}
