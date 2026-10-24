@@ -41,5 +41,7 @@
   "twoGisUrl": "https://2gis.ru/moscow/firm/70000001098229175",
   "operatorShortName": "ООО «Инвойс»",
   "operatorInn": "7723860392",
-  "operatorOgrn": "1137746040981"
+  "operatorOgrn": "1137746040981",
+  "yandexEdaRestaurantUrl": "",
+  "yandexEdaServiceUrl": "https://eda.yandex.ru/"
 }
