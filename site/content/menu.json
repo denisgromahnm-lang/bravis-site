@@ -61,8 +61,7 @@
       "items": [
         {
           "name": "Армянская сырная тарелка",
-          "price": 1200,
-          "image": "/uploads/dishes/bravis-food-40ebea5e211b5.jpg"
+          "price": 1200
         },
         {
           "name": "Баклажаны и кабачки с ореховым муссом",
@@ -74,18 +73,15 @@
         },
         {
           "name": "Мясная тарелка",
-          "price": 1480,
-          "image": "/uploads/dishes/bravis-food-ee8c91ad08017.jpg"
+          "price": 1480
         },
         {
           "name": "Кавказская брускетта микс",
-          "price": 950,
-          "image": "/uploads/dishes/bravis-food-9d7e6163223c3.jpg"
+          "price": 950
         },
         {
           "name": "Рыбная тарелка",
-          "price": 1780,
-          "image": "/uploads/dishes/bravis-food-392d38871aa47.jpg"
+          "price": 1780
         },
         {
           "name": "Маслины и оливки каламата",
@@ -93,8 +89,7 @@
         },
         {
           "name": "Овощной букет",
-          "price": 750,
-          "image": "/uploads/dishes/bravis-food-ce12a606db576.jpg"
+          "price": 750
         },
         {
           "name": "Соленья",
@@ -112,13 +107,11 @@
         },
         {
           "name": "Греческий",
-          "price": 650,
-          "image": "/uploads/dishes/bravis-food-64d8260c9347a.jpg"
+          "price": 650
         },
         {
           "name": "Салат с ростбифом",
-          "price": 900,
-          "image": "/uploads/dishes/bravis-food-8be7acf766ead.jpg"
+          "price": 900
         },
         {
           "name": "Салат свежий с зеленью",
@@ -126,13 +119,11 @@
         },
         {
           "name": "Хрустящий баклажан",
-          "price": 750,
-          "image": "/uploads/dishes/bravis-food-6fa16e65b0c3f.jpg"
+          "price": 750
         },
         {
           "name": "Цезарь с курицей",
-          "price": 650,
-          "image": "/uploads/dishes/bravis-food-e00b4bdb81a8c.jpg"
+          "price": 650
         },
         {
           "name": "Цезарь с креветками",
@@ -162,8 +153,7 @@
         },
         {
           "name": "Суп харчо",
-          "price": 550,
-          "image": "/uploads/dishes/bravis-food-d4138e0c75689.jpg"
+          "price": 550
         }
       ]
     },
@@ -173,13 +163,11 @@
       "items": [
         {
           "name": "Люля из баранины",
-          "price": 900,
-          "image": "/uploads/dishes/bravis-food-9a5f3ff262af7.jpg"
+          "price": 900
         },
         {
           "name": "Люля из говядины",
-          "price": 880,
-          "image": "/uploads/dishes/bravis-food-98cdf6e06444a.jpg"
+          "price": 880
         },
         {
           "name": "Люля из курицы",
@@ -187,28 +175,23 @@
         },
         {
           "name": "Шашлык из бараньей корейки",
-          "price": 1490,
-          "image": "/uploads/dishes/bravis-food-e9fe239626f09.jpg"
+          "price": 1490
         },
         {
           "name": "Шашлык из бараньей мякоти",
-          "price": 1390,
-          "image": "/uploads/dishes/bravis-food-0064dea6fe4e9.jpg"
+          "price": 1390
         },
         {
           "name": "Шашлык из говяжьей вырезки",
-          "price": 1550,
-          "image": "/uploads/dishes/bravis-food-fe71477702261.jpg"
+          "price": 1550
         },
         {
           "name": "Шашлык из курицы",
-          "price": 700,
-          "image": "/uploads/dishes/bravis-food-077732afd8671.jpg"
+          "price": 700
         },
         {
           "name": "Шашлык из свиной шейки",
-          "price": 820,
-          "image": "/uploads/dishes/bravis-food-09005f440de4d.jpg"
+          "price": 820
         },
         {
           "name": "Свиные рёбрышки на гриле",
@@ -222,8 +205,7 @@
       "items": [
         {
           "name": "Ламаджо",
-          "price": 350,
-          "image": "/uploads/dishes/bravis-food-02fe62931aa3f.jpg"
+          "price": 350
         },
         {
           "name": "Ламаджо с сыром",
@@ -231,23 +213,19 @@
         },
         {
           "name": "Хачапури по-аджарски",
-          "price": 690,
-          "image": "/uploads/dishes/bravis-food-8782ba7c0a3e6.jpg"
+          "price": 690
         },
         {
           "name": "Хачапури по-мегрельски",
-          "price": 750,
-          "image": "/uploads/dishes/bravis-food-e51e7b49e73f1.jpg"
+          "price": 750
         },
         {
           "name": "Хачапури по-аджарски, 5 сыров",
-          "price": 900,
-          "image": "/uploads/dishes/bravis-food-2553ed59e209a.jpg"
+          "price": 900
         },
         {
           "name": "Хачапури по-мегрельски, 5 сыров",
-          "price": 950,
-          "image": "/uploads/dishes/bravis-food-4fa46ac9489a7.jpg"
+          "price": 950
         }
       ]
     },
@@ -257,8 +235,7 @@
       "items": [
         {
           "name": "Аришта с курицей",
-          "price": 760,
-          "image": "/uploads/dishes/bravis-food-0288a896154fb.jpg"
+          "price": 760
         },
         {
           "name": "Аришта с креветками",
@@ -270,23 +247,19 @@
         },
         {
           "name": "Толма",
-          "price": 680,
-          "image": "/uploads/dishes/bravis-food-0338f59f23609.jpg"
+          "price": 680
         },
         {
           "name": "Цыплёнок табака",
-          "price": 880,
-          "image": "/uploads/dishes/bravis-food-99a713cd87744.jpg"
+          "price": 880
         },
         {
           "name": "Фаршированные грибы",
-          "price": 680,
-          "image": "/uploads/dishes/bravis-food-496dc48e5826c.jpg"
+          "price": 680
         },
         {
           "name": "Чашушули",
-          "price": 760,
-          "image": "/uploads/dishes/bravis-food-9c89db6d29719.jpg"
+          "price": 760
         }
       ]
     },
@@ -296,18 +269,15 @@
       "items": [
         {
           "name": "Бравис",
-          "price": 440,
-          "image": "/uploads/dishes/bravis-food-d166ed263f5d6.jpg"
+          "price": 440
         },
         {
           "name": "Гата",
-          "price": 390,
-          "image": "/uploads/dishes/bravis-food-eedcc7f0229de.jpg"
+          "price": 390
         },
         {
           "name": "Мильфей",
-          "price": 480,
-          "image": "/uploads/dishes/bravis-food-ce40ea22a635d.jpg"
+          "price": 480
         },
         {
           "name": "Мороженое, 50 г",
@@ -368,6 +338,5 @@
         }
       ]
     }
-  ],
-  "oldMenuPhotoSource": "/Фотографии еды/Старое меню фото"
+  ]
 }
