@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 940" role="img" aria-labelledby="title desc">
+<title id="title">Авторская иллюстрация для BRAVIS</title><desc id="desc">Бокал красного вина, тарелка и свет тёплого вечера</desc>
+<defs>
+<radialGradient id="ground"><stop stop-color="#b77f65"/><stop offset=".57" stop-color="#6f343c"/><stop offset="1" stop-color="#30161f"/></radialGradient>
+<linearGradient id="glass" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fff9e5" stop-opacity=".72"/><stop offset=".5" stop-color="#f8dec0" stop-opacity=".08"/><stop offset="1" stop-color="#fff6da" stop-opacity=".38"/></linearGradient>
+<linearGradient id="wine" x1=".2" x2=".8" y1=".2" y2="1"><stop stop-color="#812433"/><stop offset="1" stop-color="#320c1f"/></linearGradient>
+<radialGradient id="plate"><stop stop-color="#f3e6cc"/><stop offset=".8" stop-color="#d7c5aa"/><stop offset="1" stop-color="#ad957b"/></radialGradient>
+<filter id="blur"><feGaussianBlur stdDeviation="35"/></filter>
+<filter id="shadow"><feDropShadow dx="0" dy="28" stdDeviation="34" flood-color="#12060d" flood-opacity=".55"/></filter>
+</defs>
+<rect width="800" height="940" fill="url(#ground)"/>
+<ellipse cx="640" cy="200" rx="180" ry="320" fill="#dca56d" opacity=".21" filter="url(#blur)"/>
+<ellipse cx="130" cy="300" rx="150" ry="350" fill="#e3a67e" opacity=".12" filter="url(#blur)"/>
+<path d="M0 630C170 608 320 650 510 622S720 618 800 630V940H0Z" fill="#4b2229" opacity=".63"/>
+<g filter="url(#shadow)" transform="rotate(-12 275 652)">
+  <ellipse cx="278" cy="640" rx="268" ry="186" fill="#2d1620" opacity=".5"/>
+  <ellipse cx="270" cy="616" rx="263" ry="184" fill="url(#plate)"/>
+  <ellipse cx="270" cy="616" rx="219" ry="146" fill="#dfcfb9" stroke="#ba9f80" stroke-width="8"/>
+  <ellipse cx="270" cy="616" rx="174" ry="114" fill="#f6edd9"/>
+  <path d="M125 595Q148 517 218 544T333 558Q382 520 426 581T391 667Q336 703 275 667T178 661Q123 661 125 595Z" fill="#a85939"/>
+  <path d="M140 594Q165 560 205 573T285 574T376 584Q420 610 385 644T309 650Q265 645 240 647T156 634Z" fill="#cc8a54"/>
+  <path d="M145 588Q215 603 265 586T391 616" fill="none" stroke="#edc48a" stroke-width="7" stroke-linecap="round" opacity=".7"/>
+  <g fill="#355a3c"><path d="M217 538q-32-49-43-4t43 4Z"/><path d="M229 527q15-55 40-10t-40 10Z"/><path d="M311 662q48 5 33-40t-33 40Z"/><path d="M315 677q-43 12-30-27t30 27Z"/></g>
+  <circle cx="194" cy="637" r="8" fill="#e4ad69"/><circle cx="358" cy="596" r="7" fill="#edbd83"/>
+</g>
+<g filter="url(#shadow)">
+ <ellipse cx="600" cy="782" rx="92" ry="17" fill="#17070e" opacity=".65"/>
+ <ellipse cx="599" cy="772" rx="84" ry="16" fill="none" stroke="#f6e5ce" stroke-opacity=".7" stroke-width="6"/>
+ <path d="M594 445H605V769H594Z" fill="url(#glass)" stroke="#ffe8c9" stroke-opacity=".65" stroke-width="3"/>
+ <path d="M465 191Q460 361 515 428Q549 467 600 467Q655 467 688 428Q741 361 735 191Z" fill="url(#glass)" stroke="#f2e6da" stroke-opacity=".78" stroke-width="5"/>
+ <path d="M481 294Q476 382 521 423Q550 450 600 450Q650 450 681 423Q725 382 718 294Q658 284 601 292Q546 300 481 294Z" fill="url(#wine)" opacity=".92"/>
+ <ellipse cx="600" cy="296" rx="119" ry="16" fill="#a64a4e" opacity=".96"/>
+ <path d="M494 213Q499 345 522 384" fill="none" stroke="#fff4e2" stroke-width="11" stroke-opacity=".6" stroke-linecap="round"/>
+ <path d="M708 210Q705 333 687 385" fill="none" stroke="#fff4e2" stroke-width="5" stroke-opacity=".4" stroke-linecap="round"/>
+</g>
+<path d="M70 183C177 128 230 103 324 100" fill="none" stroke="#e3ad7e" stroke-width="1" opacity=".5"/>
+<circle cx="119" cy="160" r="6" fill="#e3ad7e"/><path d="M121 152V129M112 162H89" stroke="#e3ad7e" stroke-width="1"/>
+</svg>

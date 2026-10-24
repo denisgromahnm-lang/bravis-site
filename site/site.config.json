@@ -1,0 +1,24 @@
+{
+  "restaurantName": "BRAVIS",
+  "tagline": "Вкус встреч. Тепло Bravis.",
+  "city": "Москва",
+  "address": "ул. Расковой, 20",
+  "addressFull": "Москва, улица Расковой, 20",
+  "phoneDisplay": "+7 (989) 571-99-77",
+  "phoneE164": "+79895719977",
+  "hoursText": "Часы работы уточняйте по телефону",
+  "domain": "",
+  "public": false,
+  "smartReserveId": "",
+  "yandexMetrikaId": "",
+  "ga4Id": "",
+  "verificationYandex": "",
+  "verificationGoogle": "",
+  "operatorLegalName": "",
+  "operatorContactEmail": "",
+  "operatorPostalAddress": "",
+  "socialLinks": {
+    "telegram": "",
+    "vk": ""
+  }
+}
