@@ -1,0 +1,250 @@
+{
+  "catalog": "/Фотографии еды/Старое меню фото",
+  "sourceShare": "https://disk.yandex.ru/d/mM7bPzFGD0o2WA",
+  "matched": 30,
+  "eligible": 35,
+  "totalMenuDishes": 68,
+  "images": [
+    {
+      "dish": "Армянская сырная тарелка",
+      "source": "/Фотографии еды/Старое меню фото/хз/армянская сырная тарелка.jpg",
+      "url": "/uploads/dishes/bravis-food-40ebea5e211b5.jpg",
+      "status": "imported",
+      "bytes": 58922
+    },
+    {
+      "dish": "Баклажаны и кабачки с ореховым муссом",
+      "source": "/Фотографии еды/Старое меню фото/хз/баклажаны и кабачки с ореховым муссом.jpg",
+      "status": "unavailable",
+      "error": "HTTP Error 500: Internal Server Error"
+    },
+    {
+      "dish": "Кавказская брускетта микс",
+      "source": "/Фотографии еды/Старое меню фото/хз/кавказская брускетта микс.jpg",
+      "url": "/uploads/dishes/bravis-food-9d7e6163223c3.jpg",
+      "status": "imported",
+      "bytes": 98074
+    },
+    {
+      "dish": "Мясная тарелка",
+      "source": "/Фотографии еды/Старое меню фото/хз/мясная тарелка.jpg",
+      "url": "/uploads/dishes/bravis-food-ee8c91ad08017.jpg",
+      "status": "imported",
+      "bytes": 97968
+    },
+    {
+      "dish": "Рыбная тарелка",
+      "source": "/Фотографии еды/Старое меню фото/хз/рыбная тарелка.jpg",
+      "url": "/uploads/dishes/bravis-food-392d38871aa47.jpg",
+      "status": "imported",
+      "bytes": 83010
+    },
+    {
+      "dish": "Овощной букет",
+      "source": "/Фотографии еды/Старое меню фото/хз/овощной букет.jpg",
+      "url": "/uploads/dishes/bravis-food-ce12a606db576.jpg",
+      "status": "imported",
+      "bytes": 85105
+    },
+    {
+      "dish": "Соленья",
+      "source": "/Фотографии еды/Старое меню фото/хз/соленья.jpg",
+      "status": "unavailable",
+      "error": "HTTP Error 500: Internal Server Error"
+    },
+    {
+      "dish": "Греческий",
+      "source": "/Фотографии еды/Старое меню фото/салаты/греческий.jpg",
+      "url": "/uploads/dishes/bravis-food-64d8260c9347a.jpg",
+      "status": "imported",
+      "bytes": 69677
+    },
+    {
+      "dish": "Салат с ростбифом",
+      "source": "/Фотографии еды/Старое меню фото/салаты/ростбиф.jpg",
+      "url": "/uploads/dishes/bravis-food-8be7acf766ead.jpg",
+      "status": "imported",
+      "bytes": 65985
+    },
+    {
+      "dish": "Хрустящий баклажан",
+      "source": "/Фотографии еды/Старое меню фото/салаты/хрустящий баклажан.jpg",
+      "url": "/uploads/dishes/bravis-food-6fa16e65b0c3f.jpg",
+      "status": "imported",
+      "bytes": 82092
+    },
+    {
+      "dish": "Цезарь с курицей",
+      "source": "/Фотографии еды/Старое меню фото/салаты/цезарь с курицей.jpg",
+      "url": "/uploads/dishes/bravis-food-e00b4bdb81a8c.jpg",
+      "status": "imported",
+      "bytes": 78946
+    },
+    {
+      "dish": "Куриный бульон с лапшой",
+      "source": "/Фотографии еды/Старое меню фото/супы/куриный суп-лапша.jpg",
+      "status": "unavailable",
+      "error": "HTTP Error 500: Internal Server Error"
+    },
+    {
+      "dish": "Солянка",
+      "source": "/Фотографии еды/Старое меню фото/супы/солянка.jpg",
+      "status": "unavailable",
+      "error": "HTTP Error 500: Internal Server Error"
+    },
+    {
+      "dish": "Суп харчо",
+      "source": "/Фотографии еды/Старое меню фото/супы/харчо.jpg",
+      "url": "/uploads/dishes/bravis-food-d4138e0c75689.jpg",
+      "status": "imported",
+      "bytes": 108365
+    },
+    {
+      "dish": "Люля из баранины",
+      "source": "/Фотографии еды/Старое меню фото/мангал/люля из баранины.jpg",
+      "url": "/uploads/dishes/bravis-food-9a5f3ff262af7.jpg",
+      "status": "imported",
+      "bytes": 66506
+    },
+    {
+      "dish": "Люля из говядины",
+      "source": "/Фотографии еды/Старое меню фото/мангал/люля из говядины.jpg",
+      "url": "/uploads/dishes/bravis-food-98cdf6e06444a.jpg",
+      "status": "imported",
+      "bytes": 76006
+    },
+    {
+      "dish": "Люля из курицы",
+      "source": "/Фотографии еды/Старое меню фото/мангал/люля из курицы.jpg",
+      "status": "unavailable",
+      "error": "HTTP Error 500: Internal Server Error"
+    },
+    {
+      "dish": "Шашлык из бараньей корейки",
+      "source": "/Фотографии еды/Старое меню фото/мангал/шашлык из бараньей корейки.jpg",
+      "url": "/uploads/dishes/bravis-food-e9fe239626f09.jpg",
+      "status": "imported",
+      "bytes": 93549
+    },
+    {
+      "dish": "Шашлык из бараньей мякоти",
+      "source": "/Фотографии еды/Старое меню фото/мангал/шашлык из бараньей мякоти.jpg",
+      "url": "/uploads/dishes/bravis-food-0064dea6fe4e9.jpg",
+      "status": "imported",
+      "bytes": 80405
+    },
+    {
+      "dish": "Шашлык из говяжьей вырезки",
+      "source": "/Фотографии еды/Старое меню фото/мангал/шашлык из говяжьей вырезки миньон.jpg",
+      "url": "/uploads/dishes/bravis-food-fe71477702261.jpg",
+      "status": "imported",
+      "bytes": 80620
+    },
+    {
+      "dish": "Шашлык из курицы",
+      "source": "/Фотографии еды/Старое меню фото/мангал/шашлык из куриного филе.jpg",
+      "url": "/uploads/dishes/bravis-food-077732afd8671.jpg",
+      "status": "imported",
+      "bytes": 73284
+    },
+    {
+      "dish": "Шашлык из свиной шейки",
+      "source": "/Фотографии еды/Старое меню фото/мангал/шашлык из свиной шейки.jpg",
+      "url": "/uploads/dishes/bravis-food-09005f440de4d.jpg",
+      "status": "imported",
+      "bytes": 70741
+    },
+    {
+      "dish": "Ламаджо",
+      "source": "/Фотографии еды/Старое меню фото/выпечка/ламаджо.jpg",
+      "url": "/uploads/dishes/bravis-food-02fe62931aa3f.jpg",
+      "status": "imported",
+      "bytes": 99589
+    },
+    {
+      "dish": "Хачапури по-аджарски",
+      "source": "/Фотографии еды/Старое меню фото/выпечка/хач по аджарски.jpg",
+      "url": "/uploads/dishes/bravis-food-8782ba7c0a3e6.jpg",
+      "status": "imported",
+      "bytes": 91630
+    },
+    {
+      "dish": "Хачапури по-мегрельски",
+      "source": "/Фотографии еды/Старое меню фото/выпечка/хач по мегрель.jpg",
+      "url": "/uploads/dishes/bravis-food-e51e7b49e73f1.jpg",
+      "status": "imported",
+      "bytes": 69406
+    },
+    {
+      "dish": "Хачапури по-аджарски, 5 сыров",
+      "source": "/Фотографии еды/Старое меню фото/выпечка/хач по аджарски 5 сыр.jpg",
+      "url": "/uploads/dishes/bravis-food-2553ed59e209a.jpg",
+      "status": "imported",
+      "bytes": 71083
+    },
+    {
+      "dish": "Хачапури по-мегрельски, 5 сыров",
+      "source": "/Фотографии еды/Старое меню фото/выпечка/хач по мегр 5 сыров.jpg",
+      "url": "/uploads/dishes/bravis-food-4fa46ac9489a7.jpg",
+      "status": "imported",
+      "bytes": 66473
+    },
+    {
+      "dish": "Аришта с курицей",
+      "source": "/Фотографии еды/Старое меню фото/горячие/аришта с курицей.jpg",
+      "url": "/uploads/dishes/bravis-food-0288a896154fb.jpg",
+      "status": "imported",
+      "bytes": 78796
+    },
+    {
+      "dish": "Толма",
+      "source": "/Фотографии еды/Старое меню фото/горячие/толма.jpg",
+      "url": "/uploads/dishes/bravis-food-0338f59f23609.jpg",
+      "status": "imported",
+      "bytes": 86352
+    },
+    {
+      "dish": "Цыплёнок табака",
+      "source": "/Фотографии еды/Старое меню фото/горячие/цыпленок табака.jpg",
+      "url": "/uploads/dishes/bravis-food-99a713cd87744.jpg",
+      "status": "imported",
+      "bytes": 91937
+    },
+    {
+      "dish": "Фаршированные грибы",
+      "source": "/Фотографии еды/Старое меню фото/гз/фаршированные грибы.jpg",
+      "url": "/uploads/dishes/bravis-food-496dc48e5826c.jpg",
+      "status": "imported",
+      "bytes": 71256
+    },
+    {
+      "dish": "Чашушули",
+      "source": "/Фотографии еды/Старое меню фото/горячие/чашашули.jpg",
+      "url": "/uploads/dishes/bravis-food-9c89db6d29719.jpg",
+      "status": "imported",
+      "bytes": 107534
+    },
+    {
+      "dish": "Бравис",
+      "source": "/Фотографии еды/Старое меню фото/десерты/бравис.jpg",
+      "url": "/uploads/dishes/bravis-food-d166ed263f5d6.jpg",
+      "status": "imported",
+      "bytes": 56741
+    },
+    {
+      "dish": "Гата",
+      "source": "/Фотографии еды/Старое меню фото/десерты/гата.jpg",
+      "url": "/uploads/dishes/bravis-food-eedcc7f0229de.jpg",
+      "status": "imported",
+      "bytes": 57778
+    },
+    {
+      "dish": "Мильфей",
+      "source": "/Фотографии еды/Старое меню фото/десерты/мильфей.jpg",
+      "url": "/uploads/dishes/bravis-food-ce40ea22a635d.jpg",
+      "status": "imported",
+      "bytes": 57914
+    }
+  ],
+  "note": "Photos are historical BRAVIS menu photography. Dish variants without precise filename matches remain unillustrated; plating may have changed."
+}
