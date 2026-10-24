@@ -45,8 +45,16 @@ if loona_join_url:
     # reject unsafe/non-HTTPS schemes.
     if parsed_loona.scheme != 'https' or not parsed_loona.hostname or parsed_loona.username or parsed_loona.password:
         raise ValueError('Loona card enrollment link must be an owner-verified HTTPS URL')
-loona_registration_cta = (f'<a class="loyalty-action" href="{h(loona_join_url)}" data-track="loona_signup_click" target="_blank" rel="noopener noreferrer">Получить карту и бонусы <span aria-hidden="true">↗</span></a>' if loona_join_url else
-                          '<p class="loyalty-pending">Онлайн-регистрация скоро появится здесь. Пока оформить карту можно по QR-коду в ресторане.</p>')
+loona_registration_cta = (
+    f'<div class="loyalty-registration">'
+    f'<a class="loyalty-action" href="{h(loona_join_url)}" data-track="loona_signup_click" target="_blank" rel="noopener noreferrer">Получить карту и бонусы <span aria-hidden="true">↗</span></a>'
+    f'<a class="loyalty-qr" href="{h(loona_join_url)}" data-track="loona_signup_click" target="_blank" rel="noopener noreferrer" aria-label="Открыть регистрацию карты BRAVIS в Loona">'
+    f'<img src="/assets/loona-register.svg" alt="QR-код для регистрации в программе лояльности BRAVIS" width="156" height="156" loading="lazy">'
+    f'<span>Откройте камеру телефона и сканируйте QR-код для получения карты гостя.</span></a>'
+    f'</div>'
+    if loona_join_url else
+    '<p class="loyalty-pending">Онлайн-регистрация скоро появится здесь. Пока оформить карту можно по QR-коду в ресторане.</p>'
+)
 
 delivery_help_text = ('Оформление и условия доставки — в сервисе Яндекс Еда. Доступность зависит от вашего адреса.' if delivery_has_direct_link
                       else 'Выберите адрес доставки и найдите BRAVIS в Яндекс Еде. Прямой переход к меню ресторана пока уточняется.')
