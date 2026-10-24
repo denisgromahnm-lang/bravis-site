@@ -32,6 +32,8 @@ jobs:
           python3 scripts/prepare_github_pages.py
           python3 scripts/test_pages_preview.py
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/dist/
