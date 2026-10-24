@@ -31,12 +31,34 @@ jobs:
           python3 scripts/quality_gate.py
           python3 scripts/prepare_github_pages.py
           python3 scripts/test_pages_preview.py
+      # A repository owner must enable Pages once in Settings. Do not fail or
+      # claim a live deployment when the site does not exist yet.
+      - name: Check whether the owner enabled GitHub Pages
+        id: pages_ready
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          code=$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H 'Accept: application/vnd.github+json' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages")
+          if [ "$code" = "200" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "GitHub Pages enabled by owner. Uploading preview." >> "$GITHUB_STEP_SUMMARY"
+          elif [ "$code" = "404" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "GitHub Pages not enabled. Owner: Settings → Pages → Source: GitHub Actions. Website source and QA remain ready." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Unexpected Pages status HTTP $code" >&2
+            exit 1
+          fi
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
+        if: steps.pages_ready.outputs.enabled == 'true'
       - uses: actions/upload-pages-artifact@v3
+        if: steps.pages_ready.outputs.enabled == 'true'
         with:
           path: site/dist/
       - name: Deploy noindex preview
+        if: steps.pages_ready.outputs.enabled == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
