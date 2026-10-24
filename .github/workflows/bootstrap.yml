@@ -1,4 +1,5 @@
 name: Bootstrap BRAVIS readable source
+# Re-trigger after adding verifier
 on:
   push:
     paths:
