@@ -43,5 +43,7 @@
   "operatorInn": "7723860392",
   "operatorOgrn": "1137746040981",
   "yandexEdaRestaurantUrl": "https://eda.yandex.ru/r/bravis?placeSlug=bravis",
-  "yandexEdaServiceUrl": "https://eda.yandex.ru/"
+  "yandexEdaServiceUrl": "https://eda.yandex.ru/",
+  "loonaJoinUrl": "",
+  "loonaProgramName": "Карта гостя BRAVIS"
 }
