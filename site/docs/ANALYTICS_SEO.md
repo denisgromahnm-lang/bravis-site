@@ -10,6 +10,7 @@
 - `reserve_click` — открыли внешнюю форму СмартРезерва;
 - `header_phone_click`, `footer_phone_click`, `contacts_phone_click` — клики по номеру;
 - `menu_from_hero`, `menu_from_feature` — открытие меню из главной страницы;
+- `menu_open_seasonal`, `menu_open_main_front`, `menu_open_main_back`, `menu_open_business`, `menu_open_children` — просмотр каждого утверждённого раздела меню;
 - `banquet_phone_click` — обращение по банкету.
 
 Состав целей нужно сверить в кабинете счётчика после запуска. Клик «Забронировать» **не равен успешно подтверждённой брони**. Событие подтверждения добавлять только при документированной передаче результата Яндексом (callback/postback/API).
