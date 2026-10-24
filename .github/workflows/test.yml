@@ -1,0 +1,53 @@
+name: Validate BRAVIS website
+on:
+  push:
+    paths:
+      - 'site/**'
+      - 'scripts/verify_site.py'
+      - '.github/workflows/test.yml'
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  site:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate five-page static site without paid API or npm
+        run: |
+          cd site
+          python3 src/build.py
+          python3 scripts/render_menu_gallery.py
+          python3 verify.py
+      - name: Verify menu and brand integrity
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          base=Path('site')
+          c=json.loads((base/'site.config.json').read_text(encoding='utf8'))
+          assert c['public'] is False and not c['smartReserveId']
+          assert not c['yandexMetrikaId'] and not c['ga4Id']
+          assert c['restaurantName']=='BRAVIS'
+          assert c['phoneE164']=='+79895719977'
+          h=(base/'dist/menu/index.html').read_text(encoding='utf8')
+          assert 'noindex' in h and 'tel:+79895719977' in h
+          if (base/'content/menu_media.json').exists():
+              f=json.loads((base/'content/menu_media.json').read_text(encoding='utf8'))['files']
+              assert len(f)==5
+              assert [v['group'] for v in f]==['seasonal','main-front','main-back','business','children']
+              assert not any('.pdf' in p for x in f for p in x['pages'])
+              for x in f:
+                  for p in x['pages']:
+                      assert (base/'dist'/p.lstrip('/')).is_file()
+              assert 'data-menu-index' in h and 'id="menu-lightbox"' in h
+          print('PASS: brand, preview-only, real menu media, phone, SEO metadata')
+          PY
+      - name: Upload website artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bravis-static-site
+          path: site/dist/
+          retention-days: 14
