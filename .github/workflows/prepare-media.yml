@@ -1,0 +1,60 @@
+name: Prepare BRAVIS approved media and website
+on:
+  push:
+    paths:
+      - '.github/workflows/prepare-media.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install free image / PDF tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends poppler-utils
+          python3 -m pip install --user --disable-pip-version-check 'Pillow>=10,<13'
+      - name: Download only owner-approved menus and real restaurant interiors
+        run: |
+          python3 site/scripts/sync_media.py --media all
+      - name: Build and validate preview
+        run: |
+          cd site
+          python3 src/build.py
+          python3 scripts/render_menu_gallery.py
+          python3 verify.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('.')
+          menus=json.loads((root/'content/menu_media.json').read_text(encoding='utf8'))
+          expected=['seasonal','main-front','main-back','business','children']
+          assert [v['group'] for v in menus['files']]==expected
+          page=(root/'dist/menu/index.html').read_text(encoding='utf8')
+          for entry in menus['files']:
+              assert len(entry['pages'])<=8
+              assert entry['url'] in page
+              for path in entry['pages']:assert (root/'dist'/path.lstrip('/')).is_file()
+          assert 'name="robots" content="noindex' in page
+          assert '.pdf' not in page.lower()
+          print('PASS: five approved menu groups, actual photos, no PDF links, noindex')
+          PY
+      - name: Commit processed authorized menu assets and restaurant photos
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f site/public/menu-media site/public/uploads
+          git add site/content/gallery.json site/content/menu_media.json site/content/menu-source-extract || true
+          if ! git diff --cached --quiet; then
+            git commit -m 'Import approved BRAVIS menus and restaurant photos from public Yandex Disk'
+            git push
+          fi
+      - name: Save preview for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: bravis-built-preview
+          path: site/dist/
+          retention-days: 14
