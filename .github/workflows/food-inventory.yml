@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - '.github/workflows/food-inventory.yml'
+      - 'site/scripts/audit_old_food.py'
   workflow_dispatch:
 permissions:
   contents: write
