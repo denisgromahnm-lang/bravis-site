@@ -1,6 +1,11 @@
 name: Publish noindex BRAVIS preview to GitHub Pages
-# No production domain, no real reservation ID, no analytics IDs, noindex.
+# No production domain or SEO indexing; preview automatically follows GitHub source.
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - '.github/workflows/pages-preview.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -23,7 +28,9 @@ jobs:
           python3 src/build.py
           python3 scripts/render_menu_gallery.py
           python3 verify.py
+          python3 scripts/quality_gate.py
           python3 scripts/prepare_github_pages.py
+          python3 scripts/test_pages_preview.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
