@@ -1,0 +1,62 @@
+name: Bootstrap BRAVIS readable source
+on:
+  push:
+    paths:
+      - '.github/workflows/bootstrap.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Unpack verified existing BRAVIS release to readable site source
+        run: |
+          python3 - <<'PY'
+          import base64, hashlib, io, os, pathlib, tarfile
+          root=pathlib.Path('.')
+          out=root/'site'
+          if (out/'src/build.py').exists():
+              print('BRAVIS source already exists; nothing to bootstrap')
+              raise SystemExit(0)
+          b64=(root/'release/bravis-site.tar.gz.b64').read_text()
+          blob=base64.b64decode(b64,validate=False)
+          sha=hashlib.sha256(blob).hexdigest()
+          expected='05b7dae3da0d2d71192f46b933f0628c482e20a4ff4e52121e5190b4f4cf3ce6'
+          assert sha==expected, ('Release digest mismatch',sha)
+          with tarfile.open(fileobj=io.BytesIO(blob),mode='r:gz') as tar:
+              for member in tar:
+                  name=pathlib.PurePosixPath(member.name)
+                  if member.isdir(): continue
+                  if not member.isfile() or member.issym() or member.islnk() or '..' in name.parts: raise RuntimeError('Unexpected archive member')
+                  # Files are rooted at release root; no dist (generated output).
+                  parts=name.parts
+                  if parts[0] in ('bravis_ready','bravis-ready'): parts=parts[1:]
+                  if not parts or parts[0]=='dist': continue
+                  target=out.joinpath(*parts)
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  target.write_bytes(tar.extractfile(member).read())
+                  print('Source:',target)
+          assert (out/'src/build.py').exists()
+          (out/'verify.py').write_bytes((root/'scripts/verify_site.py').read_bytes())
+          (root/'.gitignore').write_text('site/dist/\nsite/public/uploads/\nsite/public/menu-media/\nsite/.menu-backups/\n__pycache__/\n*.pyc\n')
+          PY
+      - name: Verify source build
+        run: |
+          cd site
+          python3 src/build.py
+          python3 verify.py
+      - name: Commit readable sources
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .gitignore site
+          if ! git diff --cached --quiet; then
+            git commit -m 'Bootstrap readable BRAVIS source from verified archive'
+            git push
+          else
+            echo 'No source changes required'
+          fi
