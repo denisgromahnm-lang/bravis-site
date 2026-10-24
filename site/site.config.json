@@ -14,9 +14,9 @@
   "ga4Id": "",
   "verificationYandex": "",
   "verificationGoogle": "",
-  "operatorLegalName": "",
-  "operatorContactEmail": "",
-  "operatorPostalAddress": "",
+  "operatorLegalName": "Общество с ограниченной ответственностью «Инвойс»",
+  "operatorContactEmail": "in.vois@mail.ru",
+  "operatorPostalAddress": "115446, г. Москва, ул. Академика Миллионщикова, д. 35, к. 4",
   "socialLinks": {
     "telegram": "",
     "vk": ""
@@ -38,5 +38,8 @@
     "closes": "23:00"
   },
   "yandexMapsUrl": "https://yandex.ru/maps/org/bravis/120928769508/",
-  "twoGisUrl": "https://2gis.ru/moscow/firm/70000001098229175"
+  "twoGisUrl": "https://2gis.ru/moscow/firm/70000001098229175",
+  "operatorShortName": "ООО «Инвойс»",
+  "operatorInn": "7723860392",
+  "operatorOgrn": "1137746040981"
 }
