@@ -21,6 +21,7 @@ jobs:
           python3 src/build.py
           python3 scripts/render_menu_gallery.py
           python3 verify.py
+          python3 scripts/quality_gate.py --production-guard
       - name: Verify menu and brand integrity
         run: |
           python3 - <<'PY'
@@ -51,3 +52,8 @@ jobs:
           name: bravis-static-site
           path: site/dist/
           retention-days: 14
+      - name: Verify GitHub Pages preview routing independently
+        run: |
+          cd site
+          python3 scripts/prepare_github_pages.py
+          python3 scripts/test_pages_preview.py
