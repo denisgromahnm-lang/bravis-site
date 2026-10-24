@@ -22,6 +22,37 @@ published = bool(CONFIG.get('public') and domain)
 reserve_id = str(CONFIG.get('smartReserveId','')).strip()
 reserve_link = 'https://reservation.yandex.ru/partner-reserve/forms/' + quote(reserve_id, safe='') if reserve_id else phone_url
 reserve_label = 'Забронировать стол' if reserve_id else 'Забронировать по телефону'
+
+# Production guard: an owner approval, verified menu, booking, legal information and
+# analytics must all exist before search engines are allowed to index this site.
+# Static GitHub previews may still build safely with all these fields missing.
+if CONFIG.get('public'):
+    blockers = []
+    if not domain.startswith('https://') or any(x in domain for x in ('trycloudflare.com','github.io','localhost','127.0.0.1')):
+        blockers.append('HTTPS official domain')
+    if not CONFIG.get('productionReleaseApproved'):
+        blockers.append('explicit owner publication approval')
+    if not CONFIG.get('menuPricesApproved'):
+        blockers.append('owner verification of prices and menu')
+    if not CONFIG.get('legalPolicyApproved'):
+        blockers.append('owner approval of complete privacy policy')
+    if not reserve_id:
+        blockers.append('working SmartReserve ID')
+    if not str(CONFIG.get('yandexMetrikaId','')).isdigit():
+        blockers.append('Yandex Metrika counter ID')
+    if not str(CONFIG.get('verificationYandex','')).strip():
+        blockers.append('Yandex Webmaster verification')
+    if not str(CONFIG.get('operatorLegalName','')).strip() or not str(CONFIG.get('operatorContactEmail','')).strip():
+        blockers.append('legal operator name and contact')
+    hours = str(CONFIG.get('hoursText','')).strip().lower()
+    if not hours or 'уточняйте' in hours:
+        blockers.append('confirmed opening hours')
+    if not (ROOT / 'content/menu_media.json').is_file():
+        blockers.append('approved five-section menu')
+    if not GALLERY.get('hero'):
+        blockers.append('real restaurant photos')
+    if blockers:
+        raise SystemExit('PUBLICATION BLOCKED — ' + '; '.join(blockers))
 main_photo = GALLERY.get('hero', '')
 interior = GALLERY.get('interior', '')
 food = GALLERY.get('food', '')
