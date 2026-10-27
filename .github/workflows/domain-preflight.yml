@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - '.github/workflows/domain-preflight.yml'
+      - 'site/scripts/domain_dns_preflight.py'
   workflow_dispatch:
 permissions:
   contents: read
