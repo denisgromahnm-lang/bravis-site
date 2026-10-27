@@ -1,0 +1,24 @@
+name: BRAVIS domain and mail migration preflight
+on:
+  push:
+    paths:
+      - '.github/workflows/domain-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check-public-dns:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read public DNS and registry WHOIS without making changes
+        run: python3 site/scripts/domain_dns_preflight.py | tee bravis-domain-preflight.json
+      - name: Preserve preflight snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bravis-public-dns-preflight
+          path: bravis-domain-preflight.json
+          if-no-files-found: warn
+          retention-days: 7
