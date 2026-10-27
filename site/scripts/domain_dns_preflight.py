@@ -29,7 +29,9 @@ def resolve(name,kind):
             if 'v=spf1' not in value.lower() and 'v=dmarc1' not in value.lower():
                 continue
         values.append({'data':value,'ttl':answer.get('TTL')})
-    return {'status':status,'answers':values}
+    labels={0:'NOERROR',2:'SERVFAIL',3:'NXDOMAIN',5:'REFUSED'}
+    return {'status':status,'status_label':labels.get(status,'DNS_RESPONSE_'+str(status)),
+            'answers':values, 'ad':data.get('AD'), 'comment':data.get('Comment','')[:300]}
 
 def whois(domain):
     # .RU official registry WHOIS. Preserve only operational non-PII fields.
@@ -62,6 +64,22 @@ for kind,name in TYPES:
     except Exception as e:
         result['dns'][key]={'status':'unavailable','answers':[]}
         result['errors'].append(key+': '+str(e)[:120])
+# A SERVFAIL is not NXDOMAIN: collect a DNSSEC-disabled probe and alternative
+# public resolver result without guessing whether delegation is broken.
+if result['dns'].get(DOMAIN+' NS',{}).get('status')==2:
+    for base,label in [
+        ('https://dns.google/resolve','Google DNSSEC check disabled'),
+        ('https://cloudflare-dns.com/dns-query','Cloudflare DoH')]:
+        try:
+            params={'name':DOMAIN,'type':'NS','cd':'true'} if 'google' in base else {'name':DOMAIN,'type':'NS'}
+            url=base+'?'+urllib.parse.urlencode(params)
+            headers={'User-Agent':'BRAVIS-readonly-domain-check/1.0','Accept':'application/dns-json'}
+            with urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=12) as res:
+                raw=json.load(res)
+            result['dns_diagnostics_'+label]={'status':raw.get('Status'),'comment':raw.get('Comment',''),
+                'answers':[a.get('data') for a in raw.get('Answer',[])]}
+        except Exception as e:
+            result['dns_diagnostics_'+label]={'error':str(e)[:200]}
 try:
     result['whois']=whois(DOMAIN)
 except Exception as e:
