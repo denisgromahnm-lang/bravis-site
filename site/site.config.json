@@ -20,6 +20,7 @@
   "socialLinks": {
     "telegram": "https://t.me/bravisrest",
     "vk": "https://vk.com/bravisrest",
+    "instagram": "https://www.instagram.com/bravis_rest/",
     "whatsapp": "https://wa.me/79895719977",
     "telegramMessage": "https://t.me/+79895719977"
   },
@@ -49,5 +50,7 @@
   "loonaJoinUrl": "https://app.loona.ai/4992/create/register?source=qr&tag=none",
   "loonaProgramName": "Карта гостя BRAVIS",
   "yandexMapsOrgId": "120928769508",
-  "yandexGoodPlaceYear": 2026
+  "yandexGoodPlaceYear": 2026,
+  "yandexRating": "5.0",
+  "yandexRatingCheckedAt": "2026-10-28"
 }

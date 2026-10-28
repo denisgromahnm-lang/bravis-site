@@ -65,10 +65,15 @@
 @media(max-width:560px){.loyalty-registration{gap:16px}.loyalty-qr{display:none}}
 
 /* Public communities and reputation; external widgets load on request. */
-.social-links{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0}
-.social-links a{display:inline-flex;align-items:center;justify-content:space-between;gap:22px;min-height:44px;padding:10px 16px;border:1px solid #b9a49c;color:inherit;text-decoration:none;font-size:14px}
-.social-links a:hover{background:#782f46;color:#fff;border-color:#782f46}
-.footer .social-links{gap:8px}.footer .social-links a{padding:9px 12px;color:#f0dfd4}
+.social-links{display:flex;flex-wrap:wrap;gap:24px;margin:22px 0 0;width:100%}
+.social-links__group{display:flex;flex-direction:column;gap:10px}
+.social-links__label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#786569}
+.social-links__row{display:flex;flex-wrap:wrap;gap:10px}
+.social-links .social-icon{display:inline-flex;align-items:center;justify-content:center;flex:none;width:48px;height:48px;padding:11px;border:1px solid #b9a49c;border-radius:50%;color:var(--wine);text-decoration:none;transition:background .18s,color .18s,transform .18s}
+.social-icon svg{width:24px;height:24px;flex:none}
+.social-links .social-icon:hover{background:var(--wine);color:#fffaf2;transform:translateY(-2px)}
+.footer .social-links{gap:20px}.footer .social-links__label{color:#d2c0b9}.footer .social-links .social-icon{color:#f0dfd4;border-color:#b18b79}
+.footer .social-links .social-icon:hover{background:#e7c9a9;color:var(--wine-deep)}
 .reputation{background:#f0e8de}
 .reputation-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,6vw,96px);align-items:start}
 .reputation h2{font-family:Georgia,serif;font-size:clamp(36px,4.4vw,56px);font-weight:400;line-height:1.1;margin:22px 0}
@@ -105,3 +110,26 @@
  .mobile-bottom-cta{padding-bottom:env(safe-area-inset-bottom,0px)}
  .cookie-banner{bottom:calc(66px + env(safe-area-inset-bottom,0px))}
 }
+
+/* Visible, dated reputation banner links directly to the official restaurant card. */
+.yandex-award{display:flex;flex-direction:column;align-items:flex-start;gap:15px;color:var(--wine);text-decoration:none}
+.yandex-award__source{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;letter-spacing:.02em}
+.yandex-award__source svg{color:#9b704a;flex:none}
+.yandex-award__rating{display:flex;align-items:center;gap:20px}
+.yandex-award__rating>strong{font-family:var(--serif);font-size:76px;line-height:1;font-weight:400;letter-spacing:-.04em}
+.yandex-award__rating>span{display:flex;flex-direction:column;gap:7px}
+.yandex-award__stars{color:#ad7e36;font-size:22px;letter-spacing:2px;white-space:nowrap}
+.yandex-award__guests{font-size:12px;color:#786569}
+.yandex-award__title{font-family:var(--serif);font-size:32px;font-weight:400;line-height:1.15}
+.yandex-award__title>span{display:block;color:#9b704a;font-family:var(--sans);font-size:12px;letter-spacing:.15em;margin-top:7px}
+.yandex-award__date{font-size:11px;line-height:1.5;color:#786569}
+.yandex-award__link{display:flex;align-items:center;gap:25px;margin-top:4px;padding-bottom:6px;border-bottom:1px solid #b9a49c;font-size:12px}
+.yandex-award:hover .yandex-award__link{text-decoration:underline;text-underline-offset:3px}
+.yandex-award--footer{width:100%;max-width:310px;margin-top:8px;padding:23px;border:1px solid #806255;background:#301c24;color:#f2e5db;gap:13px}
+.yandex-award--footer .yandex-award__rating>strong{font-size:58px}
+.yandex-award--footer .yandex-award__rating{gap:16px}
+.yandex-award--footer .yandex-award__stars{font-size:18px;letter-spacing:1px;color:#e2bf80}
+.yandex-award--footer .yandex-award__title{font-size:27px}
+.yandex-award--footer .yandex-award__source svg,.yandex-award--footer .yandex-award__title>span{color:#e1bc91}
+.yandex-award--footer .yandex-award__guests,.yandex-award--footer .yandex-award__date{color:#d2c0b9}
+@media(max-width:380px){.yandex-award__rating{gap:15px}.yandex-award__rating>strong{font-size:62px}.yandex-award__title{font-size:29px}.yandex-award--footer{padding:20px}}

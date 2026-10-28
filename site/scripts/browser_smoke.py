@@ -175,6 +175,7 @@ try:
             assert loaded(img), 'Mobile restaurant photograph failed to load'
         mp.locator('h1').scroll_into_view_if_needed()
         mp.screenshot(path=str(REPORT/'home-mobile.png'),full_page=True)
+        mp.locator('.footer').screenshot(path=str(REPORT/'social-footer-mobile.png'))
         mp.evaluate('window.scrollTo({top:1200,behavior:"instant"})')
         expect(mp.locator('.back-to-top')).to_be_visible()
         mp.locator('.back-to-top').click()
@@ -306,6 +307,17 @@ try:
         expect(wp.locator('.social-links a[href="https://vk.com/bravisrest"]')).to_have_count(2)
         expect(wp.locator('.social-links a[href="https://wa.me/79895719977"]')).to_have_count(2)
         expect(wp.locator('.social-links a[href="https://t.me/+79895719977"]')).to_have_count(2)
+        expect(wp.get_by_role('link',name='Instagram BRAVIS',exact=True)).to_have_count(2)
+        for link in wp.locator('.social-links a').all():
+            assert link.get_attribute('aria-label'), 'Icon-only social link needs an accessible name'
+            expect(link.locator('svg')).to_have_count(1)
+            expect(link.locator('svg')).to_have_attribute('aria-hidden','true')
+            rect=link.bounding_box()
+            assert rect['width']>=44 and rect['height']>=44, 'Social icon hit area too small'
+        expect(wp.locator('.footer .yandex-award')).to_contain_text('5,0')
+        expect(wp.locator('.footer .yandex-award')).to_contain_text('Хорошее место')
+        expect(wp.locator('.footer .yandex-award')).to_contain_text('2026')
+        expect(wp.locator('.footer .yandex-award')).to_have_attribute('href','https://yandex.ru/maps/org/bravis/120928769508/')
         assert not requested, 'Yandex widgets loaded without visitor action'
         wp.locator('[data-yandex-widget="rating"] button').click()
         expect(wp.locator('[data-yandex-widget="rating"] iframe')).to_have_attribute('src','https://yandex.ru/sprav/widget/rating-badge/120928769508?type=rating')
