@@ -27,7 +27,7 @@ for path in paths:
         if not href.startswith('/') or href.startswith('//'):continue
         rel=href.split('?',1)[0].split('#',1)[0].lstrip('/')
         target=DIST/rel
-        if not rel or href.endswith('/'):target=target/'index.html'
+        if not rel or rel.endswith('/'):target=target/'index.html'
         assert target.is_file(),f'Broken local URL {path} -> {href}'
 missing=(DIST/'404.html').read_text(encoding='utf-8')
 assert 'name="robots" content="noindex' in missing, '404 must not be indexed'

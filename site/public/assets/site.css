@@ -133,3 +133,20 @@
 .yandex-award--footer .yandex-award__source svg,.yandex-award--footer .yandex-award__title>span{color:#e1bc91}
 .yandex-award--footer .yandex-award__guests,.yandex-award--footer .yandex-award__date{color:#d2c0b9}
 @media(max-width:380px){.yandex-award__rating{gap:15px}.yandex-award__rating>strong{font-size:62px}.yandex-award__title{font-size:29px}.yandex-award--footer{padding:20px}}
+.max-contact-section{border-top:1px solid #d8c9bb;scroll-margin-top:20px}
+.max-contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+.max-contact-grid h2{margin-top:24px}
+.max-contact-grid h3{font-family:var(--serif);font-size:30px;font-weight:400;margin:0 0 22px}
+.max-contact-grid p,.max-contact-steps{font-size:16px;line-height:1.7;color:#594a47}
+.max-contact-phone span,.max-contact-number{user-select:all;white-space:nowrap}
+.max-contact-grid .max-contact-phone{font-family:var(--serif);font-size:clamp(24px,5vw,34px);color:var(--wine);margin:18px 0}
+.max-contact-copy[hidden]{display:none}
+.max-contact-copy{cursor:pointer;max-width:100%}
+.max-contact-copy:disabled{opacity:.65;cursor:wait}
+.max-contact-grid .max-contact-status{font-size:14px;margin:14px 0 0;max-width:360px}
+.max-contact-status:empty{display:none}
+.max-contact-grid .max-contact-hint{font-size:13px;color:#786569;margin-bottom:0}
+.max-contact-steps{padding-left:22px;margin:0 0 24px}
+.max-contact-steps li{padding-left:5px;margin-bottom:14px}
+.max-contact-help{font-size:14px;text-decoration:underline;text-underline-offset:4px}
+@media(max-width:700px){.max-contact-grid{grid-template-columns:1fr;gap:34px}.max-contact-grid h2{font-size:44px}.max-contact-steps{font-size:15px}}

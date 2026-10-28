@@ -136,3 +136,23 @@
   });
   update();
 })();
+
+// The verified MAX account is found by phone; no public profile URL is assumed.
+(() => {
+  document.querySelectorAll('[data-copy-max-phone]').forEach(button => {
+    if (!navigator.clipboard?.writeText) return;
+    button.hidden = false;
+    const status = button.closest('.max-contact-section').querySelector('.max-contact-status');
+    button.addEventListener('click', async () => {
+      button.disabled = true;
+      try {
+        await navigator.clipboard.writeText(button.dataset.copyMaxPhone);
+        status.textContent = 'Номер скопирован. Вставьте его в поиск MAX.';
+      } catch {
+        status.textContent = 'Не удалось скопировать. Выделите номер выше и скопируйте его вручную.';
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+})();
