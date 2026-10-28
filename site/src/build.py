@@ -62,6 +62,23 @@ delivery_help_text = ('Оформление и условия доставки �
 domain = CONFIG.get('domain','').strip().rstrip('/')
 if domain and not domain.startswith(('https://','http://')): domain = 'https://' + domain
 published = bool(CONFIG.get('public') and domain)
+social_labels = {'telegram':'Telegram','vk':'ВКонтакте','instagram':'Instagram','max':'MAX','viber':'Viber','whatsapp':'Написать в WhatsApp','telegramMessage':'Написать в Telegram'}
+social_links = {key: str(value).strip() for key, value in CONFIG.get('socialLinks', {}).items() if value and key in social_labels}
+for social_url in social_links.values():
+    parts = urlsplit(social_url)
+    if parts.scheme != 'https' or not parts.hostname or parts.username or parts.password:
+        raise ValueError('Public social links must be verified HTTPS URLs')
+maps_org_id = str(CONFIG.get('yandexMapsOrgId', ''))
+if not re.fullmatch(r'[0-9]+', maps_org_id):
+    raise ValueError('Yandex Maps organization ID is required for the verified restaurant')
+
+def social_navigation():
+    return '<nav class="social-links" aria-label="Сообщества и связь с BRAVIS">' + ''.join(
+        f'<a href="{h(url)}" target="_blank" rel="noopener noreferrer" data-track="social_{h(key)}_click">{h(social_labels[key])} <span aria-hidden="true">↗</span></a>'
+        for key, url in social_links.items()) + '</nav>'
+
+def reputation():
+    return f'''<section class="reputation section" aria-labelledby="reputation-title"><div class="wrap reputation-grid"><div><div class="section-label"><span class="line"></span> BRAVIS · НА СВЯЗИ</div><h2 id="reputation-title">До встречи<br><em>в BRAVIS.</em></h2><p>Новости и события — в наших сообществах. Напишите нам в мессенджере, чтобы уточнить детали визита.</p>{social_navigation()}</div><div class="reputation-card"><span class="reputation-card__label">ЯНДЕКС КАРТЫ</span><h3>Хорошее место · {h(CONFIG.get('yandexGoodPlaceYear'))}</h3><p>Читайте отзывы гостей и смотрите актуальный рейтинг BRAVIS на Яндекс Картах.</p><div class="rating-widget" data-yandex-widget="rating" data-yandex-org="{h(maps_org_id)}"><button type="button" class="external-widget-load" data-track="rating_load">Показать текущий рейтинг</button><small>Загрузится виджет Яндекса. Сервис получит технические данные вашего браузера.</small></div><a class="text-link" href="{h(yandex_maps_url)}" target="_blank" rel="noopener noreferrer" data-track="reviews_click">Рейтинг и отзывы гостей <span aria-hidden="true">↗</span></a></div></div></section>'''
 reserve_id = str(CONFIG.get('smartReserveId','')).strip()
 reserve_link = 'https://reservation.yandex.ru/partner-reserve/forms/' + quote(reserve_id, safe='') if reserve_id else phone_url
 reserve_label = 'Забронировать стол' if reserve_id else 'Забронировать по телефону'
@@ -121,11 +138,11 @@ def site_url(path):
 def active(page, current):
     return ' aria-current="page"' if page==current else ''
 
-def head(title, desc, route, body_class):
-    full_title=f'{title} | BRAVIS — ресторан в Москве' if title else 'BRAVIS — ресторан на Расковой, 20 в Москве'
-    canonical=site_url(route)
+def head(title, desc, route, body_class, noindex=False):
+    full_title=f'{title} | BRAVIS — ресторан в Москве' if title else 'BRAVIS — ресторан у метро Динамо, Расковой, 20'
+    canonical=site_url(route) if not noindex else ''
     image=site_url(main_photo if main_photo else '/assets/wine-scene.svg')
-    robot='index, follow, max-image-preview:large' if published else 'noindex, nofollow'
+    robot='index, follow, max-image-preview:large' if published and not noindex else 'noindex, nofollow'
     verification=''
     for k,kind in [('verificationYandex','yandex-verification'),('verificationGoogle','google-site-verification')]:
         if CONFIG.get(k):verification+=f'<meta name="{kind}" content="{h(CONFIG[k])}">'
@@ -155,7 +172,10 @@ def head(title, desc, route, body_class):
             'opens':schedule.get('opens',''),
             'closes':schedule.get('closes','')
         }
-    schema['sameAs']=[link for link in (yandex_maps_url,two_gis_url) if link]
+    schema['sameAs']=[link for link in (yandex_maps_url,two_gis_url,*(url for key,url in social_links.items() if key not in ('whatsapp','telegramMessage'))) if link]
+    if main_photo: schema['image']=site_url(main_photo) or main_photo
+    if domain: schema['@id']=site_url('/#restaurant')
+    schema['acceptsReservations']=reserve_link
     if official_email: schema['email']=official_email
     if domain:schema['url']=site_url('/')
     analytics = {"ymId": str(CONFIG.get('yandexMetrikaId','')).strip(), "ga4Id": str(CONFIG.get('ga4Id','')).strip()}
@@ -172,12 +192,12 @@ def header(current):
 </div><nav class="mobile-nav" id="mobile-nav" aria-label="Мобильная навигация" hidden><a href="/">Главная</a><a href="/menu/">Меню</a><a href="/lunch/">Бизнес-ланч</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/#loyalty">Карта гостя</a><a href="/contacts/">Контакты</a>{reserve_button()}</nav></header>'''
 
 def footer():
-    return f'''<footer class="footer"><div class="wrap footer-grid"><div><a href="/" class="footer-logo">BRAVIS</a><p>Вкус встреч.<br>Тепло Bravis.</p></div><div><span class="footer-caption">Навигация</span><a href="/menu/">Меню</a><a href="/lunch/">Бизнес-ланч</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/#loyalty">Карта гостя</a><a href="/contacts/">Контакты</a></div><div><span class="footer-caption">Ждём в гости</span><p>{h(address)}</p><a href="{h(phone_url)}" data-track="footer_phone_click">{h(phone)}</a><p class="footer-schedule">{h(CONFIG.get('hoursText',''))}</p>{f'<a href="mailto:{h(official_email)}">{h(official_email)}</a>' if official_email else ''}</div><div class="footer-action">{reserve_button()}</div></div><div class="wrap footer-bottom"><span>© {date.today().year} BRAVIS. Все права защищены.</span><a href="/privacy/">Политика обработки персональных данных</a><a href="#top">Наверх ↑</a></div></footer><div class="mobile-bottom-cta"><a href="/menu/">Меню</a><a class="mobile-bottom-cta__primary" href="{h(reserve_link)}" {'target="_blank" rel="noopener noreferrer"' if reserve_id else ''} data-track="{h("reserve_click" if reserve_id else "reserve_phone_click")}">Забронировать</a></div><script src="/assets/site.js" defer></script></body></html>'''
+    return f'''<footer class="footer"><div class="wrap footer-grid"><div><a href="/" class="footer-logo">BRAVIS</a><p>Вкус встреч.<br>Тепло Bravis.</p></div><div><span class="footer-caption">Навигация</span><a href="/menu/">Меню</a><a href="/lunch/">Бизнес-ланч</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/#loyalty">Карта гостя</a><a href="/contacts/">Контакты</a></div><div><span class="footer-caption">Ждём в гости</span><p>{h(address)}</p><a href="{h(phone_url)}" data-track="footer_phone_click">{h(phone)}</a><p class="footer-schedule">{h(CONFIG.get('hoursText',''))}</p>{f'<a href="mailto:{h(official_email)}">{h(official_email)}</a>' if official_email else ''}</div><div class="footer-action">{reserve_button()}{social_navigation()}</div></div><div class="wrap footer-bottom"><span>© {date.today().year} BRAVIS. Все права защищены.</span><a href="/privacy/">Политика обработки персональных данных</a><a href="#top">Наверх ↑</a></div></footer><div class="mobile-bottom-cta"><a href="/menu/">Меню</a><a class="mobile-bottom-cta__primary" href="{h(reserve_link)}" {'target="_blank" rel="noopener noreferrer"' if reserve_id else ''} data-track="{h("reserve_click" if reserve_id else "reserve_phone_click")}">Забронировать</a></div><script src="/assets/site.js" defer></script></body></html>'''
 
-def page(content, title, desc, route, current, body_class=''):
-    return head(title,desc,route,body_class)+header(current)+f'<main id="main">{content}</main>'+footer()
+def page(content, title, desc, route, current, body_class='', noindex=False):
+    return head(title,desc,route,body_class,noindex)+header(current)+f'<main id="main">{content}</main>'+footer()
 
-home=f'''<section class="hero"><div class="wrap hero-grid"><div class="hero-content"><div class="eyebrow"><span class="line"></span> РЕСТОРАН В СЕРДЦЕ МОСКВЫ</div><h1>Вкус встреч.<br><em>Тепло Bravis.</em></h1><p class="lead">Армянская и европейская кухня, хорошее вино и атмосфера, в которой хочется остаться чуть дольше.</p><div class="hero-actions">{reserve_button()}{button('Посмотреть меню','/menu/',True,'menu_from_hero')}</div><div class="hero-foot"><span>МОСКВА</span><span class="hero-foot__divider"></span><span>УЛИЦА РАСКОВОЙ, 20</span></div></div><div class="hero-visual"><img class="hero-photo" src="{h(img(main_photo,'/assets/wine-scene.svg'))}" alt="{('Интерьер ресторана BRAVIS' if main_photo else 'Авторская иллюстрация винного вечера в BRAVIS')}" width="800" height="940" fetchpriority="high"><div class="hero-visual__frame"></div><div class="hero-visual__stamp"><span>BRAVIS</span><small>МЕСТО ДЛЯ<br>ВАШИХ ВСТРЕЧ</small></div></div></div><div class="hero-index" aria-hidden="true">01 / BRAVIS</div></section>
+home=f'''<section class="hero"><div class="wrap hero-grid"><div class="hero-content"><div class="eyebrow"><span class="line"></span> РЕСТОРАН У МЕТРО ДИНАМО</div><h1>Вкус встреч.<br><em>Тепло Bravis.</em></h1><p class="lead">Армянская и европейская кухня на улице Расковой, 20, у метро Динамо. Хорошее вино и атмосфера, в которой хочется остаться чуть дольше.</p><div class="hero-actions">{reserve_button()}{button('Посмотреть меню','/menu/',True,'menu_from_hero')}</div><div class="hero-foot"><span>МОСКВА</span><span class="hero-foot__divider"></span><span>УЛИЦА РАСКОВОЙ, 20</span></div></div><div class="hero-visual"><img class="hero-photo" src="{h(img(main_photo,'/assets/wine-scene.svg'))}" alt="{('Интерьер ресторана BRAVIS' if main_photo else 'Авторская иллюстрация винного вечера в BRAVIS')}" width="800" height="940" fetchpriority="high"><div class="hero-visual__frame"></div><div class="hero-visual__stamp"><span>BRAVIS</span><small>МЕСТО ДЛЯ<br>ВАШИХ ВСТРЕЧ</small></div></div></div><div class="hero-index" aria-hidden="true">01 / BRAVIS</div></section>
 <section class="intro section" id="about"><div class="wrap intro-grid"><div class="section-label"><span class="line"></span> НАША ФИЛОСОФИЯ</div><div><h2>Не просто ужин.<br><em>Повод встретиться.</em></h2><p>Bravis — про вечера, которые складываются из мелочей: знакомых вкусов, неспешных разговоров и тёплого света. Здесь уютно вдвоём, с семьёй и большой компанией.</p><a class="text-link" href="/contacts/">Найти нас <span aria-hidden="true">↗</span></a></div></div></section>
 <section class="feature-section"><div class="wrap feature-grid"><div class="feature-photo"><img src="{h(img(food,'/assets/cuisine.svg'))}" alt="{('Блюда ресторана BRAVIS' if food else 'Авторская иллюстрация блюда')}" width="640" height="520" loading="lazy"></div><div class="feature-copy"><div class="section-label section-label--light"><span class="line"></span> КУХНЯ И ВИНО</div><h2>Вкусы, к которым<br><em>возвращаются.</em></h2><p>Армянские гастрономические традиции и европейская классика. Блюда для общего стола, бокал вина и удовольствие быть вместе.</p>{button('Открыть меню','/menu/',False,'menu_from_feature')}<div class="feature-folio">BRAVIS · FOOD & WINE</div></div></div></section>
 <section class="delivery-section" id="delivery" aria-labelledby="delivery-heading">
@@ -272,6 +292,12 @@ banquet=f'''<section class="page-hero page-hero--dark"><div class="wrap page-her
 
 contacts=f'''<section class="page-hero page-hero--light"><div class="wrap"><div class="section-label"><span class="line"></span> КОНТАКТЫ И МАРШРУТ</div><h1>До <em>встречи.</em></h1><p>Находите время для близких. А мы найдём для вас место.</p></div></section><section class="section"><div class="wrap contacts-grid"><div class="contacts-info"><div class="contact-row"><span>АДРЕС</span><h2>{h(address)}</h2></div><div class="contact-row"><span>ТЕЛЕФОН</span><a class="contact-big" href="{h(phone_url)}" data-track="contacts_phone_click">{h(phone)}</a></div><div class="contact-row"><span>ОФИЦИАЛЬНАЯ ПОЧТА</span><a class="contact-big" href="mailto:{h(official_email)}">{h(official_email)}</a></div><div class="contact-row"><span>ВРЕМЯ РАБОТЫ</span><p>{h(CONFIG.get('hoursText',''))}</p></div><div class="contact-actions">{reserve_button()}{button('Открыть маршрут',yandex_maps_url,True,ext=True)}{button('Карточка BRAVIS в 2ГИС',two_gis_url,True,tracking='two_gis_click',ext=True) if two_gis_url else ''}</div></div><div class="map-card"><div class="map-card__line"></div><div class="map-card__inner"><span>BRAVIS</span><p>МОСКВА</p><p class="map-card__address">РАСКОВОЙ, 20</p><div class="map-pin">⌖</div><a href="{h(yandex_maps_url)}" target="_blank" rel="noopener noreferrer">Открыть на Яндекс Картах ↗</a>{f'<a href="{h(two_gis_url)}" target="_blank" rel="noopener noreferrer" data-track="two_gis_click">Открыть в 2ГИС ↗</a>' if two_gis_url else ''}</div></div></div></section>'''
 
+home += reputation()
+contacts += reputation()
+contacts = contacts.replace('<div class="map-card"><div class="map-card__line">', f'<div class="map-card" data-yandex-widget="map" data-yandex-org="{h(maps_org_id)}"><div class="map-card__line">', 1)
+contacts = contacts.replace('<div class="map-pin">⌖</div>', '<div class="map-pin" aria-hidden="true">⌖</div><button type="button" class="external-widget-load" data-track="map_load">Показать карту здесь</button><small>Загрузится карта Яндекса. Сервис получит технические данные вашего браузера.</small>', 1)
+not_found = '<section class="page-hero page-hero--light"><div class="wrap"><div class="section-label">BRAVIS · 404</div><h1>Страница <em>не найдена.</em></h1><p>Возможно, адрес изменился. Загляните в меню или вернитесь на главную.</p><div class="hero-actions">' + button('На главную','/') + button('Посмотреть меню','/menu/',True) + '</div></div></section>'
+
 privacy_title='Политика обработки персональных данных'
 operator = CONFIG.get('operatorLegalName','').strip()
 legal_email = CONFIG.get('operatorContactEmail','').strip()
@@ -309,10 +335,11 @@ if CONFIG.get('legalPolicyApproved'):
 
 PAGES={
   'index.html':page(home,'','Ресторан BRAVIS на улице Расковой, 20 в Москве. Армянская и европейская кухня, вино, семейные ужины и встречи. Бронирование столов.','/','home','home-page'),
-  'menu/index.html':page(menu_top,'Меню','Меню ресторана BRAVIS в Москве: армянская и европейская кухня, винная карта. Актуальные блюда и информация.','/menu/','menu'),
-  'lunch/index.html':page(lunch,'Бизнес-ланч','Бизнес-ланч в BRAVIS на Расковой, 20: меню по будням, суп, горячее и напиток. Оригинальное меню и бронирование стола.','/lunch/','lunch','lunch-page'),
+  'menu/index.html':page(menu_top,'Меню и цены — армянская и европейская кухня','Меню ресторана BRAVIS в Москве: армянская и европейская кухня, винная карта. Актуальные блюда и информация.','/menu/','menu'),
+  'lunch/index.html':page(lunch,'Бизнес-ланч за 690 ₽ на Расковой, 20','Бизнес-ланч в BRAVIS на Расковой, 20: меню по будням, суп, горячее и напиток. Оригинальное меню и бронирование стола.','/lunch/','lunch','lunch-page'),
   'banquets/index.html':page(banquet,'Банкеты и мероприятия','Праздники, камерные банкеты, дни рождения и семейные встречи в ресторане BRAVIS, Москва, улица Расковой, 20.','/banquets/','banquets'),
   'contacts/index.html':page(contacts,'Адрес и контакты','Ресторан BRAVIS: Москва, улица Расковой, 20. Телефон +7 (989) 571-99-77. Как добраться и забронировать стол.','/contacts/','contacts'),
+  '404.html':page(not_found,'Страница не найдена','Страница не найдена. Меню, контакты и бронирование ресторана BRAVIS.','/404.html','','not-found-page',noindex=True),
   'privacy/index.html':page(privacy,privacy_title,'Сведения об обработке персональных данных на сайте ресторана BRAVIS.','/privacy/','privacy')
 }
 
