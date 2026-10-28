@@ -2,6 +2,10 @@
   const toggle = document.querySelector('.menu-toggle');
   const nav = document.querySelector('.mobile-nav');
   if (toggle && nav) {
+    const fitNav = () => {
+      const header = toggle.closest('.site-header');
+      nav.style.setProperty('--mobile-nav-top', Math.ceil(header.getBoundingClientRect().bottom) + 'px');
+    };
     const close = () => { nav.hidden = true; toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-label','Открыть меню'); document.body.classList.remove('nav-open'); };
     toggle.addEventListener('click', () => {
       if (!nav.hidden) return close();
@@ -9,9 +13,16 @@
       toggle.setAttribute('aria-expanded', 'true');
       toggle.setAttribute('aria-label', 'Закрыть меню');
       document.body.classList.add('nav-open');
+      fitNav();
     });
+    window.addEventListener('resize', () => { if (!nav.hidden) fitNav(); });
     nav.querySelectorAll('a').forEach(el => el.addEventListener('click', close));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !nav.hidden) { close(); toggle.focus(); }
+    });
+    window.matchMedia('(max-width: 960px)').addEventListener('change', event => {
+      if (!event.matches) close();
+    });
   }
   // Counters are only initialized after explicit consent and when owner IDs exist.
   const conf = window.BRAVIS_ANALYTICS || {};
@@ -91,4 +102,37 @@
       container.replaceChildren(frame);
     }, { once: true });
   });
+})();
+
+
+// Keep mobile navigation and the return-to-top control available on long pages.
+(() => {
+  const button = document.querySelector('.back-to-top');
+  if (!button) return;
+  const mobile = window.matchMedia('(max-width: 960px)');
+  let pending = false;
+  const update = () => {
+    pending = false;
+    button.hidden = !mobile.matches || window.scrollY < 400;
+    if (button.hidden) return;
+    const booking = document.querySelector('.mobile-bottom-cta');
+    const banner = document.querySelector('.cookie-banner');
+    let bottom = Math.max(16, (booking?.getBoundingClientRect().height || 0) + 12);
+    if (banner) bottom = Math.max(bottom, innerHeight - banner.getBoundingClientRect().top + 12);
+    button.style.setProperty('--back-to-top-bottom', bottom + 'px');
+  };
+  const schedule = () => {
+    if (!pending) { pending = true; requestAnimationFrame(update); }
+  };
+  ['scroll', 'resize', 'pageshow'].forEach(event => window.addEventListener(event, schedule, { passive: true }));
+  const banner = document.querySelector('.cookie-banner');
+  if (banner) {
+    new MutationObserver(schedule).observe(document.body, { childList: true });
+    if (typeof ResizeObserver === 'function') new ResizeObserver(schedule).observe(banner);
+  }
+  button.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    document.querySelector('.logo')?.focus({ preventScroll: true });
+  });
+  update();
 })();
