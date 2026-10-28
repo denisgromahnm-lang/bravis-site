@@ -1,7 +1,7 @@
 {
   "source": "Подтверждённые печатные меню BRAVIS, актуальные изображения сохранены на сайте",
   "dataStatus": "review-from-approved-print-menu",
-  "lastUpdated": "2026-10-24",
+  "lastUpdated": "2026-10-28",
   "sections": [
     {
       "id": "seasonal-dishes",
@@ -335,6 +335,635 @@
         {
           "name": "Бизнес-ланч (комплекс)",
           "price": 690
+        }
+      ]
+    },
+    {
+      "id": "bar-absinthe",
+      "name": "Абсент",
+      "note": "Крепкий алкоголь · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Ксента Абсент Дистилд",
+          "price": 650
+        }
+      ]
+    },
+    {
+      "id": "bar-vermouth",
+      "name": "Вермут",
+      "note": "Крепкий алкоголь · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Мартини Бьянко",
+          "price": 550,
+          "weight": "100 мл"
+        },
+        {
+          "name": "Мартини Россо",
+          "price": 550,
+          "weight": "100 мл"
+        },
+        {
+          "name": "Мартини Экстра Драй",
+          "price": 550,
+          "weight": "100 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-brandy",
+      "name": "Бренди",
+      "note": "Крепкий алкоголь · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Абрикон Голд Эд, 5 лет",
+          "price": 500,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Абрикон Блек Даймонд, 12 лет",
+          "price": 900,
+          "weight": "50 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-whisky",
+      "name": "Виски",
+      "note": "Крепкий алкоголь · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Джек Дэниел’с Теннесси",
+          "price": 550,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Джонни Уокер Блю Лейбл",
+          "price": 4200,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Джонни Уокер Рэд Лейбл",
+          "price": 500,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Джура, 12 лет",
+          "price": 1100,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Макаллан Дабл Каск, 12 лет",
+          "price": 2600,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Фокс Энд Догс",
+          "price": 400,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Виски Чивас Ригал, 12 лет",
+          "price": 950,
+          "weight": "50 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-vodka",
+      "name": "Водка",
+      "note": "Крепкий алкоголь · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Белуга",
+          "price": 350,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Оганян",
+          "price": 350,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Онегин",
+          "price": 350,
+          "weight": "50 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-gin",
+      "name": "Джин",
+      "note": "Крепкий алкоголь · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Барристер Драй",
+          "price": 350,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Джин Маре",
+          "price": 800,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Леди Джейн Лондон Драй",
+          "price": 450,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Хопперс Ориджинал Драй",
+          "price": 350,
+          "weight": "50 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-cognac",
+      "name": "Коньяк и дистиляты",
+      "note": "Крепкий алкоголь · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Арарат, 5 лет",
+          "price": 550,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Арарат Ахтамар, старый КС, 10 лет",
+          "price": 900,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Арарат Наири, очень старый, ОС, 20 лет",
+          "price": 2200,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Арарат со вкусом абрикоса",
+          "price": 550,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Арарат со вкусом кофе",
+          "price": 550,
+          "weight": "50 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-liqueurs",
+      "name": "Ликеры",
+      "note": "Крепкий алкоголь · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Бальзам Рижский Чёрный бальзам",
+          "price": 450,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Куантро",
+          "price": 450,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Лимончино Лимончелло Боттега",
+          "price": 550,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Ягермайстер",
+          "price": 450,
+          "weight": "50 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-rum",
+      "name": "Ром",
+      "note": "Крепкий алкоголь · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Ангостура Эйджид, 7 еарс",
+          "price": 650,
+          "weight": "50 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-tequila",
+      "name": "Текила",
+      "note": "Крепкий алкоголь · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Ольмека Голд",
+          "price": 550,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Ольмека Сильвер",
+          "price": 600,
+          "weight": "50 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-sherry-port",
+      "name": "Херес / портвейн",
+      "note": "Крепкий алкоголь · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Сеньора Ду Конвенту Порто Руби",
+          "price": 450,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Херес Домек Мансанилья",
+          "price": 450,
+          "weight": "50 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-beer",
+      "name": "Пиво",
+      "note": "Бар и напитки · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Нат Баттер",
+          "price": 450,
+          "weight": "500 мл"
+        },
+        {
+          "name": "Айрон Вудс Стаут",
+          "price": 500,
+          "weight": "500 мл"
+        },
+        {
+          "name": "Аусвайс",
+          "price": 450,
+          "weight": "500 мл"
+        },
+        {
+          "name": "Будвайзер Ориджинал",
+          "price": 700,
+          "weight": "500 мл"
+        },
+        {
+          "name": "Корона",
+          "price": 450,
+          "weight": "350 мл"
+        },
+        {
+          "name": "Корона Б/А",
+          "price": 450,
+          "weight": "350 мл"
+        },
+        {
+          "name": "Милк Оф Амнезия Б/А",
+          "price": 450,
+          "weight": "500 мл"
+        },
+        {
+          "name": "Хайдеггер Хель",
+          "price": 450,
+          "weight": "500 мл"
+        },
+        {
+          "name": "Шпатен Ориджинал",
+          "price": 600,
+          "weight": "500 мл"
+        },
+        {
+          "name": "Руж Де Флер",
+          "price": 450,
+          "weight": "500 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-draught-beer",
+      "name": "Пиво розлив",
+      "note": "Бар и напитки · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Блю Манки Вит Эль",
+          "price": 400,
+          "weight": "0,33 л"
+        },
+        {
+          "name": "Блю Манки Вит Эль",
+          "price": 500,
+          "weight": "0,5 л"
+        },
+        {
+          "name": "Хайдеггер Хель",
+          "price": 350,
+          "weight": "0,33 л"
+        },
+        {
+          "name": "Хайдеггер Хель",
+          "price": 450,
+          "weight": "0,5 л"
+        }
+      ]
+    },
+    {
+      "id": "bar-cocktails",
+      "name": "Классические коктейли",
+      "note": "Коктейли алкогольные · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Апероль",
+          "price": 750,
+          "weight": "200 мл"
+        },
+        {
+          "name": "Лонг Айленд Айс Ти",
+          "price": 800,
+          "weight": "235 мл"
+        },
+        {
+          "name": "Май Тай",
+          "price": 700,
+          "weight": "330 мл"
+        },
+        {
+          "name": "Мохито",
+          "price": 650,
+          "weight": "250 мл"
+        },
+        {
+          "name": "Негрони",
+          "price": 1100,
+          "weight": "200 мл"
+        },
+        {
+          "name": "Секс на пляже",
+          "price": 650,
+          "weight": "280 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-shots",
+      "name": "Шоты",
+      "note": "Коктейли алкогольные · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Б-52",
+          "price": 350,
+          "weight": "60 мл"
+        },
+        {
+          "name": "Кофейный",
+          "price": 350,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Малиновый",
+          "price": 350,
+          "weight": "50 мл"
+        },
+        {
+          "name": "Патриот",
+          "price": 350,
+          "weight": "60 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-lemonades",
+      "name": "Лимонады",
+      "note": "Напитки безалкогольные · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Малина-маракуя",
+          "price": 450,
+          "weight": "300 мл"
+        },
+        {
+          "name": "Манго-маракуя",
+          "price": 450,
+          "weight": "300 мл"
+        },
+        {
+          "name": "Мохито безалкогольное",
+          "price": 450,
+          "weight": "300 мл"
+        },
+        {
+          "name": "Тан домашний",
+          "price": 400,
+          "weight": "1 л"
+        },
+        {
+          "name": "Тан домашний",
+          "price": 150,
+          "weight": "300 мл"
+        },
+        {
+          "name": "Цитрусовый лимонад",
+          "price": 450,
+          "weight": "300 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-milkshakes",
+      "name": "Молочные коктейли",
+      "note": "Напитки безалкогольные · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Ваниль, печенье, шоколад",
+          "price": 550,
+          "weight": "300 мл"
+        },
+        {
+          "name": "Малина, кокос",
+          "price": 550,
+          "weight": "300 мл"
+        },
+        {
+          "name": "Малина, шоколад",
+          "price": 550,
+          "weight": "300 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-drinks-juices",
+      "name": "Напитки / соки",
+      "note": "Напитки безалкогольные · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Винья Албали Каберне Темпранильо",
+          "price": 1700,
+          "weight": "750 мл"
+        },
+        {
+          "name": "Винья Албали Совиньон Блан",
+          "price": 1700,
+          "weight": "750 мл"
+        },
+        {
+          "name": "Боттега Зеро Розе Спарклинг Лайм",
+          "price": 3500,
+          "weight": "750 мл"
+        },
+        {
+          "name": "Вода без газа",
+          "price": 300,
+          "weight": "500 мл"
+        },
+        {
+          "name": "Вода с газом",
+          "price": 300,
+          "weight": "500 мл"
+        },
+        {
+          "name": "Кока-кола",
+          "price": 300,
+          "weight": "330 мл"
+        },
+        {
+          "name": "Кока-кола зеро",
+          "price": 300,
+          "weight": "330 мл"
+        },
+        {
+          "name": "Компот",
+          "price": 600,
+          "weight": "1 л"
+        },
+        {
+          "name": "Компот",
+          "price": 200,
+          "weight": "300 мл"
+        },
+        {
+          "name": "Морс",
+          "price": 600,
+          "weight": "1 л"
+        },
+        {
+          "name": "Морс",
+          "price": 200,
+          "weight": "300 мл"
+        },
+        {
+          "name": "Ред Булл",
+          "price": 400,
+          "weight": "250 мл"
+        },
+        {
+          "name": "Сок в ассортименте",
+          "price": 250,
+          "weight": "200 мл"
+        },
+        {
+          "name": "Спрайт",
+          "price": 300,
+          "weight": "330 мл"
+        },
+        {
+          "name": "Фанта",
+          "price": 300,
+          "weight": "330 мл"
+        }
+      ]
+    },
+    {
+      "id": "bar-tea",
+      "name": "Чай",
+      "note": "Чай и кофе · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Молочный Улун",
+          "price": 450
+        },
+        {
+          "name": "Сенча",
+          "price": 400
+        },
+        {
+          "name": "Черный",
+          "price": 400
+        },
+        {
+          "name": "Черный с чабрецом",
+          "price": 450
+        },
+        {
+          "name": "Эрл Грей",
+          "price": 450
+        }
+      ]
+    },
+    {
+      "id": "bar-coffee",
+      "name": "Кофе",
+      "note": "Чай и кофе · Из печатной барной карты BRAVIS.",
+      "sourceImage": "/menu-media/main-back.jpg",
+      "items": [
+        {
+          "name": "Американо",
+          "price": 300,
+          "weight": "200 мл"
+        },
+        {
+          "name": "Двойной эспрессо",
+          "price": 250,
+          "weight": "60 мл"
+        },
+        {
+          "name": "Капучино",
+          "price": 350,
+          "weight": "250 мл"
+        },
+        {
+          "name": "Кофе по армянски",
+          "price": 250,
+          "weight": "180 мл"
+        },
+        {
+          "name": "Латте",
+          "price": 350,
+          "weight": "350 мл"
+        },
+        {
+          "name": "Раф",
+          "price": 400,
+          "weight": "350 мл"
+        },
+        {
+          "name": "Флет уайт",
+          "price": 350,
+          "weight": "250 мл"
+        },
+        {
+          "name": "Эспрессо",
+          "price": 200,
+          "weight": "30 мл"
         }
       ]
     }

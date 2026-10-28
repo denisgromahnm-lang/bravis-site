@@ -12,7 +12,5 @@ for page in sorted(DIST.rglob('*.html')):
     data=data.replace('"/menu-media/','"'+PREFIX+'/menu-media/')
     assert 'name="robots" content="noindex' in data
     page.write_text(data,encoding='utf8')
-# Preview service paths must be under the GitHub Pages project prefix.
-p=DIST/'404.html'
-p.write_text('<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="robots" content="noindex"><title>BRAVIS · 404</title><body><h1>Страница не найдена</h1><a href="/bravis-site/">Вернуться в BRAVIS</a></body></html>',encoding='utf8')
+assert (DIST/'404.html').is_file(), 'Branded 404 must be generated before preparing the preview'
 print('GitHub Pages preview built at /bravis-site/ (noindex)')

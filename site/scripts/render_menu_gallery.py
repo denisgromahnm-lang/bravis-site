@@ -47,12 +47,25 @@ def main():
       <p>Меню ресторана, сезонные предложения, барная карта, бизнес-ланч и блюда для детей. Откройте раздел, чтобы рассмотреть его крупно.</p>
     </div><div class="print-menu-grid">'''+''.join(tiles)+'''</div>
     <p class="approved-menus__disclaimer">Изображения меню предоставлены рестораном. Состав блюд, доступность и актуальные цены уточняйте у сотрудников.</p>
-    </div><dialog class="menu-lightbox" id="menu-lightbox" aria-label="Просмотр меню">
+    </div><dialog class="menu-lightbox" id="menu-lightbox" aria-labelledby="menu-lightbox-title">
       <header class="menu-lightbox__header"><strong id="menu-lightbox-title">Меню BRAVIS</strong>
       <span class="menu-lightbox__counter" id="menu-lightbox-counter"></span>
       <button type="button" id="menu-lightbox-close" aria-label="Закрыть меню">Закрыть ✕</button></header>
+      <div class="menu-lightbox__toolbar" role="group" aria-label="Масштаб меню">
+        <button type="button" id="menu-zoom-out" aria-label="Уменьшить меню" title="Уменьшить (−)" disabled>−</button>
+        <output id="menu-zoom-level" aria-live="polite" aria-label="Масштаб просмотра">100%</output>
+        <button type="button" id="menu-zoom-in" aria-label="Увеличить меню" title="Увеличить (+)" disabled>+</button>
+        <button type="button" id="menu-zoom-fit" disabled>Уместить</button>
+        <a id="menu-original" href="/menu-media/seasonal.jpg" target="_blank" rel="noopener noreferrer">Оригинал ↗</a>
+      </div>
+      <p class="menu-lightbox__hint">Увеличьте меню и перемещайте страницу, чтобы рассмотреть детали.</p>
+      <p class="menu-lightbox__status" id="menu-lightbox-status" role="status"></p>
       <div class="menu-lightbox__viewer"><button type="button" id="menu-lightbox-prev" aria-label="Предыдущая страница">‹</button>
-      <img id="menu-lightbox-image" alt="Оригинальная страница меню ресторана BRAVIS" width="1100" height="1550">
+      <div class="menu-lightbox__stage" id="menu-lightbox-stage" tabindex="0" aria-label="Страница меню. Клавиши плюс и минус меняют масштаб, ноль — уместить.">
+        <div class="menu-lightbox__stage-inner"><div id="menu-lightbox-sheet" class="menu-lightbox__sheet">
+          <img id="menu-lightbox-image" alt="Оригинальная страница меню ресторана BRAVIS" width="1100" height="1550" draggable="false">
+        </div></div>
+      </div>
       <button type="button" id="menu-lightbox-next" aria-label="Следующая страница">›</button></div>
     </dialog>'''
     if '<div class="menu-placeholder">' in page:
@@ -60,7 +73,7 @@ def main():
         if n!=1:raise RuntimeError('Cannot locate safe insertion point in /menu/')
     elif '<nav class="menu-filter"' in page:
         # Preserve the owner-approved text menu for SEO, and put the image menus first.
-        page=page.replace('<nav class="menu-filter"', widget + '<div class="menu-structured-heading"><h2>Блюда и цены из печатного меню</h2><p>Выбор позиций ниже. Полный ассортимент — на изображениях меню выше.</p></div><nav class="menu-filter"',1)
+        page=page.replace('<nav class="menu-filter"', widget + '<div class="menu-structured-heading"><h2>Блюда, напитки и цены из печатного меню</h2><p>Выбор позиций ниже. Полный ассортимент — на изображениях меню выше.</p></div><nav class="menu-filter"',1)
     else:
         raise RuntimeError('Unexpected menu template, refusing to replace')
     schema={"@context":"https://schema.org","@type":"Menu","name":"Меню ресторана BRAVIS","inLanguage":"ru","hasMenuSection":[{"@type":"MenuSection","name":entry["title"]} for entry in files]}

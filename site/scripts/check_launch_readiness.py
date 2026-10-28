@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 """Report BRAVIS launch blockers without modifying files or credentials."""
-import argparse,json,os,re
+import argparse,json,re
 from html import unescape
 from urllib.parse import urlsplit
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--production',action='store_true',help='Check the production overlay instead of the noindex preview')
+parser.add_argument('--strict',action='store_true',help='Exit with status 2 while required gates remain open')
+args=parser.parse_args()
 c=json.loads((ROOT/'site.config.json').read_text(encoding='utf8'))
+if args.production:
+    c.update(json.loads((ROOT/'production.config.json').read_text(encoding='utf8')))
+print('Configuration:', 'production overlay' if args.production else 'noindex preview')
 fail=[]
 def check(label,test):
     print(('PASS ' if test else 'PENDING ')+label)
@@ -13,7 +20,11 @@ def check(label,test):
 check('Own official domain configured',c.get('domain','').removesuffix('/')=='https://bravisrest.ru')
 check('Production indexing explicitly enabled',c.get('public') is True)
 check('Owner has approved current printed menu prices',c.get('menuPricesApproved') is True)
-check('Owner has approved final privacy policy',c.get('legalPolicyApproved') is True)
+check('Privacy approval flag is configured (final text checked separately)',c.get('legalPolicyApproved') is True)
+policy=ROOT/'content/privacy.approved.html'
+policy_text=policy.read_text(encoding='utf8') if policy.is_file() else ''
+check('Published privacy text is present and has no working-draft notice',
+      bool(policy_text) and not re.search(r'рабочим проектом|перед выпуском окончательной редакции|должен быть актуализирован и утверждён',policy_text,re.I))
 check('Owner has explicitly authorized publication',c.get('productionReleaseApproved') is True)
 check('Legal entity named',bool(c.get('operatorLegalName','').strip()))
 check('Legal data processing email',bool(re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+',c.get('operatorContactEmail','').strip())))
@@ -48,5 +59,4 @@ if gallery.exists():
     check('Own restaurant interior photo',bool(g.get('hero') and (ROOT/'public'/g['hero'].lstrip('/')).is_file()))
 else:check('Own restaurant interior photo',False)
 print('\nOPEN GATES:',len(fail),'|',', '.join(fail) if fail else 'none')
-if argparse.ArgumentParser(add_help=False).parse_known_args()[1]:pass
-if '--strict' in os.sys.argv and fail:raise SystemExit(2)
+if args.strict and fail:raise SystemExit(2)
