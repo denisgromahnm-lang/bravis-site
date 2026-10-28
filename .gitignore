@@ -4,3 +4,5 @@ site/public/menu-media/
 site/.menu-backups/
 __pycache__/
 *.pyc
+
+site/browser-report/

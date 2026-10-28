@@ -3,6 +3,8 @@
 Outputs three screenshots in site/browser-report without touching production servers.
 """
 import contextlib
+import os
+import shutil
 import socket
 import subprocess
 import sys
@@ -26,7 +28,8 @@ def loaded(img):
     return img.evaluate('(e)=>e.complete && e.naturalWidth > 0')
 try:
     with sync_playwright() as p:
-        browser=p.chromium.launch(headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+        browser_path=os.environ.get('BRAVIS_CHROMIUM_EXECUTABLE') or shutil.which('chromium')
+        browser=p.chromium.launch(executable_path=browser_path,headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
         desktop=browser.new_context(viewport={'width':1440,'height':900},device_scale_factor=1)
         page=desktop.new_page()
         page_errors=[]
@@ -44,6 +47,8 @@ try:
         expect(page.locator('.loyalty-action')).to_have_attribute('href','https://app.loona.ai/4992/create/register?source=qr&tag=none')
         assert page.locator('.delivery-action').get_attribute('target')=='_blank'
         assert page.locator('.loyalty-action').get_attribute('rel')=='noopener noreferrer'
+        page.locator('.loyalty-qr img').scroll_into_view_if_needed()
+        page.locator('.loyalty-qr img').evaluate('(image) => image.decode()')
         assert loaded(page.locator('.loyalty-qr img')),'Loona card enrollment QR did not load'
         assert page.locator('.loyalty-qr').get_attribute('href')==page.locator('.loyalty-action').get_attribute('href')
         expect(page.locator('#delivery')).to_be_visible()
@@ -82,6 +87,34 @@ try:
         expect(dialog).not_to_be_visible()
         page.screenshot(path=str(REPORT/'menu-desktop.png'),full_page=True)
         print('PASS: five actual menu thumbnails and full-screen viewer')
+        page.goto(base+'/lunch/',wait_until='networkidle')
+        expect(page.get_by_role('heading',level=1)).to_contain_text('Пауза на')
+        expect(page.get_by_role('tab',name='Понедельник',exact=True)).to_have_attribute('aria-selected','true')
+        page.get_by_role('tab',name='Среда',exact=True).click()
+        expect(page.locator('#lunch-wednesday')).to_be_visible()
+        expect(page.locator('#lunch-monday')).to_be_hidden()
+        expect(page.locator('#lunch-wednesday')).to_contain_text('Харчо с телятиной и ткемали')
+        page.get_by_role('tab',name='Среда',exact=True).press('End')
+        expect(page.get_by_role('tab',name='Пятница',exact=True)).to_be_focused()
+        expect(page.locator('#lunch-friday')).to_be_visible()
+        page.locator('.lunch-original summary').click()
+        original=page.locator('.lunch-original img')
+        original.scroll_into_view_if_needed()
+        original.evaluate('(image) => image.decode()')
+        assert loaded(original), 'Original lunch menu image failed to load'
+        expect(page.locator('.lunch-original__body > a')).to_have_attribute('href','/menu-media/business.jpg')
+        page.locator('.lunch-original summary').click()
+        if page.locator('[data-consent="no"]').count(): page.locator('[data-consent="no"]').click()
+        page.get_by_role('tab',name='Понедельник',exact=True).click()
+        page.locator('h1').scroll_into_view_if_needed()
+        page.screenshot(path=str(REPORT/'lunch-desktop.png'),full_page=True)
+        nojs=browser.new_context(java_script_enabled=False)
+        nj=nojs.new_page()
+        nj.goto(base+'/lunch/',wait_until='domcontentloaded')
+        expect(nj.locator('.lunch-day:visible')).to_have_count(5)
+        expect(nj.locator('[data-lunch-tabs]')).to_be_hidden()
+        nojs.close()
+        print('PASS: lunch day selection, keyboard navigation, original menu and no-JavaScript fallback')
         mobile=browser.new_context(viewport={'width':390,'height':844},device_scale_factor=1,is_mobile=True,has_touch=True)
         mp=mobile.new_page()
         mp.goto(base+'/',wait_until='networkidle')
@@ -108,6 +141,13 @@ try:
         mp.locator('#menu-lightbox-close').click()
         assert mp.evaluate('document.documentElement.scrollWidth <= window.innerWidth + 2'), 'Horizontal scroll on mobile menu'
         mp.screenshot(path=str(REPORT/'menu-mobile.png'),full_page=True)
+        mp.goto(base+'/lunch/',wait_until='networkidle')
+        mp.get_by_role('tab',name='Среда',exact=True).click()
+        expect(mp.locator('#lunch-wednesday')).to_be_visible()
+        assert mp.evaluate('document.documentElement.scrollWidth <= innerWidth + 2'), 'Horizontal scroll on mobile lunch'
+        if mp.locator('[data-consent="no"]').count(): mp.locator('[data-consent="no"]').click()
+        mp.locator('h1').scroll_into_view_if_needed()
+        mp.screenshot(path=str(REPORT/'lunch-mobile.png'),full_page=True)
         mp.goto(base+'/',wait_until='networkidle')
         for img in mp.locator('.gallery-grid img:visible, .events-photo img:visible').all():
             img.scroll_into_view_if_needed()
@@ -119,15 +159,16 @@ try:
         # At minimum supported phone width, content must not force sideways scrolling.
         narrow=browser.new_context(viewport={'width':320,'height':720},is_mobile=True,has_touch=True)
         np=narrow.new_page()
-        for route in ('/','/menu/','/banquets/','/contacts/','/privacy/'):
+        for route in ('/','/menu/','/lunch/','/banquets/','/contacts/','/privacy/'):
             np.goto(base+route,wait_until='domcontentloaded')
             np.wait_for_timeout(100)
             dimensions=np.evaluate('({viewport:innerWidth,scroll:document.documentElement.scrollWidth})')
             assert dimensions['scroll'] <= dimensions['viewport']+2, f'Horizontal overflow at 320px on {route}: {dimensions}'
         narrow.close()
-        print('PASS: no horizontal scrolling at 320px across all five pages')
+        print('PASS: no horizontal scrolling at 320px across all six pages')
         # Consent regression: no Yandex request before opt-in, including after opt-out.
-        consent=desktop.new_page()
+        consent_context=browser.new_context()
+        consent=consent_context.new_page()
         metrika_requests=[]
         consent.route('https://mc.yandex.ru/metrika/tag.js?id=113768615',lambda route: route.fulfill(status=200,content_type='application/javascript',body=''))
         consent.on('request',lambda req: metrika_requests.append(req.url) if req.url.startswith('https://mc.yandex.ru/') else None)
@@ -151,7 +192,7 @@ try:
         consent.wait_for_function("window.ym?.a?.some(x=>x[1]==='reachGoal' && x[2]==='menu_from_hero' && x[0]===113768615)",timeout=10000)
         print('PASS: Yandex Metrika 113768615 loads only after opt-in, rejected opt-in stays rejected, reachGoal fires')
         assert not page_errors,'Unexpected page JavaScript errors: '+str(page_errors)
-        consent.close()
+        consent_context.close()
         desktop.close()
         mobile.close()
         browser.close()
