@@ -190,8 +190,8 @@ try:
         consent_context=browser.new_context()
         consent=consent_context.new_page()
         metrika_requests=[]
-        consent.route('https://mc.yandex.ru/metrika/tag.js?id=113768615',lambda route: route.fulfill(status=200,content_type='application/javascript',body=''))
-        consent.on('request',lambda req: metrika_requests.append(req.url) if req.url.startswith('https://mc.yandex.ru/') else None)
+        consent.route('https://mc.yandex.com/metrika/tag.js?id=113768615',lambda route: route.fulfill(status=200,content_type='application/javascript',body=''))
+        consent.on('request',lambda req: metrika_requests.append(req.url) if req.url.startswith('https://mc.yandex.com/') else None)
         consent.goto(base+'/',wait_until='networkidle')
         expect(consent.locator('.cookie-banner')).to_be_visible()
         assert not metrika_requests,'Metrika must not request external scripts before consent'
@@ -215,7 +215,7 @@ try:
         blocked=browser.new_context()
         blocked.add_init_script("Object.defineProperty(window,'localStorage',{get(){throw new DOMException('Storage blocked','SecurityError')}})")
         bp=blocked.new_page()
-        bp.route('https://mc.yandex.ru/**',lambda route: route.fulfill(status=200,content_type='application/javascript',body=''))
+        bp.route('https://mc.yandex.com/**',lambda route: route.fulfill(status=200,content_type='application/javascript',body=''))
         bp.goto(base+'/',wait_until='networkidle')
         expect(bp.locator('.cookie-banner')).to_be_visible()
         assert not bp.evaluate('typeof window.ym === "function"'), 'Blocked storage must default to no analytics'
