@@ -16,8 +16,11 @@
   // Counters are only initialized after explicit consent and when owner IDs exist.
   const conf = window.BRAVIS_ANALYTICS || {};
   const consentKey = 'bravis_analytics_consent_v1';
+  // Some browser privacy modes block storage. Keep consent for this page in memory.
+  let consentValue = null;
+  try { consentValue = localStorage.getItem(consentKey); } catch {}
   const track = (eventName) => {
-    if (localStorage.getItem(consentKey) !== 'yes') return;
+    if (consentValue !== 'yes') return;
     if (typeof window.ym === 'function' && conf.ymId) window.ym(Number(conf.ymId), 'reachGoal', eventName);
     if (typeof window.gtag === 'function' && conf.ga4Id) window.gtag('event', eventName);
   };
@@ -50,7 +53,7 @@
       gtag('js',new Date()); gtag('config',conf.ga4Id);
     }
   }
-  const saved = localStorage.getItem(consentKey);
+  const saved = consentValue;
   if (saved === 'yes') { loadAnalytics(); }
   if (saved === null) {
     const banner=document.createElement('div');banner.className='cookie-banner';banner.setAttribute('role','dialog');banner.setAttribute('aria-label','Настройки аналитики');
@@ -59,14 +62,33 @@
     banner.innerHTML='<p>Для улучшения сайта мы используем необязательную аналитику. <a href="'+privacyHref+'">Подробнее</a></p><div><button type="button" data-consent="no">Без аналитики</button><button type="button" data-consent="yes">Разрешить</button></div>';
     document.body.appendChild(banner);
     banner.querySelectorAll('[data-consent]').forEach(b => b.addEventListener('click',()=>{
-      localStorage.setItem(consentKey,b.dataset.consent);
+      consentValue = b.dataset.consent;
+      try { localStorage.setItem(consentKey,consentValue); } catch {}
       banner.remove();if(b.dataset.consent==='yes') loadAnalytics();
     }));
   }
   const footer = document.querySelector('.footer-bottom');
   if (footer) {
     const settings=document.createElement('button'); settings.type='button';settings.className='cookie-settings';settings.textContent='Настройки cookie';
-    settings.onclick=()=>{localStorage.removeItem(consentKey);location.reload();};
+    settings.onclick=()=>{try { localStorage.removeItem(consentKey); } catch {} location.reload();};
     footer.appendChild(settings);
   }
+})();
+
+// Loading a map or a rating is an explicit visitor action, separate from analytics consent.
+(() => {
+  document.querySelectorAll('[data-yandex-widget]').forEach(container => {
+    const button = container.querySelector('.external-widget-load');
+    const id = container.dataset.yandexOrg;
+    if (!button || !/^\d+$/.test(id || '')) return;
+    button.addEventListener('click', () => {
+      const frame = document.createElement('iframe');
+      const map = container.dataset.yandexWidget === 'map';
+      frame.title = map ? 'Ресторан BRAVIS на Яндекс Картах' : 'Текущий рейтинг BRAVIS на Яндекс Картах';
+      frame.src = map ? 'https://yandex.ru/map-widget/v1/?ol=biz&oid=' + id + '&z=16' : 'https://yandex.ru/sprav/widget/rating-badge/' + id + '?type=rating';
+      frame.referrerPolicy = 'strict-origin-when-cross-origin';
+      if (map) frame.allowFullscreen = true;
+      container.replaceChildren(frame);
+    }, { once: true });
+  });
 })();
