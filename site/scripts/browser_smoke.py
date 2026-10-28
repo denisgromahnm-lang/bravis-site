@@ -175,6 +175,10 @@ try:
             assert loaded(img), 'Mobile restaurant photograph failed to load'
         mp.locator('h1').scroll_into_view_if_needed()
         mp.screenshot(path=str(REPORT/'home-mobile.png'),full_page=True)
+        mp.evaluate('window.scrollTo({top:1200,behavior:"instant"})')
+        expect(mp.locator('.back-to-top')).to_be_visible()
+        mp.locator('.back-to-top').click()
+        mp.wait_for_function('scrollY <= 1',timeout=5000)
         print('PASS: mobile delivery navigation, no horizontal scroll or old food images; five menu cards')
         # At minimum supported phone width, content must not force sideways scrolling.
         narrow=browser.new_context(viewport={'width':320,'height':720},is_mobile=True,has_touch=True)
@@ -186,6 +190,75 @@ try:
             assert dimensions['scroll'] <= dimensions['viewport']+2, f'Horizontal overflow at 320px on {route}: {dimensions}'
         narrow.close()
         print('PASS: no horizontal scrolling at 320px across all six pages')
+        # Long mobile pages keep their header and catalog usable in either scroll direction.
+        navigation=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,reduced_motion='reduce')
+        navpage=navigation.new_page()
+        naverrors=[]
+        navpage.on('pageerror',lambda error: naverrors.append(str(error)))
+        for width,height in [(320,720),(390,844),(844,390),(960,600)]:
+            navpage.set_viewport_size({'width':width,'height':height})
+            navpage.goto(base+'/',wait_until='networkidle')
+            expect(navpage.locator('.back-to-top')).to_be_hidden()
+            # At the top, the announcement still occupies space above the sticky header.
+            navpage.locator('.menu-toggle').click()
+            initial_booking=navpage.locator('.mobile-nav > .btn')
+            initial_booking.scroll_into_view_if_needed()
+            assert initial_booking.bounding_box()['y']+initial_booking.bounding_box()['height']<=height, f'Initial dropdown clipped at {width}x{height}'
+            navpage.locator('.menu-toggle').press('Escape')
+            assert navpage.evaluate('scrollY')<=1, 'Opening navigation moved the page'
+            navpage.evaluate('window.scrollTo(0,1000)')
+            navpage.wait_for_function('scrollY >= 900')
+            expect(navpage.locator('.back-to-top')).to_be_visible()
+            for amount in [1000,750]:
+                navpage.evaluate('(y) => window.scrollTo(0,y)',amount)
+                assert abs(navpage.locator('.site-header').bounding_box()['y'])<=1, f'Header left the viewport at {width}px'
+                expect(navpage.locator('.header-menu-link')).to_be_visible()
+            button=navpage.locator('.back-to-top').bounding_box()
+            assert button['width']>=44 and button['height']>=44, 'Return-to-top hit area too small'
+            for selector in ['.cookie-banner','.mobile-bottom-cta']:
+                item=navpage.locator(selector)
+                if item.is_visible():
+                    rect=item.bounding_box()
+                    overlaps=button['x'] < rect['x']+rect['width'] and button['x']+button['width'] > rect['x'] and button['y'] < rect['y']+rect['height'] and button['y']+button['height'] > rect['y']
+                    assert not overlaps, f'Return-to-top overlaps {selector} at {width}px'
+            navpage.locator('.back-to-top').click()
+            navpage.wait_for_function('scrollY <= 1')
+            expect(navpage.locator('.logo')).to_be_focused()
+            expect(navpage.locator('.back-to-top')).to_be_hidden()
+            navpage.evaluate('window.scrollTo(0,1000)')
+            navpage.locator('.menu-toggle').click()
+            expect(navpage.locator('.mobile-nav')).to_be_visible()
+            expect(navpage.locator('.cookie-banner')).to_be_hidden()
+            expect(navpage.locator('.back-to-top')).to_be_hidden()
+            booking=navpage.locator('.mobile-nav > .btn')
+            booking.scroll_into_view_if_needed()
+            rect=booking.bounding_box()
+            assert rect['y']>=navpage.locator('.site-header').bounding_box()['height'], 'Dropdown booking is behind header'
+            assert rect['y']+rect['height']<=height, f'Dropdown booking clipped at {width}x{height}'
+            navpage.locator('.menu-toggle').press('Escape')
+            expect(navpage.locator('.mobile-nav')).to_be_hidden()
+            expect(navpage.locator('.menu-toggle')).to_be_focused()
+            expect(navpage.locator('.cookie-banner')).to_be_visible()
+            navpage.locator('.header-menu-link').click()
+            expect(navpage).to_have_url(base+'/menu/')
+            expect(navpage.locator('.print-card')).to_have_count(5)
+            assert navpage.evaluate('document.documentElement.scrollWidth <= innerWidth + 2'), 'Navigation added horizontal overflow'
+        navpage.set_viewport_size({'width':390,'height':844})
+        navpage.goto(base+'/',wait_until='networkidle')
+        navpage.locator('[data-consent="no"]').click()
+        navpage.locator('.menu-toggle').click()
+        navpage.locator('.mobile-nav a[href="/#delivery"]').click()
+        navpage.wait_for_function('scrollY > 400')
+        assert navpage.locator('#delivery').bounding_box()['y']>=navpage.locator('.site-header').bounding_box()['height'], 'Anchor hidden under sticky header'
+        navpage.screenshot(path=str(REPORT/'navigation-mobile.png'))
+        navpage.locator('.menu-toggle').click()
+        navpage.set_viewport_size({'width':1200,'height':900})
+        expect(navpage.locator('.mobile-nav')).to_be_hidden()
+        assert not navpage.locator('body').evaluate('(e) => e.classList.contains("nav-open")'), 'Navigation left page locked after resize'
+        expect(navpage.locator('.back-to-top')).to_be_hidden()
+        assert not naverrors, 'Mobile navigation runtime errors: '+str(naverrors)
+        navigation.close()
+        print('PASS: sticky mobile header, direct menu, back-to-top, unobscured anchors and scrollable landscape navigation')
         # Consent regression: no Yandex request before opt-in, including after opt-out.
         consent_context=browser.new_context()
         consent=consent_context.new_page()
