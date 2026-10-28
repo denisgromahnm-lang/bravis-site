@@ -5,7 +5,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent
 DIST=ROOT/'dist'
-paths=['index.html','menu/index.html','banquets/index.html','contacts/index.html','privacy/index.html']
+paths=['index.html','menu/index.html','lunch/index.html','banquets/index.html','contacts/index.html','privacy/index.html']
 class Links(HTMLParser):
     def __init__(self):
         super().__init__();self.links=[];self.images=[];self.scripts=[]
@@ -35,4 +35,5 @@ if (ROOT/'site.config.json').exists():
         for p in paths:
             assert 'name="robots" content="noindex' in (DIST/p).read_text(encoding='utf-8'),p
         assert 'Disallow: /' in (DIST/'robots.txt').read_text(encoding='utf-8')
-print('PASS: five BRAVIS pages, accessible links, local media assets, JSON-LD, preview noindex')
+mode='public indexing' if config.get('public') else 'preview noindex'
+print('PASS: six BRAVIS pages, accessible links, local media assets, JSON-LD, '+mode)

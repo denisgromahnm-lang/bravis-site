@@ -8,7 +8,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT/'dist'
-PAGES = ['index.html','menu/index.html','banquets/index.html','contacts/index.html','privacy/index.html']
+PAGES = ['index.html','menu/index.html','lunch/index.html','banquets/index.html','contacts/index.html','privacy/index.html']
 class Audit(HTMLParser):
     def __init__(self):
         super().__init__()
@@ -78,7 +78,7 @@ def audit():
     assert (DIST/'assets/site.js').stat().st_size < 30000
     for file in (DIST/'uploads').glob('*.jpg'):
         assert file.stat().st_size < 2500000,"Large photo "+file.name
-    print('PASS: 5 unique print menus, valid image assets, 5 accessible mobile pages, JSON-LD and noindex')
+    print('PASS: 5 unique print menus, valid image assets, 6 accessible mobile pages, JSON-LD and noindex')
 def test_production_guard():
     config=ROOT/'site.config.json'
     original=config.read_bytes()

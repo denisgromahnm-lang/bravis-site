@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-      - name: Generate five-page static site without paid API or npm
+      - name: Generate six-page static site without paid API or npm
         run: |
           cd site
           python3 src/build.py
