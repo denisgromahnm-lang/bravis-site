@@ -292,8 +292,15 @@ menu_top += '<a class="lunch-link" href="/lunch/" data-track="lunch_from_menu">�
 sections=MENU.get('sections',[])
 available=[s for s in sections if s.get('items')]
 if available:
-    menu_top+='<nav class="menu-filter" aria-label="Разделы меню">' + ''.join(f'<a href="#{h(s.get("id","category"))}">{h(s.get("name","Раздел"))}</a>' for s in available) + '</nav>'
+    bar_sections=[s for s in available if s.get('id','').startswith('bar-')]
+    kitchen_sections=[s for s in available if s not in bar_sections]
+    menu_top+='<nav class="menu-filter" aria-label="Разделы меню">' + ''.join(f'<a href="#{h(s.get("id","category"))}">{h(s.get("name","Раздел"))}</a>' for s in kitchen_sections)
+    if bar_sections:
+        menu_top+='<a href="#bar-menu">Бар и напитки</a>'
+    menu_top+='</nav>'
     for s in available:
+        if bar_sections and s is bar_sections[0]:
+            menu_top+='<div id="bar-menu"><div class="menu-category-header"><div class="section-label"><span class="line"></span> БАРНАЯ КАРТА BRAVIS</div><h2>Бар и напитки</h2><p>Названия, цены и объёмы из печатной барной карты ресторана.</p></div><nav class="menu-filter" aria-label="Разделы барной карты">' + ''.join(f'<a href="#{h(b.get("id","category"))}">{h(b.get("name","Раздел"))}</a>' for b in bar_sections) + '</nav></div>'
         menu_top+=f'<div class="menu-category" id="{h(s.get("id","category"))}"><div class="menu-category-header"><div class="section-label"><span class="line"></span> МЕНЮ BRAVIS</div><h2>{h(s.get("name","Раздел"))}</h2><p>{h(s.get("note",""))}</p></div><div class="menu-items">'
         for item in s['items']:
             price = str(item.get('price','')).strip()
