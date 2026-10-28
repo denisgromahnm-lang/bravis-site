@@ -64,6 +64,10 @@ if domain and not domain.startswith(('https://','http://')): domain = 'https://'
 published = bool(CONFIG.get('public') and domain)
 social_labels = {'telegram':'Telegram','vk':'ВКонтакте','instagram':'Instagram','max':'MAX','viber':'Viber','whatsapp':'Написать в WhatsApp','telegramMessage':'Написать в Telegram'}
 social_links = {key: str(value).strip() for key, value in CONFIG.get('socialLinks', {}).items() if value and key in social_labels}
+max_contact_name = str(CONFIG.get('maxContactName', '')).strip()
+max_contact_phone = str(CONFIG.get('phoneE164', '')).strip()
+if max_contact_name and not re.fullmatch(r'\+[1-9][0-9]{7,14}', max_contact_phone):
+    raise ValueError('MAX contact instructions require the verified business phone')
 for social_url in social_links.values():
     parts = urlsplit(social_url)
     if parts.scheme != 'https' or not parts.hostname or parts.username or parts.password:
@@ -74,6 +78,8 @@ if not re.fullmatch(r'[0-9]+', maps_org_id):
 
 def social_icon(key):
     icon_name = 'telegram' if key == 'telegramMessage' else key
+    if icon_name == 'max':
+        return '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><text x="12" y="15.5" text-anchor="middle" fill="currentColor" font-family="Arial,sans-serif" font-size="9" font-weight="700">MAX</text></svg>'
     if icon_name in ('telegram', 'vk', 'instagram', 'whatsapp'):
         return (ROOT / f'public/assets/icons/{icon_name}.svg').read_text(encoding='utf-8').strip()
     return '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="M20 11a8 8 0 0 1-8 8H5l-3 3V11a9 9 0 0 1 18 0Z"/></svg>'
@@ -84,9 +90,16 @@ def social_navigation():
     result = '<nav class="social-links" aria-label="Сообщества и связь с BRAVIS">'
     for caption, keys in groups:
         links = ''.join(f'<a class="social-icon social-icon--{h(key)}" href="{h(social_links[key])}" target="_blank" rel="noopener noreferrer" data-track="social_{h(key)}_click" aria-label="{h(labels[key])}" title="{h(labels[key])}">{social_icon(key)}</a>' for key in keys if key in social_links)
+        if 'max' in keys and max_contact_name and 'max' not in social_links:
+            links += '<a class="social-icon social-icon--max" href="/contacts/#max-contact" data-track="max_contact_open" aria-label="Как написать BRAVIS в MAX" title="Как написать BRAVIS в MAX">' + social_icon('max') + '</a>'
         if links:
             result += f'<div class="social-links__group"><span class="social-links__label">{caption}</span><div class="social-links__row">{links}</div></div>'
     return result + '</nav>'
+
+def max_contact_guide():
+    if not max_contact_name:
+        return ''
+    return f'''<section class="section max-contact-section" id="max-contact" aria-labelledby="max-contact-heading"><div class="wrap max-contact-grid"><div><div class="section-label"><span class="line"></span> НАПИСАТЬ НАМ</div><h2 id="max-contact-heading">BRAVIS <em>в MAX.</em></h2><p>Наш рабочий аккаунт — «{h(max_contact_name)}».</p><p class="max-contact-phone"><span>{h(phone)}</span></p><button type="button" class="btn btn--outline max-contact-copy" data-copy-max-phone="{h(max_contact_phone)}" hidden>Скопировать номер</button><p class="max-contact-status" role="status" aria-live="polite"></p><p class="max-contact-hint">Номер также можно выделить и скопировать.</p></div><div><h3>Как найти нас</h3><ol class="max-contact-steps"><li>В приложении MAX откройте «Чаты» и строку поиска.</li><li>Введите номер <span class="max-contact-number">{h(max_contact_phone)}</span> и выберите «Найти по номеру».</li><li>Откройте аккаунт «{h(max_contact_name)}» и напишите нам.</li></ol><a class="max-contact-help" href="https://help.max.ru/help/contacts/upravlenie_kontaktami/kak_priglasit_v_max_nuzhnogo_cheloveka" target="_blank" rel="noopener noreferrer">Инструкция MAX по поиску контакта ↗</a></div></div></section>'''
 
 rating = str(CONFIG.get('yandexRating', '')).strip()
 if not re.fullmatch(r'[0-5]\.[0-9]', rating) or not 0 < float(rating) <= 5:
@@ -321,6 +334,7 @@ banquet=f'''<section class="page-hero page-hero--dark"><div class="wrap page-her
 contacts=f'''<section class="page-hero page-hero--light"><div class="wrap"><div class="section-label"><span class="line"></span> КОНТАКТЫ И МАРШРУТ</div><h1>До <em>встречи.</em></h1><p>Находите время для близких. А мы найдём для вас место.</p></div></section><section class="section"><div class="wrap contacts-grid"><div class="contacts-info"><div class="contact-row"><span>АДРЕС</span><h2>{h(address)}</h2></div><div class="contact-row"><span>ТЕЛЕФОН</span><a class="contact-big" href="{h(phone_url)}" data-track="contacts_phone_click">{h(phone)}</a></div><div class="contact-row"><span>ОФИЦИАЛЬНАЯ ПОЧТА</span><a class="contact-big" href="mailto:{h(official_email)}">{h(official_email)}</a></div><div class="contact-row"><span>ВРЕМЯ РАБОТЫ</span><p>{h(CONFIG.get('hoursText',''))}</p></div><div class="contact-actions">{reserve_button()}{button('Открыть маршрут',yandex_maps_url,True,ext=True)}{button('Карточка BRAVIS в 2ГИС',two_gis_url,True,tracking='two_gis_click',ext=True) if two_gis_url else ''}</div></div><div class="map-card"><div class="map-card__line"></div><div class="map-card__inner"><span>BRAVIS</span><p>МОСКВА</p><p class="map-card__address">РАСКОВОЙ, 20</p><div class="map-pin">⌖</div><a href="{h(yandex_maps_url)}" target="_blank" rel="noopener noreferrer">Открыть на Яндекс Картах ↗</a>{f'<a href="{h(two_gis_url)}" target="_blank" rel="noopener noreferrer" data-track="two_gis_click">Открыть в 2ГИС ↗</a>' if two_gis_url else ''}</div></div></div></section>'''
 
 home += reputation()
+contacts += max_contact_guide()
 contacts += reputation()
 contacts = contacts.replace('<div class="map-card"><div class="map-card__line">', f'<div class="map-card" data-yandex-widget="map" data-yandex-org="{h(maps_org_id)}"><div class="map-card__line">', 1)
 contacts = contacts.replace('<div class="map-pin">⌖</div>', '<div class="map-pin" aria-hidden="true">⌖</div><button type="button" class="external-widget-load" data-track="map_load">Показать карту здесь</button><small>Загрузится карта Яндекса. Сервис получит технические данные вашего браузера.</small>', 1)
