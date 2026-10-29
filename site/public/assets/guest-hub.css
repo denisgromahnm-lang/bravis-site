@@ -1,0 +1,47 @@
+/* In-restaurant hub only; preserve the main website and consent styles. */
+.guest-hub-page { min-width: 0; background: #f8f4ee; color: #30242a; }
+.guest-hub-header { width: min(100% - 40px, 640px); margin: 0 auto; padding: 26px 0 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.guest-hub-brand { color: #4c2636; font-size: 24px; font-weight: 700; letter-spacing: .14em; text-decoration: none; }
+.guest-hub-header > span { font-size: 13px; text-align: right; }
+.guest-hub-shell { width: min(100% - 40px, 640px); margin: 0 auto; padding: 16px 0 28px; }
+.guest-hub-intro { margin-bottom: 24px; }
+.guest-hub-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .16em; color: #805366; }
+.guest-hub-intro h1 { font-size: clamp(30px, 6vw, 46px); line-height: 1.1; margin: 12px 0; }
+.guest-hub-intro > p:last-child { font-size: 16px; line-height: 1.6; max-width: 36em; }
+.guest-hub-links { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.guest-hub-links li { min-width: 0; }
+.guest-hub-card { position: relative; display: flex; flex-direction: column; gap: 6px; min-height: 76px; padding: 18px 46px 18px 20px; border: 1px solid #d8c8cc; border-radius: 12px; color: #30242a; background: #fffdf9; text-decoration: none; overflow-wrap: anywhere; }
+.guest-hub-card:hover { border-color: #785164; background: #fff; }
+.guest-hub-card:focus-visible, .guest-hub-page a:focus-visible, .guest-hub-page button:focus-visible { outline: 3px solid #a36d24; outline-offset: 4px; }
+.guest-hub-card--primary { color: #fffaf6; background: #592c40; border-color: #592c40; }
+.guest-hub-card--primary:hover { color: #fffaf6; background: #452032; }
+.guest-hub-card__title { font-size: 18px; font-weight: 600; line-height: 1.35; }
+.guest-hub-card__description { font-size: 14px; line-height: 1.5; }
+.guest-hub-card__arrow { position: absolute; right: 19px; top: 19px; font-size: 20px; }
+.guest-hub-card--unavailable { background: #eee8e2; color: #55454c; }
+.guest-hub-badge { display: inline-block; margin: 0 0 14px; padding: 8px 12px; border-radius: 6px; background: #e4eadf; color: #2b462e; font-size: 14px; }
+.guest-hub-badge[hidden] { display: none; }
+.guest-hub-notes { margin-top: 26px; font-size: 13px; line-height: 1.7; color: #62505a; }
+.guest-hub-notes p { margin: 0 0 12px; }
+.guest-hub-footer { width: min(100% - 40px, 640px); margin: 0 auto; padding-bottom: 240px; }
+.guest-hub-footer .footer-bottom { display: flex; flex-wrap: wrap; gap: 16px; width: 100%; margin: 0; padding: 20px 0; border-top: 1px solid #d8c8cc; color: #59424e; font-size: 13px; }
+.guest-hub-footer .footer-bottom a, .guest-hub-footer .cookie-settings { color: #59424e; }
+@media (max-width: 360px) { .guest-hub-header, .guest-hub-shell, .guest-hub-footer { width: calc(100% - 32px); } .guest-hub-card { padding-left: 16px; } }
+
+/* A single compact offer, using the already approved menu artwork and real hall photo. */
+.guest-hub-promo { margin: 0 0 14px; }
+.guest-hub-promo__variant { display: grid; grid-template-columns: 68px minmax(0, 1fr); align-items: center; gap: 12px; padding: 12px; border: 1px solid #d8c8cc; border-radius: 12px; background: #eee5db; color: #432d38; text-decoration: none; }
+.guest-hub-promo__variant[hidden] { display: none; }
+.guest-hub-promo__variant img { width: 68px; height: 86px; object-fit: cover; border-radius: 6px; }
+.guest-hub-promo__variant--menu img { object-fit: contain; background: #fffdf9; }
+.guest-hub-promo__eyebrow { margin: 0 0 3px; font-size: 11px; line-height: 1.35; }
+.guest-hub-promo h2 { margin: 0 0 5px; font-size: 17px; line-height: 1.2; letter-spacing: 0; }
+.guest-hub-promo__cta { font-size: 13px; line-height: 1.5; text-decoration: underline; text-underline-offset: 3px; }
+.guest-hub-promo__variant:hover { border-color: #805366; }
+
+
+.guest-hub-menu {display:inline-flex;align-items:center;justify-content:center;min-width:62px;min-height:44px;padding:8px 12px;border:1px solid #a89285;font-size:14px;background:#fffdf9;color:#4c2636;}
+.guest-hub-header > span {margin-left:auto;}
+.guest-hub-card__arrow svg,.guest-hub-promo__cta svg {display:inline-block;vertical-align:middle;}
+@media(max-width:960px){.guest-hub-header{position:sticky;top:0;z-index:60;background:#f8f4ee;padding-top:16px;padding-bottom:16px;border-bottom:1px solid #d8c8cc;box-shadow:0 3px 16px #2819200a;}.guest-hub-page .back-to-top{bottom:calc(var(--back-to-top-bottom,16px) + env(safe-area-inset-bottom,0px));}}
+@media(max-width:360px){.guest-hub-header{gap:10px;}.guest-hub-brand{font-size:21px;}.guest-hub-header > span{font-size:11px;max-width:64px;}}

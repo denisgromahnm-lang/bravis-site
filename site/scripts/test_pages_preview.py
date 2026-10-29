@@ -6,7 +6,7 @@ from pathlib import Path
 root=Path(__file__).resolve().parents[1]/'dist'
 prefix='/bravis-site/'
 assert (root/'404.html').is_file()
-for page in ('index.html','menu/index.html','lunch/index.html','banquets/index.html','contacts/index.html','privacy/index.html','404.html'):
+for page in ('index.html','menu/index.html','lunch/index.html','banquets/index.html','contacts/index.html','privacy/index.html','go/index.html','404.html'):
     doc=(root/page).read_text(encoding='utf-8')
     for field,value in re.findall(r'(href|src)=["\']([^"\']+)["\']',doc):
         if value.startswith('/') and not value.startswith(prefix):
