@@ -105,20 +105,25 @@
 })();
 
 
-// Keep mobile navigation and the return-to-top control available on long pages.
+// Keep the return-to-top control available on long pages at every screen size.
 (() => {
   const button = document.querySelector('.back-to-top');
   if (!button) return;
-  const mobile = window.matchMedia('(max-width: 960px)');
   let pending = false;
   const update = () => {
     pending = false;
-    button.hidden = !mobile.matches || window.scrollY < 400;
+    button.hidden = window.scrollY < 400;
     if (button.hidden) return;
     const booking = document.querySelector('.mobile-bottom-cta');
     const banner = document.querySelector('.cookie-banner');
-    let bottom = Math.max(16, (booking?.getBoundingClientRect().height || 0) + 12);
-    if (banner) bottom = Math.max(bottom, innerHeight - banner.getBoundingClientRect().top + 12);
+    let bottom = Math.max(20, (booking?.getBoundingClientRect().height || 0) + 12);
+    if (banner) {
+      const bannerRect = banner.getBoundingClientRect();
+      const buttonRect = button.getBoundingClientRect();
+      if (bannerRect.right > buttonRect.left - 12 && bannerRect.left < buttonRect.right + 12) {
+        bottom = Math.max(bottom, innerHeight - bannerRect.top + 12);
+      }
+    }
     button.style.setProperty('--back-to-top-bottom', bottom + 'px');
   };
   const schedule = () => {

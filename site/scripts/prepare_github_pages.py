@@ -12,5 +12,10 @@ for page in sorted(DIST.rglob('*.html')):
     data=data.replace('"/menu-media/','"'+PREFIX+'/menu-media/')
     assert 'name="robots" content="noindex' in data
     page.write_text(data,encoding='utf8')
+# CSS artwork must use the same project prefix as HTML links.
+for stylesheet in sorted(DIST.rglob('*.css')):
+    data=stylesheet.read_text(encoding='utf8')
+    data=re.sub(r"url\(\s*([\"']?)/(?!/)", lambda m: 'url('+m.group(1)+PREFIX+'/', data)
+    stylesheet.write_text(data,encoding='utf8')
 assert (DIST/'404.html').is_file(), 'Branded 404 must be generated before preparing the preview'
 print('GitHub Pages preview built at /bravis-site/ (noindex)')
