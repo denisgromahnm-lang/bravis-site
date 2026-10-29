@@ -256,6 +256,13 @@ try:
         navpage.set_viewport_size({'width':1200,'height':900})
         expect(navpage.locator('.mobile-nav')).to_be_hidden()
         assert not navpage.locator('body').evaluate('(e) => e.classList.contains("nav-open")'), 'Navigation left page locked after resize'
+        # Verify desktop return after an explicit long scroll; resizing may settle
+        # the prior mobile anchor animation at a different scroll position.
+        navpage.evaluate('window.scrollTo({top:1200,behavior:"instant"})')
+        navpage.wait_for_function('scrollY > 400')
+        expect(navpage.locator('.back-to-top')).to_be_visible()
+        navpage.locator('.back-to-top').click()
+        navpage.wait_for_function('scrollY <= 1',timeout=5000)
         expect(navpage.locator('.back-to-top')).to_be_hidden()
         assert not naverrors, 'Mobile navigation runtime errors: '+str(naverrors)
         navigation.close()

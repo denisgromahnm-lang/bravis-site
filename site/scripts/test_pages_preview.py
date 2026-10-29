@@ -12,8 +12,8 @@ for page in ('index.html','menu/index.html','lunch/index.html','banquets/index.h
         if value.startswith('/') and not value.startswith(prefix):
             raise AssertionError(f'Preview path is unprefixed: {page} {field}={value}')
     assert 'name="robots" content="noindex' in doc
-    assert 'href="'+prefix+'assets/site.css"' in doc
-    assert 'src="'+prefix+'assets/site.js"' in doc
+    assert re.search(r'href="'+re.escape(prefix)+r'assets/site\.css(?:\?v=[a-f0-9]{12})?"',doc)
+    assert re.search(r'src="'+re.escape(prefix)+r'assets/site\.js(?:\?v=[a-f0-9]{12})?"',doc)
 menu=(root/'menu/index.html').read_text(encoding='utf8')
 match=re.search(r'<script type="application/json" id="bravis-menu-data">(.*?)</script>',menu,re.S)
 assert match,'Menu viewer manifest absent'
@@ -26,4 +26,8 @@ for m in data:
 assert 'href="'+prefix+'privacy/"' in menu
 js=(root/'assets/site.js').read_text(encoding='utf8')
 assert "privacyHref" in js,'Cookie banner must derive route rather than hardcode it'
+for stylesheet in root.rglob('*.css'):
+    for value in re.findall(r"url\(\s*[\"']?(/[^)\"']+)",stylesheet.read_text(encoding='utf8')):
+        assert value.startswith(prefix),f'Preview CSS artwork is unprefixed: {stylesheet.name} {value}'
+        assert (root/value[len(prefix):]).is_file(),f'Missing CSS artwork: {value}'
 print('PASS: GitHub Pages links, image viewer, privacy consent route and noindex')

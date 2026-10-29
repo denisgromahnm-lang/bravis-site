@@ -90,9 +90,12 @@
 .map-card>iframe{display:block;width:100%;height:100%;min-height:460px;border:0}
 @media(max-width:700px){.reputation-grid{grid-template-columns:1fr}.reputation-card h3{font-size:26px}.footer .social-links{justify-content:flex-start}}
 
-/* Mobile navigation stays available while reading any page. */
-.header-menu-link,.back-to-top{display:none}
+/* Return to the top on desktop and mobile; mobile navigation remains available. */
+.header-menu-link{display:none}
+.back-to-top{display:none}
 .back-to-top[hidden]{display:none}
+.back-to-top:not([hidden]){display:inline-flex;align-items:center;justify-content:center;gap:7px;position:fixed;right:clamp(16px,2vw,28px);bottom:var(--back-to-top-bottom,20px);z-index:55;min-width:48px;min-height:48px;max-width:calc(100vw - 32px);padding:10px 15px;border:1px solid #e7c9a9;border-radius:25px;background:var(--wine);color:#fffaf2;box-shadow:0 4px 18px #28192029;cursor:pointer;font-size:12px;line-height:1.4}
+.back-to-top:hover{background:#60343d}
 @media(max-width:960px){
  :root{--mobile-header-height:82px;--mobile-cta-space:0px}
  html{scroll-padding-top:calc(var(--mobile-header-height) + 12px)}
@@ -101,7 +104,6 @@
  .menu-toggle{min-width:44px;min-height:44px;align-items:center;justify-content:center}
  .mobile-nav{max-height:calc(100vh - var(--mobile-nav-top,var(--mobile-header-height)) - var(--mobile-cta-space));max-height:calc(100dvh - var(--mobile-nav-top,var(--mobile-header-height)) - var(--mobile-cta-space));overflow-y:auto;overscroll-behavior:contain}
  body.nav-open{overflow:hidden}
- .back-to-top:not([hidden]){display:inline-flex;align-items:center;justify-content:center;gap:7px;position:fixed;right:16px;bottom:var(--back-to-top-bottom,72px);z-index:55;min-width:48px;min-height:48px;padding:10px 13px;border:1px solid #e7c9a9;border-radius:25px;background:var(--wine);color:#fffaf2;box-shadow:0 4px 18px #28192029;cursor:pointer;font-size:12px}
  .nav-open .back-to-top,.nav-open .cookie-banner{visibility:hidden}
 }
 @media(max-width:820px){:root{--mobile-header-height:76px}}
@@ -200,6 +202,39 @@
  .guest-offer>p:not(.guest-offer__value){font-size:15px}
  .loyalty-card__center{gap:12px}
  .loyalty-card__center small{font-size:8px}
+}
+
+/* Contact details share a calm, readable type scale with natural wrapping. */
+.contacts-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:clamp(32px,5vw,65px)}
+.contacts-info{display:grid;gap:27px;min-width:0}
+.contact-row{min-width:0;margin:0;padding-bottom:25px;border-bottom:1px solid #dfd2c4}
+.contact-row>span{display:block;font-size:10px;line-height:1.4;letter-spacing:.15em;color:#856b60}
+.contact-row h2,.contact-row .contact-big,.contact-row p{display:block;max-width:100%;margin:11px 0 0;font-family:var(--sans);font-size:clamp(20px,2.1vw,29px);font-weight:400;line-height:1.45;letter-spacing:0;color:var(--ink)}
+.contact-row .contact-big{width:fit-content;min-height:44px;padding:2px 0}
+.contact-row a[href^="tel:"],.contact-value--phone{white-space:nowrap;font-variant-numeric:tabular-nums}
+.contact-row a[href^="mailto:"],.contact-row .contact-value--email{font-size:clamp(18px,1.85vw,26px);overflow-wrap:anywhere;word-break:normal}
+.contact-row a:hover{text-decoration:underline;text-underline-offset:5px}
+.contact-row p,.contact-row .contact-value--hours{font-size:clamp(18px,1.65vw,23px);font-variant-numeric:tabular-nums}
+.contact-actions{margin-top:1px}
+.announcement{letter-spacing:.035em}
+.announcement__inner{min-height:44px;gap:12px}
+.announcement__inner>a{display:inline-flex;align-items:center;min-height:44px;white-space:nowrap;font-size:12px;line-height:1.4;letter-spacing:.01em;font-variant-numeric:tabular-nums}
+@media(max-width:820px){.contacts-grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:560px){
+ .announcement__inner{flex-wrap:wrap;gap:0 12px;padding-top:3px;padding-bottom:3px}
+ .announcement__city{white-space:normal;font-size:10px;line-height:1.5;letter-spacing:.015em}
+ .announcement__city .dot{margin-right:7px}
+ .announcement__inner>a{display:inline-flex;font-size:11px}
+ .contacts-info{gap:22px}
+ .contact-row{padding-bottom:20px}
+ .contact-row h2,.contact-row .contact-big{font-size:21px;line-height:1.45}
+ .contact-row a[href^="mailto:"],.contact-row .contact-value--email{font-size:20px}
+ .contact-row p,.contact-row .contact-value--hours{font-size:18px}
+}
+@media(max-width:360px){
+ .announcement__inner{justify-content:flex-start}
+ .contact-row h2,.contact-row .contact-big{font-size:20px}
+ .contact-row a[href^="mailto:"],.contact-row .contact-value--email{font-size:19px}
 }
 
 .welcome-offer a svg,.guest-offer__link svg,.loyalty-action svg,.delivery-action svg{flex:none}

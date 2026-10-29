@@ -2,6 +2,7 @@
 """Headless guest-hub checks. No company profile, submissions or production changes."""
 import json
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -165,7 +166,7 @@ try:
         checks.append('Clock/Intl failure keeps static links and conservative note')
         sys.path.insert(0, str(ROOT / 'src'))
         from guest_hub import render_guest_hub
-        head = original.split('<a class="skip"')[0].replace('<link rel="stylesheet" href="/assets/guest-hub.css">', '')
+        head = re.sub(r'<link rel="stylesheet" href="/assets/guest-hub\.css(?:\?v=[a-f0-9]+)?">', '', original.split('<a class="skip"')[0])
         config = json.loads((ROOT / 'site.config.json').read_text())
         disabled = render_guest_hub(config, {**settings, 'loonaEnabled': False}, head, 690, 'https://reservation.yandex.ru/partner-reserve/forms/' + config['smartReserveId'])
         ctx, page = context(browser, body=disabled)
