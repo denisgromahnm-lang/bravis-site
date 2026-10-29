@@ -150,3 +150,56 @@
 .max-contact-steps li{padding-left:5px;margin-bottom:14px}
 .max-contact-help{font-size:14px;text-decoration:underline;text-underline-offset:4px}
 @media(max-width:700px){.max-contact-grid{grid-template-columns:1fr;gap:34px}.max-contact-grid h2{font-size:44px}.max-contact-steps{font-size:15px}}
+
+/* A visible welcome gift and current guest offers, without interrupting browsing. */
+.welcome-offer{background:var(--wine);color:#fff8ef;border-bottom:1px solid #a17b68}
+.welcome-offer__inner{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-top:17px;padding-bottom:17px}
+.welcome-offer p{display:flex;align-items:baseline;flex-wrap:wrap;gap:7px 20px;margin:0}
+.welcome-offer strong{font-family:var(--serif);font-size:25px;font-weight:400;line-height:1.15}
+.welcome-offer p>span{font-size:13px;line-height:1.45;color:#ead8cf}
+.welcome-offer a{display:inline-flex;align-items:center;justify-content:center;gap:20px;flex-shrink:0;min-height:44px;padding:10px 16px;border:1px solid #d2b394;font-size:12px}
+.welcome-offer a:hover{background:#fff8ef;color:var(--wine)}
+.guest-offers{background:#f6f0e7;border-top:1px solid #e4d9cb;border-bottom:1px solid #e4d9cb}
+.guest-offers__heading{margin-bottom:38px}
+.guest-offers__heading h2{max-width:800px;margin:24px 0 0}
+.guest-offers__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px}
+.guest-offer{display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:clamp(25px,3.3vw,48px);border:1px solid #d0bda8;background:#fffaf3;color:var(--wine)}
+.guest-offer--loyalty{background:var(--wine);color:#fff8ef;border-color:var(--wine)}
+.guest-offer__eyebrow{font-size:10px;line-height:1.4;letter-spacing:.17em}
+.guest-offer .guest-offer__value{display:flex;align-items:baseline;flex-wrap:wrap;gap:5px 16px;margin:25px 0 24px;font-family:var(--serif);font-size:clamp(54px,5vw,74px);line-height:1;letter-spacing:-.04em;color:inherit}
+.guest-offer__value>span{font:400 13px/1.4 var(--sans);letter-spacing:0}
+.guest-offer h3{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.15;letter-spacing:-.02em;margin:0 0 17px}
+.guest-offer>p:not(.guest-offer__value){max-width:460px;margin:0 0 25px;font-size:16px;line-height:1.65;color:#67554e}
+.guest-offer--loyalty>p:not(.guest-offer__value){color:#ead8cf}
+.guest-offer__link{display:inline-flex;align-items:center;justify-content:space-between;gap:25px;min-height:44px;margin-top:auto;padding:11px 0;border-bottom:1px solid #a88d77;font-size:13px}
+.guest-offer__link:hover{text-decoration:underline;text-underline-offset:4px}
+.guest-offer--loyalty .guest-offer__link{border-color:#d2b394}
+.guest-offer>small{display:block;font-size:11px;line-height:1.6;color:#786a62;margin-top:17px;max-width:380px}
+.guest-offer--loyalty>small{color:#d8c0b4}
+.loyalty-card__center{display:flex;flex-direction:column;align-items:center;gap:16px}
+.loyalty-card__center small{font:400 9px/1.2 var(--sans);letter-spacing:.18em}
+@media(max-width:700px){
+ .welcome-offer__inner{gap:18px}
+ .welcome-offer p{display:block}
+ .welcome-offer strong,.welcome-offer p>span{display:block}
+ .welcome-offer strong{font-size:23px}
+ .welcome-offer p>span{font-size:12px;margin-top:5px}
+ .welcome-offer a{gap:10px;padding:10px 13px}
+ .guest-offers__grid{grid-template-columns:1fr;gap:18px}
+ .guest-offer .guest-offer__value{font-size:64px}
+}
+@media(max-width:420px){
+ .welcome-offer__inner{align-items:flex-start;gap:12px;padding-top:14px;padding-bottom:14px}
+ .welcome-offer strong{font-size:20px;max-width:180px}
+ .welcome-offer p>span{font-size:11px;max-width:170px}
+ .welcome-offer a{gap:6px;padding:9px 11px;font-size:11px;white-space:nowrap;min-height:44px}
+ .guest-offers__heading{margin-bottom:28px}
+ .guest-offers__heading h2{font-size:43px}
+ .guest-offer{padding:27px 23px}
+ .guest-offer h3{font-size:28px}
+ .guest-offer>p:not(.guest-offer__value){font-size:15px}
+ .loyalty-card__center{gap:12px}
+ .loyalty-card__center small{font-size:8px}
+}
+
+.welcome-offer a svg,.guest-offer__link svg,.loyalty-action svg,.delivery-action svg{flex:none}

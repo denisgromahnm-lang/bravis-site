@@ -66,7 +66,9 @@ jobs:
           qr=(base/'dist/assets/loona-register.svg').read_text(encoding='utf8')
           assert loona in unescape(qr), 'QR must describe owner-provided Loona registration URL'
           assert 'viewBox="0 0 41 41"' in qr and qr.count('h-')>=250, 'QR SVG missing matrix geometry'
-          assert 'приветственные бонусы сразу после регистрации' in index
+          assert '500 бонусных баллов' in index
+          assert 'за установку карты' in index
+          assert '500 ₽' not in index, 'Welcome offer must not promise an unrestricted cash discount'
           assert 'href="/#delivery"' in index and 'href="/#loyalty"' in index
           twogis=c['twoGisUrl']
           contacts=(base/'dist/contacts/index.html').read_text(encoding='utf8')

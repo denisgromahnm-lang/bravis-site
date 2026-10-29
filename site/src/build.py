@@ -39,6 +39,8 @@ delivery_button_label = 'Заказать доставку' if delivery_has_dire
 # Loona signup is enabled only with the actual, owner-verified card registration URL.
 loona_join_url = str(CONFIG.get('loonaJoinUrl', '')).strip()
 loona_program_name = str(CONFIG.get('loonaProgramName', 'Карта гостя BRAVIS')).strip()
+welcome_bonus = 500
+arrow_up_right = '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 13 13 3M3 3h10v10" stroke="currentColor" stroke-width="1.3"/></svg>'
 if loona_join_url:
     parsed_loona = urlsplit(loona_join_url)
     # The vendor may issue registration links on loona.ai subdomains or its
@@ -48,7 +50,7 @@ if loona_join_url:
         raise ValueError('Loona card enrollment link must be an owner-verified HTTPS URL')
 loona_registration_cta = (
     f'<div class="loyalty-registration">'
-    f'<a class="loyalty-action" href="{h(loona_join_url)}" data-track="loona_signup_click" target="_blank" rel="noopener noreferrer">Получить карту и бонусы <span aria-hidden="true">↗</span></a>'
+    f'<a class="loyalty-action" href="{h(loona_join_url)}" data-track="loona_signup_click" target="_blank" rel="noopener noreferrer">Оформить карту {arrow_up_right}</a>'
     f'<a class="loyalty-qr" href="{h(loona_join_url)}" data-track="loona_signup_click" target="_blank" rel="noopener noreferrer" aria-label="Открыть регистрацию карты BRAVIS в Loona">'
     f'<img src="/assets/loona-register.svg" alt="QR-код для регистрации в программе лояльности BRAVIS" width="156" height="156" loading="lazy">'
     f'<span>Откройте камеру телефона и сканируйте QR-код для получения карты гостя.</span></a>'
@@ -223,16 +225,25 @@ def header(current):
 <a class="logo" href="/" aria-label="BRAVIS — главная"><span class="logo__text">BRAVIS</span><span class="logo__caption">Ресторан · Москва</span></a>
 <nav class="desktop-nav" aria-label="Основная навигация"><a href="/"{active('home',current)}>Главная</a><a href="/menu/"{active('menu',current)}>Меню</a><a href="/lunch/"{active('lunch',current)}>Бизнес-ланч</a><a href="/banquets/"{active('banquets',current)}>Банкеты</a><a href="/#delivery">Доставка</a><a href="/contacts/"{active('contacts',current)}>Контакты</a></nav>
 <div class="header-actions"><a class="header-menu-link" href="/menu/" data-track="menu_from_header">Меню</a>{reserve_button()}<button type="button" class="menu-toggle" aria-label="Открыть меню" aria-controls="mobile-nav" aria-expanded="false"><span></span><span></span><span></span></button></div>
-</div><nav class="mobile-nav" id="mobile-nav" aria-label="Мобильная навигация" hidden><a href="/">Главная</a><a href="/menu/">Меню</a><a href="/lunch/">Бизнес-ланч</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/#loyalty">Карта гостя</a><a href="/contacts/">Контакты</a>{reserve_button()}</nav></header>'''
+</div><nav class="mobile-nav" id="mobile-nav" aria-label="Мобильная навигация" hidden><a href="/">Главная</a><a href="/menu/">Меню</a><a href="/lunch/">Бизнес-ланч</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/#offers">Предложения</a><a href="/#loyalty">Карта гостя</a><a href="/contacts/">Контакты</a>{reserve_button()}</nav></header>'''
 
 def footer():
-    return f'''<footer class="footer"><div class="wrap footer-grid"><div><a href="/" class="footer-logo">BRAVIS</a><p>Вкус встреч.<br>Тепло Bravis.</p></div><div><span class="footer-caption">Навигация</span><a href="/menu/">Меню</a><a href="/lunch/">Бизнес-ланч</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/#loyalty">Карта гостя</a><a href="/contacts/">Контакты</a></div><div><span class="footer-caption">Ждём в гости</span><p>{h(address)}</p><a href="{h(phone_url)}" data-track="footer_phone_click">{h(phone)}</a><p class="footer-schedule">{h(CONFIG.get('hoursText',''))}</p>{f'<a href="mailto:{h(official_email)}">{h(official_email)}</a>' if official_email else ''}</div><div class="footer-action">{reserve_button()}{social_navigation()}{yandex_award_banner(footer=True)}</div></div><div class="wrap footer-bottom"><span>© {date.today().year} BRAVIS. Все права защищены.</span><a href="/privacy/">Политика обработки персональных данных</a><a href="#top">Наверх ↑</a></div></footer><div class="mobile-bottom-cta"><a href="/menu/">Меню</a><a class="mobile-bottom-cta__primary" href="{h(reserve_link)}" {'target="_blank" rel="noopener noreferrer"' if reserve_id else ''} data-track="{h("reserve_click" if reserve_id else "reserve_phone_click")}">Забронировать</a></div><button class="back-to-top" type="button" aria-label="Наверх страницы" hidden><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12 7-7 7 7M12 5v15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Наверх</span></button><script src="/assets/site.js" defer></script></body></html>'''
+    return f'''<footer class="footer"><div class="wrap footer-grid"><div><a href="/" class="footer-logo">BRAVIS</a><p>Вкус встреч.<br>Тепло Bravis.</p></div><div><span class="footer-caption">Навигация</span><a href="/menu/">Меню</a><a href="/lunch/">Бизнес-ланч</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/#offers">Предложения</a><a href="/#loyalty">Карта гостя</a><a href="/contacts/">Контакты</a></div><div><span class="footer-caption">Ждём в гости</span><p>{h(address)}</p><a href="{h(phone_url)}" data-track="footer_phone_click">{h(phone)}</a><p class="footer-schedule">{h(CONFIG.get('hoursText',''))}</p>{f'<a href="mailto:{h(official_email)}">{h(official_email)}</a>' if official_email else ''}</div><div class="footer-action">{reserve_button()}{social_navigation()}{yandex_award_banner(footer=True)}</div></div><div class="wrap footer-bottom"><span>© {date.today().year} BRAVIS. Все права защищены.</span><a href="/privacy/">Политика обработки персональных данных</a><a href="#top">Наверх ↑</a></div></footer><div class="mobile-bottom-cta"><a href="/menu/">Меню</a><a class="mobile-bottom-cta__primary" href="{h(reserve_link)}" {'target="_blank" rel="noopener noreferrer"' if reserve_id else ''} data-track="{h("reserve_click" if reserve_id else "reserve_phone_click")}">Забронировать</a></div><button class="back-to-top" type="button" aria-label="Наверх страницы" hidden><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12 7-7 7 7M12 5v15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Наверх</span></button><script src="/assets/site.js" defer></script></body></html>'''
 
 def page(content, title, desc, route, current, body_class='', noindex=False):
     return head(title,desc,route,body_class,noindex)+header(current)+f'<main id="main">{content}</main>'+footer()
 
-home=f'''<section class="hero"><div class="wrap hero-grid"><div class="hero-content"><div class="eyebrow"><span class="line"></span> РЕСТОРАН У МЕТРО ДИНАМО</div><h1>Вкус встреч.<br><em>Тепло Bravis.</em></h1><p class="lead">Армянская и европейская кухня на улице Расковой, 20, у метро Динамо. Хорошее вино и атмосфера, в которой хочется остаться чуть дольше.</p><div class="hero-actions">{reserve_button()}{button('Посмотреть меню','/menu/',True,'menu_from_hero')}</div><div class="hero-foot"><span>МОСКВА</span><span class="hero-foot__divider"></span><span>УЛИЦА РАСКОВОЙ, 20</span></div></div><div class="hero-visual"><img class="hero-photo" src="{h(img(main_photo,'/assets/wine-scene.svg'))}" alt="{('Интерьер ресторана BRAVIS' if main_photo else 'Авторская иллюстрация винного вечера в BRAVIS')}" width="800" height="940" fetchpriority="high"><div class="hero-visual__frame"></div><div class="hero-visual__stamp"><span>BRAVIS</span><small>МЕСТО ДЛЯ<br>ВАШИХ ВСТРЕЧ</small></div></div></div><div class="hero-index" aria-hidden="true">01 / BRAVIS</div></section>
-<section class="intro section" id="about"><div class="wrap intro-grid"><div class="section-label"><span class="line"></span> НАША ФИЛОСОФИЯ</div><div><h2>Не просто ужин.<br><em>Повод встретиться.</em></h2><p>Bravis — про вечера, которые складываются из мелочей: знакомых вкусов, неспешных разговоров и тёплого света. Здесь уютно вдвоём, с семьёй и большой компанией.</p><a class="text-link" href="/contacts/">Найти нас <span aria-hidden="true">↗</span></a></div></div></section>
+# Share the approved menu price between both home offers and the lunch page.
+lunch_item = next(item for section in MENU['sections'] if section['id'] == 'lunch' for item in section['items'])
+lunch_price = h(lunch_item['price'])
+
+home=f'''<aside class="welcome-offer" aria-label="Приветственные бонусы BRAVIS"><div class="wrap welcome-offer__inner"><p><strong>{welcome_bonus} бонусов в подарок</strong><span>за установку карты гостя BRAVIS</span></p><a href="{h(loona_join_url)}" data-track="loona_signup_click" target="_blank" rel="noopener noreferrer">Оформить карту {arrow_up_right}</a></div></aside>
+<section class="hero"><div class="wrap hero-grid"><div class="hero-content"><div class="eyebrow"><span class="line"></span> РЕСТОРАН У МЕТРО ДИНАМО</div><h1>Вкус встреч.<br><em>Тепло Bravis.</em></h1><p class="lead">Армянская и европейская кухня на улице Расковой, 20, у метро Динамо. Хорошее вино и атмосфера, в которой хочется остаться чуть дольше.</p><div class="hero-actions">{reserve_button()}{button('Посмотреть меню','/menu/',True,'menu_from_hero')}</div><div class="hero-foot"><span>МОСКВА</span><span class="hero-foot__divider"></span><span>УЛИЦА РАСКОВОЙ, 20</span></div></div><div class="hero-visual"><img class="hero-photo" src="{h(img(main_photo,'/assets/wine-scene.svg'))}" alt="{('Интерьер ресторана BRAVIS' if main_photo else 'Авторская иллюстрация винного вечера в BRAVIS')}" width="800" height="940" fetchpriority="high"><div class="hero-visual__frame"></div><div class="hero-visual__stamp"><span>BRAVIS</span><small>МЕСТО ДЛЯ<br>ВАШИХ ВСТРЕЧ</small></div></div></div><div class="hero-index" aria-hidden="true">01 / BRAVIS</div></section>
+<section class="guest-offers section" id="offers" aria-labelledby="offers-heading"><div class="wrap"><div class="guest-offers__heading"><div class="section-label"><span class="line"></span> BRAVIS · ПРИЯТНЫЕ ПОВОДЫ</div><h2 id="offers-heading">Предложения <em>для гостей.</em></h2></div><div class="guest-offers__grid">
+<article class="guest-offer guest-offer--loyalty"><span class="guest-offer__eyebrow">КАРТА ГОСТЯ</span><p class="guest-offer__value">{welcome_bonus}<span>бонусных баллов</span></p><h3>Начнём знакомство с подарка.</h3><p>Оформите и установите карту гостя BRAVIS в смартфон — получите {welcome_bonus} бонусных баллов за установку карты.</p><a class="guest-offer__link" href="{h(loona_join_url)}" data-track="loona_signup_click" target="_blank" rel="noopener noreferrer">Оформить карту {arrow_up_right}</a><small>Баланс и действующие условия использования — на вашей карте.</small></article>
+<article class="guest-offer guest-offer--lunch"><span class="guest-offer__eyebrow">ОБЕДЫ ПО БУДНЯМ</span><p class="guest-offer__value">{lunch_price} ₽<span>бизнес-ланч</span></p><h3>Вкусная пауза в рабочем дне.</h3><p>В комплекс входят суп, горячее и напиток. Фирменный салат и хлебная корзина — к каждому заказу.</p><a class="guest-offer__link" href="/lunch/" data-track="lunch_from_offers">Посмотреть меню ланча {arrow_up_right}</a><small>По будням, 11:00–16:00. В праздничные дни уточняйте расписание у ресторана.</small></article>
+</div></div></section>
+<section class="intro section" id="about"><div class="wrap intro-grid"><div class="section-label"><span class="line"></span> НАША ФИЛОСОФИЯ</div><div><h2>Не просто ужин.<br><em>Повод встретиться.</em></h2><p>Bravis — про вечера, которые складываются из мелочей: знакомых вкусов, неспешных разговоров и тёплого света. Здесь уютно вдвоём, с семьёй и большой компанией.</p><a class="text-link" href="/contacts/">Найти нас {arrow_up_right}</a></div></div></section>
 <section class="feature-section"><div class="wrap feature-grid"><div class="feature-photo"><img src="{h(img(food,'/assets/cuisine.svg'))}" alt="{('Блюда ресторана BRAVIS' if food else 'Авторская иллюстрация блюда')}" width="640" height="520" loading="lazy"></div><div class="feature-copy"><div class="section-label section-label--light"><span class="line"></span> КУХНЯ И ВИНО</div><h2>Вкусы, к которым<br><em>возвращаются.</em></h2><p>Армянские гастрономические традиции и европейская классика. Блюда для общего стола, бокал вина и удовольствие быть вместе.</p>{button('Открыть меню','/menu/',False,'menu_from_feature')}<div class="feature-folio">BRAVIS · FOOD & WINE</div></div></div></section>
 <section class="delivery-section" id="delivery" aria-labelledby="delivery-heading">
   <div class="wrap">
@@ -241,7 +252,7 @@ home=f'''<section class="hero"><div class="wrap hero-grid"><div class="hero-cont
         <div class="section-label section-label--light"><span class="line"></span> BRAVIS · ДОСТАВКА</div>
         <h2 id="delivery-heading">BRAVIS —<br><em>у вас дома.</em></h2>
         <p>Любимые вкусы не обязательно ждать до следующей встречи. Перейдите в Яндекс Еду, чтобы проверить возможность доставки по вашему адресу.</p>
-        <a class="delivery-action" href="{h(delivery_url)}" data-track="delivery_click" target="_blank" rel="noopener noreferrer">{h(delivery_button_label)} <span aria-hidden="true">↗</span></a>
+        <a class="delivery-action" href="{h(delivery_url)}" data-track="delivery_click" target="_blank" rel="noopener noreferrer">{h(delivery_button_label)} {arrow_up_right}</a>
         <p class="delivery-disclaimer">{h(delivery_help_text)}</p>
       </div>
       <div class="delivery-visual" aria-hidden="true">
@@ -257,15 +268,15 @@ home=f'''<section class="hero"><div class="wrap hero-grid"><div class="hero-cont
   <div class="wrap loyalty-grid">
     <div class="loyalty-copy">
       <div class="section-label"><span class="line"></span> BRAVIS · ПРОГРАММА ЛОЯЛЬНОСТИ</div>
-      <h2 id="loyalty-heading">Встречаемся чаще.<br><em>Бонусов больше.</em></h2>
-      <p>Оформите карту гостя BRAVIS в программе Loona и получите приветственные бонусы сразу после регистрации.</p>
+      <h2 id="loyalty-heading">{welcome_bonus} бонусов<br><em>за знакомство.</em></h2>
+      <p>Оформите и установите карту гостя BRAVIS в программе Loona. За установку карты начисляются {welcome_bonus} бонусных баллов.</p>
       <p class="loyalty-subtext">Карта всегда под рукой — в вашем смартфоне. Узнавайте о персональных предложениях и специальных событиях ресторана.</p>
       {loona_registration_cta}
-      <small class="loyalty-smallprint">Начисление и использование бонусов — по действующим правилам программы лояльности BRAVIS. При регистрации действуют условия Loona.</small>
+      <small class="loyalty-smallprint">Баланс и действующие условия использования — на вашей карте. При регистрации действуют условия Loona.</small>
     </div>
     <div class="loyalty-art" aria-hidden="true">
-      <div class="loyalty-card"><span class="loyalty-card__top">BRAVIS <i>LOONA</i></span><span class="loyalty-card__center">B</span><span class="loyalty-card__bottom">КАРТА ГОСТЯ <i>•</i> PRIVILEGE CARD</span></div>
-      <span class="loyalty-art__caption">ВАШИ ВСТРЕЧИ · ВАШИ БОНУСЫ</span>
+      <div class="loyalty-card"><span class="loyalty-card__top">BRAVIS <i>LOONA</i></span><span class="loyalty-card__center">{welcome_bonus}<small>БОНУСНЫХ БАЛЛОВ</small></span><span class="loyalty-card__bottom">КАРТА ГОСТЯ <i>•</i> PRIVILEGE CARD</span></div>
+      <span class="loyalty-art__caption">ПОДАРОК ЗА УСТАНОВКУ КАРТЫ</span>
     </div>
   </div>
 </section>
@@ -278,8 +289,6 @@ home+=f'''<section class="events-strip"><div class="wrap events-inner"><div><div
 
 # Lunch dishes were transcribed and checked against the restaurant's print artwork.
 # The complex price has one source: the existing structured restaurant menu.
-lunch_item = next(item for section in MENU['sections'] if section['id'] == 'lunch' for item in section['items'])
-lunch_price = h(lunch_item['price'])
 lunch_image = LUNCH['sourceImage']
 lunch_media = json.loads((ROOT / 'content/menu_media.json').read_text(encoding='utf-8'))
 assert any(entry['group'] == 'business' and lunch_image in entry['pages'] for entry in lunch_media['files']), 'Lunch artwork must match the approved menu manifest'
@@ -287,7 +296,7 @@ assert any(entry['group'] == 'business' and lunch_image in entry['pages'] for en
 home_lunch = f'''<section class="lunch-teaser" aria-labelledby="home-lunch-title"><div class="wrap lunch-teaser__inner"><div><div class="section-label"><span class="line"></span> BRAVIS · ОБЕДЫ ПО БУДНЯМ</div><h2 id="home-lunch-title">Встретимся <em>за обедом.</em></h2><p>Суп, горячее и напиток — {lunch_price} ₽ за комплекс. Фирменный салат и хлебная корзина к каждому заказу.</p></div>{button('Меню бизнес-ланча','/lunch/',tracking='lunch_from_home')}</div></section>'''
 home = home.replace('<section class="delivery-section"', home_lunch + '<section class="delivery-section"', 1)
 
-lunch = f'''<section class="lunch-hero"><div class="wrap lunch-hero__grid"><div><div class="section-label"><span class="line"></span> BRAVIS · БИЗНЕС-ЛАНЧ</div><h1>Пауза на<br><em>вкусный обед.</em></h1><p class="lead">Загляните в BRAVIS в будний день: на обед с коллегами или просто на время для себя.</p><div class="lunch-price"><strong>{lunch_price} ₽</strong><span>суп, горячее и напиток</span></div><div class="hero-actions">{button('Выбрать день','#lunch-menu',tracking='lunch_menu_click')}{button('Уточнить ланч',phone_url,True,'lunch_phone_click')}</div></div><figure class="lunch-hero__photo"><img src="{h(img(interior,'/assets/ambience.svg'))}" alt="Интерьер ресторана BRAVIS для обеда и встреч" width="740" height="900" fetchpriority="high"><figcaption>МОСКВА · РАСКОВОЙ, 20</figcaption></figure></div></section>
+lunch = f'''<section class="lunch-hero"><div class="wrap lunch-hero__grid"><div><div class="section-label"><span class="line"></span> BRAVIS · БИЗНЕС-ЛАНЧ</div><h1>Пауза на<br><em>вкусный обед.</em></h1><p class="lead">Загляните в BRAVIS по будням с 11:00 до 16:00: на обед с коллегами или просто на время для себя. В праздничные дни уточняйте расписание у ресторана.</p><div class="lunch-price"><strong>{lunch_price} ₽</strong><span>суп, горячее и напиток</span></div><div class="hero-actions">{button('Выбрать день','#lunch-menu',tracking='lunch_menu_click')}{button('Уточнить ланч',phone_url,True,'lunch_phone_click')}</div></div><figure class="lunch-hero__photo"><img src="{h(img(interior,'/assets/ambience.svg'))}" alt="Интерьер ресторана BRAVIS для обеда и встреч" width="740" height="900" fetchpriority="high"><figcaption>МОСКВА · РАСКОВОЙ, 20</figcaption></figure></div></section>
 <section class="lunch-menu" id="lunch-menu" aria-labelledby="lunch-menu-title"><div class="wrap"><div class="lunch-menu__intro"><div class="section-label"><span class="line"></span> МЕНЮ ПО ДНЯМ НЕДЕЛИ</div><h2 id="lunch-menu-title">Каждый день —<br><em>свой вкус.</em></h2><p>Выберите суп, горячее блюдо и напиток. Фирменный салат и хлебная корзина подаются к каждому заказу.</p></div><div class="lunch-tabs" role="tablist" aria-label="День недели для бизнес-ланча" data-lunch-tabs hidden>'''
 for day in LUNCH['days']:
     lunch += f'<button type="button" role="tab" id="lunch-tab-{h(day["id"])}" aria-controls="lunch-{h(day["id"])}" aria-selected="false" tabindex="-1" aria-label="{h(day["name"])}"><span class="lunch-tabs__long" aria-hidden="true">{h(day["name"])}</span><span class="lunch-tabs__short" aria-hidden="true">{h(day["shortName"])}</span></button>'
@@ -376,7 +385,7 @@ if CONFIG.get('legalPolicyApproved'):
     privacy = (ROOT / 'content/privacy.approved.html').read_text(encoding='utf-8')
 
 PAGES={
-  'index.html':page(home,'','Ресторан BRAVIS на улице Расковой, 20 в Москве. Армянская и европейская кухня, вино, семейные ужины и встречи. Бронирование столов.','/','home','home-page'),
+  'index.html':page(home,'','Ресторан BRAVIS на Расковой, 20 в Москве: армянская и европейская кухня, бизнес-ланч за 690 ₽ и 500 бонусов за установку карты гостя. Меню и бронирование.','/','home','home-page'),
   'menu/index.html':page(menu_top,'Меню и цены — армянская и европейская кухня','Меню ресторана BRAVIS в Москве: армянская и европейская кухня, винная карта. Актуальные блюда и информация.','/menu/','menu'),
   'lunch/index.html':page(lunch,'Бизнес-ланч за 690 ₽ на Расковой, 20','Бизнес-ланч в BRAVIS на Расковой, 20: меню по будням, суп, горячее и напиток. Оригинальное меню и бронирование стола.','/lunch/','lunch','lunch-page'),
   'banquets/index.html':page(banquet,'Банкеты и мероприятия','Праздники, камерные банкеты, дни рождения и семейные встречи в ресторане BRAVIS, Москва, улица Расковой, 20.','/banquets/','banquets'),
@@ -384,6 +393,15 @@ PAGES={
   '404.html':page(not_found,'Страница не найдена','Страница не найдена. Меню, контакты и бронирование ресторана BRAVIS.','/404.html','','not-found-page',noindex=True),
   'privacy/index.html':page(privacy,privacy_title,'Сведения об обработке персональных данных на сайте ресторана BRAVIS.','/privacy/','privacy')
 }
+
+# Reuse the guest hub prepared by the existing marketing executor.
+from guest_hub import render_guest_hub
+hub_settings = json.loads((ROOT / 'content/guest-hub.json').read_text(encoding='utf-8'))
+PAGES['go/index.html'] = render_guest_hub(
+    CONFIG, hub_settings,
+    head('Меню и карта гостя', 'Меню, карта гостя и следующий визит в BRAVIS на Расковой, 20.', '/go/', 'guest-hub-page'),
+    lunch_item['price'], reserve_link,
+)
 
 if DIST.exists():shutil.rmtree(DIST)
 DIST.mkdir()
@@ -395,7 +413,7 @@ for filename,content in PAGES.items():
 # Don't enable indexing before owner authorizes publication and sets domain/legal data.
 (DIST/'robots.txt').write_text(('User-agent: *\nAllow: /\nSitemap: '+site_url('/sitemap.xml')+'\n') if published else 'User-agent: *\nDisallow: /\n', encoding='utf-8')
 if published:
-    uris=['/','/menu/','/lunch/','/banquets/','/contacts/','/privacy/']
+    uris=['/','/menu/','/lunch/','/banquets/','/contacts/','/privacy/','/go/']
     sitemap='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join('<url><loc>'+h(site_url(uri))+'</loc></url>' for uri in uris)+'</urlset>'
     (DIST/'sitemap.xml').write_text(sitemap,encoding='utf-8')
 (DIST/'.nojekyll').write_text('',encoding='utf-8')

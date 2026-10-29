@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - '.github/workflows/browser-qa.yml'
-      - 'site/scripts/browser_smoke.py'
+      - 'site/**'
   workflow_dispatch:
 permissions:
   contents: read
@@ -27,6 +27,7 @@ jobs:
       - name: Run browser acceptance for desktop and mobile
         run: |
           python3 site/scripts/browser_smoke.py
+          python3 site/scripts/guest_hub_acceptance.py
       - name: Preserve screenshots for owner review
         if: always()
         uses: actions/upload-artifact@v4
