@@ -32,6 +32,109 @@ base=f'http://127.0.0.1:{port}'
 def loaded(img):
     return img.evaluate('(e)=>e.complete && e.naturalWidth > 0')
 
+def accept_gallery_and_messengers(browser):
+    """Inspect actual responsive photographs and contact choices without sending."""
+    config=json.loads((ROOT/'site.config.json').read_text(encoding='utf8'))
+    max_url=config['socialLinks']['max']
+    for width,columns in ((320,1),(768,2),(1440,3)):
+        context=browser.new_context(viewport={'width':width,'height':900},java_script_enabled=False)
+        context.route('**/*',lambda route: route.continue_() if route.request.url.startswith(base+'/') else route.abort())
+        page=context.new_page()
+        page.goto(base+'/gallery/',wait_until='networkidle')
+        page.screenshot(path=str(REPORT/f'gallery-{width}.png'),full_page=False)
+        assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2'), 'Gallery overflow at '+str(width)
+        expect(page.locator('.restaurant-gallery img')).to_have_count(10)
+        assert page.locator('.restaurant-gallery__columns').evaluate('(e)=>getComputedStyle(e).columnCount')==str(columns)
+        assert len(set(page.locator('.restaurant-gallery img').evaluate_all('(items)=>items.map(e=>e.getAttribute("src"))')))==10
+        for img in page.locator('.restaurant-gallery img').all():
+            expect(img).to_have_attribute('loading','lazy')
+            expect(img).to_have_attribute('decoding','async')
+            img.scroll_into_view_if_needed()
+            expect(img).to_have_js_property('complete',True)
+            assert loaded(img), 'Gallery original did not load'
+            assert img.evaluate('(e)=>Number(e.getAttribute("width"))===e.naturalWidth && Number(e.getAttribute("height"))===e.naturalHeight'), 'Gallery dimensions do not match the original'
+            assert img.evaluate('(e)=>Math.abs(e.getBoundingClientRect().width/e.getBoundingClientRect().height-e.naturalWidth/e.naturalHeight)<.01'), 'Gallery photograph was cropped'
+        page.goto(base+'/banquets/',wait_until='networkidle')
+        page.screenshot(path=str(REPORT/f'banquet-messengers-{width}.png'),full_page=False)
+        assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2'), 'Banquet overflow at '+str(width)
+        choices=page.locator('.banquet-messengers__links')
+        assert choices.count()>=3, 'Messenger choices missing in a banquet conversion block'
+        for group in choices.all():
+            expect(group.locator('a')).to_have_count(3)
+            assert group.locator('a>span').all_text_contents()==['WhatsApp','Telegram','MAX']
+            assert group.locator('a').nth(0).get_attribute('href').startswith('https://wa.me/79895719977?text=')
+            expect(group.locator('a').nth(1)).to_have_attribute('href','https://t.me/+79895719977')
+            expect(group.locator('a').nth(2)).to_have_attribute('href',max_url)
+            for link in group.locator('a').all():
+                assert link.get_attribute('aria-label')
+                expect(link).to_have_attribute('rel','noopener noreferrer')
+                expect(link).to_have_attribute('target','_blank')
+                rect=link.bounding_box()
+                assert rect['width']>=44 and rect['height']>=44, 'Messenger target too small'
+        for route in ('/menu/','/lunch/'):
+            page.goto(base+route,wait_until='networkidle')
+            expect(page.locator('.bravis-lunch-reward')).to_contain_text('Шестой бизнес-ланч — бесплатно')
+            assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2'), 'Lunch reward overflow at '+str(width)
+        page.goto(base+'/',wait_until='networkidle')
+        expect(page.locator('.bravis-offer--lunch .bravis-lunch-tag')).to_contain_text('Бесплатно')
+        expect(page.locator('.bravis-offer--lunch')).to_contain_text('каждый шестой бизнес-ланч')
+        context.close()
+    header_context=browser.new_context(viewport={'width':1440,'height':900})
+    header=header_context.new_page()
+    for width in (1024,1440):
+        header.set_viewport_size({'width':width,'height':900})
+        header.goto(base+'/gallery/',wait_until='networkidle')
+        assert header.evaluate('document.documentElement.scrollWidth<=innerWidth+2'), 'Header overflow at '+str(width)
+        if width==1024:
+            expect(header.locator('.desktop-nav')).not_to_be_visible()
+            expect(header.locator('.menu-toggle')).to_be_visible()
+            header.locator('.menu-toggle').click()
+            expect(header.locator('.mobile-nav a[href="/gallery/"]')).to_be_visible()
+        else:
+            expect(header.locator('.desktop-nav a[href="/gallery/"]')).to_be_visible()
+            boxes=[header.locator(selector).bounding_box() for selector in ('.logo','.desktop-nav','.header-actions')]
+            assert all(boxes), 'Header element missing'
+            assert boxes[0]['x']+boxes[0]['width']<=boxes[1]['x'] and boxes[1]['x']+boxes[1]['width']<=boxes[2]['x'], 'Desktop navigation overlaps logo or booking'
+    header_context.close()
+    print('PASS: 10 uncropped responsive gallery originals, sixth lunch offer and direct WhatsApp/Telegram/MAX choices; headers at 1024/1440')
+
+def accept_event_clock(browser):
+    """A reading leaves Today at Moscow midnight; Friday/Saturday music repeats."""
+    reading='chekhov-readings-2026-10-30'
+    for instant,music,readings in (
+            (datetime(2026,10,30,15,tzinfo=timezone.utc),1,1),
+            (datetime(2026,10,31,17,tzinfo=timezone.utc),1,0),
+            (datetime(2026,11,1,17,tzinfo=timezone.utc),0,0)):
+        context=browser.new_context(viewport={'width':390,'height':844},timezone_id='America/Los_Angeles')
+        context.route('**/*',lambda route: route.continue_() if route.request.url.startswith(base+'/') else route.abort())
+        page=context.new_page()
+        page.clock.install(time=instant)
+        page.goto(base+'/events/',wait_until='networkidle')
+        today=page.locator('[data-restaurant-life-part="today"]')
+        expect(today.locator('[data-life-id="live-music"]')).to_have_count(music)
+        expect(today.locator('[data-life-id="'+reading+'"]')).to_have_count(readings)
+        expect(page.locator('[data-restaurant-life-part="news"] [data-life-id="'+reading+'"]')).to_contain_text('19:00')
+        ids=today.locator('[data-life-id]').evaluate_all('(items)=>items.map(e=>e.dataset.lifeId)')
+        assert len(ids)==len(set(ids)), 'Duplicate Today cards'
+        context.close()
+    boundary=browser.new_context(timezone_id='America/Los_Angeles')
+    boundary.route('**/*',lambda route: route.continue_() if route.request.url.startswith(base+'/') else route.abort())
+    page=boundary.new_page()
+    page.clock.install(time=datetime(2026,10,30,20,59,30,tzinfo=timezone.utc))
+    navigations=[]
+    page.on('framenavigated',lambda frame:navigations.append(frame.url) if frame==page.main_frame else None)
+    page.goto(base+'/events/',wait_until='networkidle')
+    today=page.locator('[data-restaurant-life-part="today"]')
+    expect(today.locator('[data-life-id="'+reading+'"]')).to_have_count(1)
+    page.clock.fast_forward(61000)
+    page.clock.run_for(100)
+    expect(today.locator('[data-life-id="'+reading+'"]')).to_have_count(0)
+    expect(today.locator('[data-life-id="live-music"]')).to_have_count(1)
+    expect(page.locator('[data-restaurant-life-part="news"] [data-life-id="'+reading+'"]')).to_have_count(1)
+    assert len(navigations)==1, 'Moscow midnight reloaded the page'
+    boundary.close()
+    print('PASS: 30 October reading at 19:00, Friday/Saturday music, Sunday fallback and Moscow midnight update without navigation')
+
 def accept_public_revision(browser):
     """Exercise the public menu/editorial change, including an already open page."""
     def guest_brand(page):
@@ -141,6 +244,8 @@ try:
     with sync_playwright() as p:
         browser_path=os.environ.get('BRAVIS_CHROMIUM_EXECUTABLE') or shutil.which('chromium')
         browser=p.chromium.launch(executable_path=browser_path,headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+        accept_gallery_and_messengers(browser)
+        accept_event_clock(browser)
         accept_public_revision(browser)
         if '--public-revision-only' in sys.argv:
             browser.close()
@@ -299,13 +404,13 @@ try:
         # At minimum supported phone width, content must not force sideways scrolling.
         narrow=browser.new_context(viewport={'width':320,'height':720},is_mobile=True,has_touch=True)
         np=narrow.new_page()
-        for route in ('/','/menu/','/lunch/','/banquets/','/contacts/','/privacy/','/go/','/events/'):
+        for route in ('/','/menu/','/lunch/','/banquets/','/contacts/','/privacy/','/go/','/events/','/gallery/'):
             np.goto(base+route,wait_until='domcontentloaded')
             np.wait_for_timeout(100)
             dimensions=np.evaluate('({viewport:innerWidth,scroll:document.documentElement.scrollWidth})')
             assert dimensions['scroll'] <= dimensions['viewport']+2, f'Horizontal overflow at 320px on {route}: {dimensions}'
         narrow.close()
-        print('PASS: no horizontal scrolling at 320px across all eight pages')
+        print('PASS: no horizontal scrolling at 320px across all nine pages')
         # Long mobile pages keep their header and catalog usable in either scroll direction.
         navigation=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,reduced_motion='reduce')
         navpage=navigation.new_page()

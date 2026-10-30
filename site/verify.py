@@ -6,7 +6,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent
 DIST=ROOT/'dist'
-paths=['index.html','menu/index.html','lunch/index.html','banquets/index.html','contacts/index.html','privacy/index.html','go/index.html','events/index.html']
+paths=['index.html','menu/index.html','lunch/index.html','banquets/index.html','contacts/index.html','privacy/index.html','go/index.html','events/index.html','gallery/index.html']
 class Links(HTMLParser):
     def __init__(self):
         super().__init__();self.links=[];self.images=[];self.scripts=[]
@@ -38,7 +38,7 @@ if (DIST/'sitemap.xml').is_file():
     sitemap=ET.parse(DIST/'sitemap.xml')
     urls=[node.text for node in sitemap.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
     expected=['https://bravisrest.ru'+('/' if p=='index.html' else '/'+p.removesuffix('index.html')) for p in paths]
-    assert len(urls)==len(set(urls))==8, 'Sitemap must contain eight unique public pages'
+    assert len(urls)==len(set(urls))==9, 'Sitemap must contain nine unique public pages'
     assert set(urls)==set(expected), 'Sitemap must retain every canonical public route and exclude 404'
 if (ROOT/'site.config.json').exists():
     config=json.loads((ROOT/'site.config.json').read_text(encoding='utf-8'))
@@ -47,4 +47,4 @@ if (ROOT/'site.config.json').exists():
             assert 'name="robots" content="noindex' in (DIST/p).read_text(encoding='utf-8'),p
         assert 'Disallow: /' in (DIST/'robots.txt').read_text(encoding='utf-8')
 mode='public indexing' if config.get('public') else 'preview noindex'
-print('PASS: eight BRAVIS pages, accessible links, local media assets, JSON-LD, '+mode)
+print('PASS: nine BRAVIS pages, accessible links, local media assets, JSON-LD, '+mode)

@@ -151,17 +151,25 @@ def _date_label(value):
 
 
 def select_today(data, *, now=None):
-    """Select a conservative current-day view; future formats never enter it.
+    """Select the current-day view from confirmed date and weekday facts.
 
     weekday is ISO Monday=1. A scheduled lunch may be shown before service starts;
     the active label applies only to start <= Moscow minute < end. After service
-    ends, or without confirmed holiday hours, only the general menu remains.
+    ends, or without confirmed holiday hours, the lunch card is omitted. Dated
+    news appears on that Moscow date; music is labelled tonight on Friday/Saturday.
     """
     current = _moscow_now(now)
     key = current.date().isoformat()
     minute = current.hour * 60 + current.minute
     result = {'date': key, 'dateLabel': _date_label(current.date()),
               'weekdayLabel': _WEEKDAYS[current.weekday()], 'items': [], 'notice': ''}
+    seen = set()
+
+    def append_item(item, eyebrow):
+        if item['id'] not in seen:
+            seen.add(item['id'])
+            result['items'].append({name: item[name] for name in _ITEM_KEYS} | {'eyebrow': eyebrow})
+
     override = data['holidayOverrides'].get(key)
     for regular in data['regulars']:
         start, end = regular['start'], regular['end']
@@ -179,9 +187,15 @@ def select_today(data, *, now=None):
                 start, end = override['start'], override['end']
         if scheduled and minute < _minute(end):
             active = minute >= _minute(start)
-            result['items'].append({key: regular[key] for key in _ITEM_KEYS} | {
-                'eyebrow': ('Сейчас время бизнес-ланча' if active else 'Сегодня') + f' · {start}–{end} МСК'})
-    result['items'].append(dict(data['fallback'], eyebrow='Меню и встречи'))
+            append_item(regular, ('Сейчас время бизнес-ланча' if active else 'Сегодня') + f' · {start}–{end} МСК')
+    for item in data['news']:
+        if item['date'] == key:
+            append_item(item, 'Сегодня в BRAVIS')
+    if current.isoweekday() in (5, 6):
+        for item in data['formats']:
+            if item['id'] == 'live-music':
+                append_item(item, 'Сегодня вечером')
+    append_item(data['fallback'], 'Меню и встречи')
     return result
 
 
