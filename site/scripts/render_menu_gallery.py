@@ -49,11 +49,11 @@ def main():
         <span class="print-card__more">Посмотреть {'страницы' if cnt>1 else 'меню'} <span aria-hidden="true">↗</span></span></div></a>''')
     data=json.dumps([{"title":x["title"],"pages":x["pages"]} for x in files],ensure_ascii=False).replace("<","\\u003c")
     widget='''<div class="approved-menus" id="approved-menus"><div class="approved-menus__intro">
-      <div class="section-label"><span class="line"></span> ОРИГИНАЛЬНЫЕ МЕНЮ BRAVIS</div>
+      <div class="section-label"><span class="line"></span> МЕНЮ BRAVIS</div>
       <h2>Выбирайте то, <em>что нравится.</em></h2>
       <p>Меню ресторана, барная карта, бизнес-ланч и блюда для детей. Откройте раздел, чтобы рассмотреть его крупно.</p>
     </div><div class="print-menu-grid">'''+''.join(tiles)+'''</div>
-    <p class="approved-menus__disclaimer">Изображения меню предоставлены рестораном. Состав блюд, доступность и актуальные цены уточняйте у сотрудников.</p>
+    <p class="approved-menus__disclaimer">Состав блюд, доступность и актуальные цены уточняйте у сотрудников.</p>
     </div><dialog class="menu-lightbox" id="menu-lightbox" aria-labelledby="menu-lightbox-title">
       <header class="menu-lightbox__header"><strong id="menu-lightbox-title">Меню BRAVIS</strong>
       <span class="menu-lightbox__counter" id="menu-lightbox-counter"></span>
@@ -81,7 +81,7 @@ def main():
         if n!=1:raise RuntimeError('Cannot locate safe insertion point in /menu/')
     elif '<nav class="menu-filter"' in page:
         # Preserve the owner-approved text menu for SEO, and put the image menus first.
-        page=page.replace('<nav class="menu-filter"', widget + '<div class="menu-structured-heading"><h2>Блюда, напитки и цены из печатного меню</h2><p>Выбор позиций ниже. Полный ассортимент — на изображениях меню выше.</p></div><nav class="menu-filter"',1)
+        page=page.replace('<nav class="menu-filter"', widget + '<div class="menu-structured-heading"><h2>Блюда и напитки</h2></div><nav class="menu-filter"',1)
     else:
         raise RuntimeError('Unexpected menu template, refusing to replace')
     schema={"@context":"https://schema.org","@type":"Menu","name":"Меню ресторана BRAVIS","inLanguage":"ru","hasMenuSection":[{"@type":"MenuSection","name":entry["title"]} for entry in files]}
