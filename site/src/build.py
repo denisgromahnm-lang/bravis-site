@@ -9,6 +9,7 @@ from restaurant_life import (load_restaurant_life, restaurant_life_json, render_
 from guest_promotions import (welcome_strip, offers_section, experiences_section,
                               menu_campaign, banquet_details, contact_invitation, gift_art, lunch_reward_strip)
 from restaurant_gallery import render_restaurant_gallery
+from event_media import render_event_media, render_restaurant_videos
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / 'dist'
@@ -16,6 +17,7 @@ CONFIG = json.loads((ROOT / 'site.config.json').read_text(encoding='utf-8'))
 MENU = json.loads((ROOT / 'content/menu.json').read_text(encoding='utf-8'))
 LUNCH = json.loads((ROOT / 'content/lunch.json').read_text(encoding='utf-8'))
 GALLERY = json.loads((ROOT / 'content/gallery.json').read_text(encoding='utf-8')) if (ROOT / 'content/gallery.json').exists() else {}
+EVENT_MEDIA = json.loads((ROOT / 'content/event-media.json').read_text(encoding='utf-8')) if (ROOT / 'content/event-media.json').exists() else {}
 
 h = lambda s: html.escape(str(s or ''), quote=True)
 name = CONFIG.get('restaurantName','BRAVIS')
@@ -212,7 +214,7 @@ def head(title, desc, route, body_class, noindex=False):
 <link rel="stylesheet" href="/assets/site.css">
 <link rel="stylesheet" href="/assets/lunch.css">
 <link rel="stylesheet" href="/assets/promotions.css">
-<link rel="stylesheet" href="/assets/restaurant-life.css"><link rel="stylesheet" href="/assets/restaurant-gallery.css">
+<link rel="stylesheet" href="/assets/restaurant-life.css"><link rel="stylesheet" href="/assets/restaurant-gallery.css"><link rel="stylesheet" href="/assets/event-media.css">
 <meta property="og:type" content="website"><meta property="og:locale" content="ru_RU">
 <meta property="og:site_name" content="BRAVIS"><meta property="og:title" content="{h(full_title)}">
 <meta property="og:description" content="{h(desc)}"><meta property="og:image" content="{h(image or '/assets/wine-scene.svg')}">
@@ -266,6 +268,7 @@ home=f'''{welcome_strip(welcome_bonus)}
 {render_restaurant_life_today(life_data)}
 {experiences_section(whatsapp_url)}
 {render_restaurant_life_news(life_data, compact=True)}
+{render_event_media(EVENT_MEDIA, compact=True)}
 <section class="intro section" id="about"><div class="wrap intro-grid"><div class="section-label"><span class="line"></span> НАША ФИЛОСОФИЯ</div><div><h2>Не просто ужин.<br><em>Повод встретиться.</em></h2><p>Bravis — про вечера, которые складываются из мелочей: знакомых вкусов, неспешных разговоров и тёплого света. Здесь уютно вдвоём, с семьёй и большой компанией.</p><a class="text-link" href="/contacts/">Найти нас {arrow_up_right}</a></div></div></section>
 <section class="feature-section"><div class="wrap feature-grid"><div class="feature-photo"><img src="{h(img(food,'/assets/cuisine.svg'))}" alt="{('Блюда ресторана BRAVIS' if food else 'Авторская иллюстрация блюда')}" width="640" height="520" loading="lazy"></div><div class="feature-copy"><div class="section-label section-label--light"><span class="line"></span> КУХНЯ И ВИНО</div><h2>Вкусы, к которым<br><em>возвращаются.</em></h2><p>Армянские гастрономические традиции и европейская классика. Блюда для общего стола, бокал вина и удовольствие быть вместе.</p>{button('Открыть меню','/menu/',False,'menu_from_feature')}<div class="feature-folio">BRAVIS · FOOD & WINE</div></div></div></section>
 <section class="delivery-section" id="delivery" aria-labelledby="delivery-heading">
@@ -345,7 +348,7 @@ if available:
     menu_top+='</nav>'
     for s in available:
         if bar_sections and s is bar_sections[0]:
-            menu_top+='<div id="bar-menu"><div class="menu-category-header"><div class="section-label"><span class="line"></span> БАРНАЯ КАРТА BRAVIS</div><h2>Бар и напитки</h2><p>Названия, цены и объёмы из печатной барной карты ресторана.</p></div><nav class="menu-filter" aria-label="Разделы барной карты">' + ''.join(f'<a href="#{h(b.get("id","category"))}">{h(b.get("name","Раздел"))}</a>' for b in bar_sections) + '</nav></div>'
+            menu_top+='<div id="bar-menu"><div class="menu-category-header"><div class="section-label"><span class="line"></span> БАРНАЯ КАРТА BRAVIS</div><h2>Бар и напитки</h2></div><nav class="menu-filter" aria-label="Разделы барной карты">' + ''.join(f'<a href="#{h(b.get("id","category"))}">{h(b.get("name","Раздел"))}</a>' for b in bar_sections) + '</nav></div>'
         menu_top+=f'<div class="menu-category" id="{h(s.get("id","category"))}"><div class="menu-category-header"><div class="section-label"><span class="line"></span> МЕНЮ BRAVIS</div><h2>{h(s.get("name","Раздел"))}</h2><p>{h(s.get("note",""))}</p></div><div class="menu-items">'
         for item in s['items']:
             price = str(item.get('price','')).strip()
@@ -364,11 +367,11 @@ banquet=f'''<section class="page-hero page-hero--dark"><div class="wrap page-her
 <section class="section"><div class="wrap"><div class="section-label"><span class="line"></span> ВАШ ФОРМАТ</div><h2>Не только меню.<br><em>Время вместе.</em></h2><p>Обсудим, что нужно вашей встрече: праздничный стол, приватность или пространство для съёмок. Стоимость и доступность согласуем по заявке.</p><div class="banquet-options"><article><h3>Праздничный стол</h3><p>Подберём блюда, подачу и обслуживание под ваш повод.</p>{banquet_messengers('Обсудить условия', 'Хочу обсудить банкетное меню и стоимость мероприятия.', 'banquet_format_contact')}</article><article><h3>Аренда и приватность</h3><p>Обсудим возможность аренды, время и условия проведения закрытой встречи.</p>{banquet_messengers('Обсудить условия', 'Хочу обсудить возможность аренды и приватный формат встречи.', 'banquet_format_contact')}</article><article><h3>Встречи и съёмки</h3><p>Расскажите о деловой встрече или съёмочном дне — обсудим формат и требования к площадке.</p>{banquet_messengers('Обсудить условия', 'Хочу обсудить площадку BRAVIS для встречи или съёмок.', 'banquet_format_contact')}</article></div></div></section>
 <section class="banner-dark"><div class="wrap banner-inner"><div><span class="overline">BRAVIS · ВАШЕ СОБЫТИЕ</span><h2>Начнём<br><em>с ваших пожеланий.</em></h2><p>Дату, меню и стоимость согласуем с вами до подтверждения мероприятия.</p></div><div>{banquet_messengers()}</div></div></section>'''
 
-events = render_restaurant_life_page(life_data)
+events = render_restaurant_life_page(life_data) + render_event_media(EVENT_MEDIA) + render_restaurant_videos(EVENT_MEDIA)
 events += '<section class="section life-gallery"><div class="wrap"><div class="section-label"><span class="line"></span> АТМОСФЕРА В КАДРЕ</div><h2>Место для <em>ваших историй.</em></h2><p>Залы и детали BRAVIS. Фотографии интерьера ресторана.</p><div class="gallery-grid">'
 for i, photo in enumerate(photos[:3]):
     events += f'<a class="gallery-item gallery-item--{i+1}" href="{h(img(photo, "/assets/ambience.svg"))}" target="_blank" rel="noopener noreferrer"><img src="{h(img(photo, "/assets/ambience.svg"))}" alt="Интерьер BRAVIS — фотография {i+1}" width="650" height="650" loading="lazy"></a>'
-events += '</div><p><a class="text-link" href="/gallery/">Посмотреть весь интерьер ↗</a></p><a class="text-link" href="https://rutube.ru/video/c2c357acb4f02a17b8ac298d603e38be/" target="_blank" rel="noopener noreferrer">Посмотреть видеосюжет о BRAVIS ↗</a><p class="subtle">Архивный сюжет о ресторане. Фотографии выше показывают интерьер, а не съёмки фильма.</p></div></section>'
+events += '</div><p><a class="text-link" href="/gallery/">Посмотреть весь интерьер ↗</a></p></div></section>'
 events += '<section class="banner-dark"><div class="wrap banner-inner"><div><span class="overline">ВАШ ПОВОД ДЛЯ ВСТРЕЧИ</span><h2>Пусть следующая история<br><em>будет вашей.</em></h2></div><div>' + reserve_button() + '</div></div></section>'
 
 contacts=f'''<section class="page-hero page-hero--light"><div class="wrap"><div class="section-label"><span class="line"></span> КОНТАКТЫ И МАРШРУТ</div><h1>До <em>встречи.</em></h1><p>Находите время для близких. А мы найдём для вас место.</p></div></section><section class="section"><div class="wrap contacts-grid"><div class="contacts-info"><div class="contact-row"><span>АДРЕС</span><h2>{h(address)}</h2></div><div class="contact-row"><span>ТЕЛЕФОН</span><a class="contact-big contact-value--phone" href="{h(phone_url)}" data-track="contacts_phone_click">{h(phone)}</a></div><div class="contact-row"><span>ОФИЦИАЛЬНАЯ ПОЧТА</span><a class="contact-big contact-value--email" href="mailto:{h(official_email)}">{h(official_email)}</a></div><div class="contact-row"><span>ВРЕМЯ РАБОТЫ</span><p>{h(CONFIG.get('hoursText',''))}</p></div><div class="contact-actions">{reserve_button()}{button('Открыть маршрут',yandex_maps_url,True,ext=True)}{button('Карточка BRAVIS в 2ГИС',two_gis_url,True,tracking='two_gis_click',ext=True) if two_gis_url else ''}</div></div><div class="map-card"><div class="map-card__line"></div><div class="map-card__inner"><span>BRAVIS</span><p>МОСКВА</p><p class="map-card__address">РАСКОВОЙ, 20</p><div class="map-pin">⌖</div><a href="{h(yandex_maps_url)}" target="_blank" rel="noopener noreferrer">Открыть на Яндекс Картах ↗</a>{f'<a href="{h(two_gis_url)}" target="_blank" rel="noopener noreferrer" data-track="two_gis_click">Открыть в 2ГИС ↗</a>' if two_gis_url else ''}</div></div></div></section>'''
@@ -422,7 +425,7 @@ PAGES={
   'lunch/index.html':page(lunch,'Бизнес-ланч за 690 ₽ на Расковой, 20','Бизнес-ланч в BRAVIS на Расковой, 20: меню по будням, суп, горячее и напиток. Оригинальное меню и бронирование стола.','/lunch/','lunch','lunch-page'),
   'banquets/index.html':page(banquet,'Банкеты и мероприятия','Праздники, камерные банкеты, дни рождения и семейные встречи в ресторане BRAVIS, Москва, улица Расковой, 20.','/banquets/','banquets'),
   'events/index.html':page(events,'Жизнь ресторана — события и новости','События и новости BRAVIS: дегустации, гастроужины, встречи и жизнь ресторана на Расковой, 20.','/events/','events','events-page'),
-  'gallery/index.html':page(render_restaurant_gallery(GALLERY),'Интерьер ресторана — фотогалерея','Фотографии интерьера BRAVIS на Расковой, 20: залы, столы и детали ресторана. Посмотрите атмосферу перед визитом.','/gallery/','gallery','gallery-page'),
+  'gallery/index.html':page(render_restaurant_gallery(GALLERY) + render_restaurant_videos(EVENT_MEDIA),'Интерьер ресторана — фотогалерея','Фотографии интерьера BRAVIS на Расковой, 20: залы, столы и детали ресторана. Посмотрите атмосферу перед визитом.','/gallery/','gallery','gallery-page'),
   'contacts/index.html':page(contacts,'Адрес и контакты','Ресторан BRAVIS: Москва, улица Расковой, 20. Телефон +7 (989) 571-99-77. Как добраться и забронировать стол.','/contacts/','contacts'),
   '404.html':page(not_found,'Страница не найдена','Страница не найдена. Меню, контакты и бронирование ресторана BRAVIS.','/404.html','','not-found-page',noindex=True),
   'privacy/index.html':page(privacy,privacy_title,'Сведения об обработке персональных данных на сайте ресторана BRAVIS.','/privacy/','privacy')

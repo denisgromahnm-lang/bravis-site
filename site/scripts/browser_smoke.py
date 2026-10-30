@@ -32,6 +32,42 @@ base=f'http://127.0.0.1:{port}'
 def loaded(img):
     return img.evaluate('(e)=>e.complete && e.naturalWidth > 0')
 
+def accept_sticky_header(browser):
+    """Scrolling and native section links keep navigation available on every layout."""
+    context=browser.new_context(viewport={'width':1440,'height':900},reduced_motion='reduce')
+    context.route('**/*',lambda route: route.continue_() if route.request.url.startswith(base+'/') else route.abort())
+    context.add_init_script("localStorage.setItem('bravis_analytics_consent_v1','no')")
+    page=context.new_page()
+    for width in (320,390,768,960,1024,1120,1199,1200,1440):
+        page.set_viewport_size({'width':width,'height':900})
+        page.goto(base+'/',wait_until='networkidle')
+        header=page.locator('.site-header')
+        for offset in (1000,750):
+            page.evaluate('(top)=>scrollTo({top,behavior:"instant"})',offset)
+            assert abs(header.bounding_box()['y'])<=1, 'Header left viewport at '+str(width)
+        measured=page.evaluate('parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--site-header-height"))')
+        assert abs(measured-header.bounding_box()['height'])<=1, 'Header offset is stale at '+str(width)
+        if width>=1200:
+            page.locator('.desktop-nav a[href="/#delivery"]').click()
+        else:
+            page.locator('.menu-toggle').click()
+            page.locator('.mobile-nav a[href="/#delivery"]').click()
+        page.wait_for_function('location.hash === "#delivery"')
+        assert page.locator('#delivery').bounding_box()['y']>=header.bounding_box()['height'], 'Section hidden under header at '+str(width)
+        assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2'), 'Sticky navigation overflow at '+str(width)
+    page.set_viewport_size({'width':1024,'height':900})
+    page.goto(base+'/',wait_until='networkidle')
+    page.locator('.menu-toggle').click()
+    expect(page.locator('.mobile-nav')).to_be_visible()
+    page.set_viewport_size({'width':1200,'height':900})
+    expect(page.locator('.mobile-nav')).to_be_hidden()
+    assert not page.locator('body').evaluate('(e)=>e.classList.contains("nav-open")'), 'Tablet-to-desktop resize left the page locked'
+    page.goto(base+'/menu/',wait_until='networkidle')
+    expect(page.locator('.menu-structured-heading')).to_have_text('Блюда и напитки')
+    assert 'Блюда, напитки и цены из печатного меню' not in page.locator('body').inner_text()
+    context.close()
+    print('PASS: desktop/tablet/mobile sticky header, measured section offsets, tablet resize unlock and concise menu heading')
+
 def accept_gallery_and_messengers(browser):
     """Inspect actual responsive photographs and contact choices without sending."""
     config=json.loads((ROOT/'site.config.json').read_text(encoding='utf8'))
@@ -244,6 +280,7 @@ try:
     with sync_playwright() as p:
         browser_path=os.environ.get('BRAVIS_CHROMIUM_EXECUTABLE') or shutil.which('chromium')
         browser=p.chromium.launch(executable_path=browser_path,headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+        accept_sticky_header(browser)
         accept_gallery_and_messengers(browser)
         accept_event_clock(browser)
         accept_public_revision(browser)
