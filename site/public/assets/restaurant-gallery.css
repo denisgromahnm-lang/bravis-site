@@ -1,0 +1,15 @@
+/* Original restaurant photographs: no cropping, viewer script or extra requests. */
+.restaurant-gallery-hero{padding-block:62px 46px}
+.restaurant-gallery-hero h1{font-size:clamp(48px,6vw,86px)}
+.restaurant-gallery-hero p{max-width:650px}
+.restaurant-gallery__events{display:inline-flex;align-items:center;gap:10px;min-height:44px;border-bottom:1px solid #9a7770;margin-top:12px;font-size:13px}
+.restaurant-gallery{padding:0 0 85px;background:var(--cream)}
+.restaurant-gallery__hint{font-size:12px;line-height:1.7;color:var(--muted);margin:0 0 28px}
+.restaurant-gallery__columns{columns:3;column-gap:24px}
+.restaurant-gallery__item{display:inline-block;vertical-align:top;width:100%;margin:0 0 25px;break-inside:avoid}
+.restaurant-gallery__photo{display:block;background:#eee1d4;overflow:hidden}
+.restaurant-gallery__photo img{display:block;width:100%;height:auto}
+.restaurant-gallery__photo:focus-visible{outline-offset:5px}
+.restaurant-gallery__item figcaption{display:flex;justify-content:space-between;gap:12px;padding-top:13px;font-size:9px;line-height:1.5;letter-spacing:.13em;color:#8c6a5b}
+@media(max-width:1000px){.restaurant-gallery__columns{columns:2;column-gap:20px}}
+@media(max-width:560px){.restaurant-gallery-hero{padding-block:40px 32px}.restaurant-gallery-hero h1{font-size:clamp(47px,11vw,64px)}.restaurant-gallery-hero p{font-size:18px;line-height:1.6}.restaurant-gallery{padding-bottom:60px}.restaurant-gallery__columns{columns:1}.restaurant-gallery__item{margin-bottom:27px}.restaurant-gallery__hint{margin-bottom:23px}}

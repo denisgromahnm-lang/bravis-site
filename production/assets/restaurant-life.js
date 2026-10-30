@@ -136,6 +136,12 @@
     const weekday = stamp.getUTCDay() || 7;
     const clockMinute = Number(fields.hour) * 60 + Number(fields.minute);
     const result = {date: key, dateLabel: dateLabel(calendar), weekdayLabel: WEEKDAYS[weekday - 1], items: [], notice: ''};
+    const seen = new Set();
+    const appendItem = (value, eyebrow) => {
+      if (seen.has(value.id)) return;
+      seen.add(value.id);
+      result.items.push({...Object.fromEntries(ITEM_KEYS.map(name => [name, value[name]])), eyebrow});
+    };
     const override = data.holidayOverrides[key];
     for (const regular of data.regulars) {
       let {start, end} = regular;
@@ -151,11 +157,15 @@
         ({start, end} = override);
       }
       if (scheduled && clockMinute < minute(end)) {
-        result.items.push({...regular, eyebrow: (clockMinute >= minute(start) ? 'Сейчас время бизнес-ланча' : 'Сегодня')
-          + ' · ' + start + '–' + end + ' МСК'});
+        appendItem(regular, (clockMinute >= minute(start) ? 'Сейчас время бизнес-ланча' : 'Сегодня')
+          + ' · ' + start + '–' + end + ' МСК');
       }
     }
-    result.items.push({...data.fallback, eyebrow: 'Меню и встречи'});
+    data.news.filter(value => value.date === key).forEach(value => appendItem(value, 'Сегодня в BRAVIS'));
+    if (weekday === 5 || weekday === 6) {
+      data.formats.filter(value => value.id === 'live-music').forEach(value => appendItem(value, 'Сегодня вечером'));
+    }
+    appendItem(data.fallback, 'Меню и встречи');
     return result;
   };
 

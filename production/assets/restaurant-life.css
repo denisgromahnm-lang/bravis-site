@@ -43,3 +43,15 @@
 .banquet-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:28px}
 .banquet-options article{border:1px solid #d8c4ad;padding:26px;background:#f6ede1}.banquet-options h3{font-family:var(--serif);font-size:29px;font-weight:400;line-height:1.15;margin-bottom:18px}.banquet-options p{font-size:15px;line-height:1.75;color:#705b56}
 @media(max-width:700px){.restaurant-life{padding:46px 0}.restaurant-life--today{padding:26px 0}.restaurant-life__heading{display:block}.restaurant-life__heading>p{margin-top:20px}.restaurant-life__all{margin-top:14px}.restaurant-life__grid,.banquet-options{grid-template-columns:1fr}.restaurant-life__card{padding:24px}.restaurant-life--today .restaurant-life__card{padding:19px 22px}.menu-page .page-hero{padding-block:32px}.menu-hero-offer{margin-top:22px;padding-top:22px}.menu-hero-offer h2{font-size:44px}.menu-hero-offer .hero-actions{align-items:stretch;flex-direction:column;max-width:320px}.map-card.map-is-open{height:390px}.map-embedded__toolbar{padding-inline:10px;gap:8px}.map-embedded__toolbar a{font-size:11px}.delivery-dish-art{width:175px}}
+
+/* A compact choice of the restaurant's working messengers. */
+.banquet-messengers{margin-top:24px;max-width:100%}
+.banquet-messengers__label{display:block;margin-bottom:9px;font:14px/1.5 var(--sans);letter-spacing:.02em}
+.banquet-messengers__links{display:flex;flex-wrap:wrap;gap:6px}
+.banquet-messengers__links a{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:9px 10px;border:1px solid currentColor;border-radius:3px;color:inherit;font:12px/1.3 var(--sans);text-decoration:none;transition:background .15s}
+.banquet-messengers__links a:hover{background:#bb946c1a}
+.banquet-messengers__links a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.banquet-messengers__links svg{flex:none;width:19px;height:19px}
+.banquet-options .banquet-messengers{margin-top:auto;padding-top:12px}
+@media(min-width:821px) and (max-width:1199px){.header-inner{grid-template-columns:1fr auto}.desktop-nav{display:none}.menu-toggle{display:flex;min-width:44px;min-height:44px;align-items:center;justify-content:center}.mobile-nav{position:absolute;top:100%;left:0;right:0;background:var(--cream);padding:23px 27px 29px;box-shadow:0 14px 22px #140a0a1f;display:flex;flex-direction:column;max-height:calc(100dvh - 110px);overflow-y:auto}.mobile-nav>a:not(.btn){padding:12px 8px;border-bottom:1px solid #e1d4c8;font-family:var(--serif);font-size:23px}.mobile-nav>.btn{margin-top:20px}}
+@media(prefers-reduced-motion:reduce){.banquet-messengers__links a{transition:none}}
