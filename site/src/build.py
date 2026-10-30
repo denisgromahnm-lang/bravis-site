@@ -4,8 +4,10 @@ import json, html, re, shutil, hashlib
 from pathlib import Path
 from urllib.parse import quote
 from datetime import date
+from restaurant_life import (load_restaurant_life, restaurant_life_json, render_restaurant_life_today,
+                             render_restaurant_life_formats, render_restaurant_life_news, render_restaurant_life_page)
 from guest_promotions import (welcome_strip, offers_section, experiences_section,
-                              menu_campaign, banquet_details, contact_invitation)
+                              menu_campaign, banquet_details, contact_invitation, gift_art)
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / 'dist'
@@ -53,7 +55,7 @@ if loona_join_url:
 loona_registration_cta = (
     f'<div class="loyalty-registration">'
     f'<a class="loyalty-action" href="{h(loona_join_url)}" data-track="loona_signup_click" target="_blank" rel="noopener noreferrer">Оформить карту {arrow_up_right}</a>'
-    f'<a class="loyalty-qr" href="{h(loona_join_url)}" data-track="loona_signup_click" target="_blank" rel="noopener noreferrer" aria-label="Открыть регистрацию карты BRAVIS в Loona">'
+    f'<a class="loyalty-qr" href="{h(loona_join_url)}" data-track="loona_signup_click" target="_blank" rel="noopener noreferrer" aria-label="Оформить карту гостя BRAVIS">'
     f'<img src="/assets/loona-register.svg" alt="QR-код для регистрации в программе лояльности BRAVIS" width="156" height="156" loading="lazy">'
     f'<span>Откройте камеру телефона и сканируйте QR-код для получения карты гостя.</span></a>'
     f'</div>'
@@ -104,7 +106,7 @@ def social_navigation():
 def max_contact_guide():
     if not max_contact_name:
         return ''
-    return f'''<section class="section max-contact-section" id="max-contact" aria-labelledby="max-contact-heading"><div class="wrap max-contact-grid"><div><div class="section-label"><span class="line"></span> НАПИСАТЬ НАМ</div><h2 id="max-contact-heading">BRAVIS <em>в MAX.</em></h2><p>Наш рабочий аккаунт — «{h(max_contact_name)}».</p><p class="max-contact-phone"><span>{h(phone)}</span></p><button type="button" class="btn btn--outline max-contact-copy" data-copy-max-phone="{h(max_contact_phone)}" hidden>Скопировать номер</button><p class="max-contact-status" role="status" aria-live="polite"></p><p class="max-contact-hint">Номер также можно выделить и скопировать.</p></div><div><h3>Как найти нас</h3><ol class="max-contact-steps"><li>В приложении MAX откройте «Чаты» и строку поиска.</li><li>Введите номер <span class="max-contact-number">{h(max_contact_phone)}</span> и выберите «Найти по номеру».</li><li>Откройте аккаунт «{h(max_contact_name)}» и напишите нам.</li></ol><a class="max-contact-help" href="https://help.max.ru/help/contacts/upravlenie_kontaktami/kak_priglasit_v_max_nuzhnogo_cheloveka" target="_blank" rel="noopener noreferrer">Инструкция MAX по поиску контакта ↗</a></div></div></section>'''
+    return f'''<section class="section max-contact-section" id="max-contact" aria-labelledby="max-contact-heading"><div class="wrap max-contact-grid"><div><div class="section-label"><span class="line"></span> НАПИСАТЬ НАМ</div><h2 id="max-contact-heading">BRAVIS <em>в MAX.</em></h2><p>Поможем спланировать визит и ответим на ваши вопросы.</p><a class="btn btn--outline" href="https://web.max.ru/" target="_blank" rel="noopener noreferrer" data-track="max_app_open">Открыть MAX ↗</a><p class="max-contact-phone"><span>{h(phone)}</span></p><button type="button" class="btn btn--outline max-contact-copy" data-copy-max-phone="{h(max_contact_phone)}" hidden>Скопировать номер</button><p class="max-contact-status" role="status" aria-live="polite"></p><p class="max-contact-hint">Номер также можно выделить и скопировать.</p></div><div><details class="max-contact-details"><summary>Как найти BRAVIS в MAX</summary><ol class="max-contact-steps"><li>В приложении MAX откройте «Чаты» и строку поиска.</li><li>Введите номер <span class="max-contact-number">{h(max_contact_phone)}</span> и выберите «Найти по номеру».</li><li>Откройте аккаунт «{h(max_contact_name)}» и напишите нам.</li></ol><a class="max-contact-help" href="https://help.max.ru/help/contacts/upravlenie_kontaktami/kak_priglasit_v_max_nuzhnogo_cheloveka" target="_blank" rel="noopener noreferrer">Инструкция MAX по поиску контакта ↗</a></details></div></div></section>'''
 
 rating = str(CONFIG.get('yandexRating', '')).strip()
 if not re.fullmatch(r'[0-5]\.[0-9]', rating) or not 0 < float(rating) <= 5:
@@ -117,7 +119,7 @@ def yandex_award_banner(footer=False):
     return f'''<a class="yandex-award{modifier}" href="{h(yandex_maps_url)}" target="_blank" rel="noopener noreferrer" data-track="reviews_click" aria-label="{h(label)}"><span class="yandex-award__source"><svg width="20" height="24" viewBox="0 0 20 24" fill="none" aria-hidden="true"><path d="M10 22S2 14.7 2 9a8 8 0 1 1 16 0c0 5.7-8 13-8 13Z" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="9" r="2.5" fill="currentColor"/></svg>Яндекс Карты</span><span class="yandex-award__rating"><strong>{h(rating.replace('.',','))}</strong><span><span class="yandex-award__stars" aria-hidden="true">★★★★★</span><span class="yandex-award__guests">По оценкам гостей</span></span></span><strong class="yandex-award__title">Хорошее место <span>{h(CONFIG['yandexGoodPlaceYear'])}</span></strong><span class="yandex-award__date">По данным Яндекс Карт на {rating_checked.strftime('%d.%m.%Y')}</span><span class="yandex-award__link">Читать отзывы <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 13 13 3M3 3h10v10" stroke="currentColor" stroke-width="1.4"/></svg></span></a>'''
 
 def reputation():
-    return f'''<section class="reputation section" aria-labelledby="reputation-title"><div class="wrap reputation-grid"><div><div class="section-label"><span class="line"></span> BRAVIS · НА СВЯЗИ</div><h2 id="reputation-title">До встречи<br><em>в BRAVIS.</em></h2><p>Новости и события — в наших сообществах. Напишите нам в мессенджере, чтобы уточнить детали визита.</p>{social_navigation()}</div><div class="reputation-card">{yandex_award_banner()}<div class="rating-widget" data-yandex-widget="rating" data-yandex-org="{h(maps_org_id)}"><button type="button" class="external-widget-load" data-track="rating_load">Проверить актуальный рейтинг</button><small>Загрузится виджет Яндекса. Сервис получит технические данные вашего браузера.</small></div></div></div></section>'''
+    return f'''<section class="reputation section" aria-labelledby="reputation-title"><div class="wrap reputation-grid"><div><div class="section-label"><span class="line"></span> BRAVIS · НА СВЯЗИ</div><h2 id="reputation-title">До встречи<br><em>в BRAVIS.</em></h2><p>Новости и события — в наших сообществах. Напишите нам в мессенджере, чтобы уточнить детали визита.</p>{social_navigation()}</div><div class="reputation-card">{yandex_award_banner()}</div></div></section>'''
 reserve_id = str(CONFIG.get('smartReserveId','')).strip()
 reserve_link = 'https://reservation.yandex.ru/partner-reserve/forms/' + quote(reserve_id, safe='') if reserve_id else phone_url
 reserve_label = 'Забронировать стол' if reserve_id else 'Забронировать по телефону'
@@ -196,6 +198,7 @@ def head(title, desc, route, body_class, noindex=False):
 <link rel="stylesheet" href="/assets/site.css">
 <link rel="stylesheet" href="/assets/lunch.css">
 <link rel="stylesheet" href="/assets/promotions.css">
+<link rel="stylesheet" href="/assets/restaurant-life.css">
 <meta property="og:type" content="website"><meta property="og:locale" content="ru_RU">
 <meta property="og:site_name" content="BRAVIS"><meta property="og:title" content="{h(full_title)}">
 <meta property="og:description" content="{h(desc)}"><meta property="og:image" content="{h(image or '/assets/wine-scene.svg')}">
@@ -227,12 +230,12 @@ def header(current):
 <div class="announcement" id="top"><div class="wrap announcement__inner"><span class="announcement__city"><span class="dot"></span> Москва, улица Расковой, 20</span><a href="{h(phone_url)}" data-track="header_phone_click">{h(phone)}</a></div></div>
 <header class="site-header"><div class="wrap header-inner">
 <a class="logo" href="/" aria-label="BRAVIS — главная"><span class="logo__text">BRAVIS</span><span class="logo__caption">Ресторан · Москва</span></a>
-<nav class="desktop-nav" aria-label="Основная навигация"><a href="/"{active('home',current)}>Главная</a><a href="/menu/"{active('menu',current)}>Меню</a><a href="/lunch/"{active('lunch',current)}>Бизнес-ланч</a><a href="/banquets/"{active('banquets',current)}>Банкеты</a><a href="/#delivery">Доставка</a><a href="/contacts/"{active('contacts',current)}>Контакты</a></nav>
+<nav class="desktop-nav" aria-label="Основная навигация"><a href="/events/"{active('events',current)}>События</a><a href="/menu/"{active('menu',current)}>Меню</a><a href="/lunch/"{active('lunch',current)}>Бизнес-ланч</a><a href="/banquets/"{active('banquets',current)}>Банкеты</a><a href="/#delivery">Доставка</a><a href="/contacts/"{active('contacts',current)}>Контакты</a></nav>
 <div class="header-actions"><a class="header-menu-link" href="/menu/" data-track="menu_from_header">Меню</a>{reserve_button()}<button type="button" class="menu-toggle" aria-label="Открыть меню" aria-controls="mobile-nav" aria-expanded="false"><span></span><span></span><span></span></button></div>
-</div><nav class="mobile-nav" id="mobile-nav" aria-label="Мобильная навигация" hidden><a href="/">Главная</a><a href="/menu/">Меню</a><a href="/lunch/">Бизнес-ланч</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/#offers">Предложения</a><a href="/#experiences">Дегустации и гастроужины</a><a href="/#loyalty">Карта гостя</a><a href="/contacts/">Контакты</a>{reserve_button()}</nav></header>'''
+</div><nav class="mobile-nav" id="mobile-nav" aria-label="Мобильная навигация" hidden><a href="/">Главная</a><a href="/menu/">Меню</a><a href="/lunch/">Бизнес-ланч</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/#offers">Предложения</a><a href="/events/">Жизнь ресторана</a><a href="/events/#bravis-formats">Дегустации и гастроужины</a><a href="/#loyalty">Карта гостя</a><a href="/contacts/">Контакты</a>{reserve_button()}</nav></header>'''
 
 def footer():
-    return f'''<footer class="footer"><div class="wrap footer-grid"><div><a href="/" class="footer-logo">BRAVIS</a><p>Вкус встреч.<br>Тепло Bravis.</p></div><div><span class="footer-caption">Навигация</span><a href="/menu/">Меню</a><a href="/lunch/">Бизнес-ланч</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/#offers">Предложения</a><a href="/#experiences">Дегустации и гастроужины</a><a href="/#loyalty">Карта гостя</a><a href="/contacts/">Контакты</a></div><div><span class="footer-caption">Ждём в гости</span><p>{h(address)}</p><a href="{h(phone_url)}" data-track="footer_phone_click">{h(phone)}</a><p class="footer-schedule">{h(CONFIG.get('hoursText',''))}</p>{f'<a href="mailto:{h(official_email)}">{h(official_email)}</a>' if official_email else ''}</div><div class="footer-action">{reserve_button()}{social_navigation()}{yandex_award_banner(footer=True)}</div></div><div class="wrap footer-bottom"><span>© {date.today().year} BRAVIS. Все права защищены.</span><a href="/privacy/">Политика обработки персональных данных</a><a href="#top">Наверх ↑</a></div></footer><div class="mobile-bottom-cta"><a href="/menu/">Меню</a><a class="mobile-bottom-cta__primary" href="{h(reserve_link)}" {'target="_blank" rel="noopener noreferrer"' if reserve_id else ''} data-track="{h("reserve_click" if reserve_id else "reserve_phone_click")}">Забронировать</a></div><button class="back-to-top" type="button" aria-label="Наверх страницы" hidden><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12 7-7 7 7M12 5v15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Наверх</span></button><script src="/assets/site.js" defer></script></body></html>'''
+    return f'''<footer class="footer"><div class="wrap footer-grid"><div><a href="/" class="footer-logo">BRAVIS</a><p>Вкус встреч.<br>Тепло Bravis.</p></div><div><span class="footer-caption">Навигация</span><a href="/menu/">Меню</a><a href="/lunch/">Бизнес-ланч</a><a href="/banquets/">Банкеты</a><a href="/#delivery">Доставка</a><a href="/#offers">Предложения</a><a href="/events/">Жизнь ресторана</a><a href="/events/#bravis-formats">Дегустации и гастроужины</a><a href="/#loyalty">Карта гостя</a><a href="/contacts/">Контакты</a></div><div><span class="footer-caption">Ждём в гости</span><p>{h(address)}</p><a href="{h(phone_url)}" data-track="footer_phone_click">{h(phone)}</a><p class="footer-schedule">{h(CONFIG.get('hoursText',''))}</p>{f'<a href="mailto:{h(official_email)}">{h(official_email)}</a>' if official_email else ''}</div><div class="footer-action">{reserve_button()}{social_navigation()}{yandex_award_banner(footer=True)}</div></div><div class="wrap footer-bottom"><span>© {date.today().year} BRAVIS. Все права защищены.</span><a href="/privacy/">Политика обработки персональных данных</a><a href="#top">Наверх ↑</a></div></footer><div class="mobile-bottom-cta"><a href="/menu/">Меню</a><a class="mobile-bottom-cta__primary" href="{h(reserve_link)}" {'target="_blank" rel="noopener noreferrer"' if reserve_id else ''} data-track="{h("reserve_click" if reserve_id else "reserve_phone_click")}">Забронировать</a></div><button class="back-to-top" type="button" aria-label="Наверх страницы" hidden><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12 7-7 7 7M12 5v15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Наверх</span></button><script src="/assets/site.js" defer></script></body></html>'''
 
 def page(content, title, desc, route, current, body_class='', noindex=False):
     return head(title,desc,route,body_class,noindex)+header(current)+f'<main id="main">{content}</main>'+footer()
@@ -240,11 +243,15 @@ def page(content, title, desc, route, current, body_class='', noindex=False):
 # Share the approved menu price between both home offers and the lunch page.
 lunch_item = next(item for section in MENU['sections'] if section['id'] == 'lunch' for item in section['items'])
 lunch_price = h(lunch_item['price'])
+life_settings = json.loads((ROOT / 'content/guest-hub.json').read_text(encoding='utf-8'))
+life_data = load_restaurant_life(ROOT / 'content/restaurant-life.json', lunch_price=lunch_item['price'], holiday_overrides=life_settings.get('holidayOverrides', {}))
 
 home=f'''{welcome_strip(welcome_bonus)}
 <section class="hero"><div class="wrap hero-grid"><div class="hero-content"><div class="eyebrow"><span class="line"></span> РЕСТОРАН У МЕТРО ДИНАМО</div><h1>Вкус встреч.<br><em>Тепло Bravis.</em></h1><p class="lead">Армянская и европейская кухня на улице Расковой, 20, у метро Динамо. Хорошее вино и атмосфера, в которой хочется остаться чуть дольше.</p><div class="hero-actions">{reserve_button()}{button('Посмотреть меню','/menu/',True,'menu_from_hero')}</div><div class="hero-foot"><span>МОСКВА</span><span class="hero-foot__divider"></span><span>УЛИЦА РАСКОВОЙ, 20</span></div></div><div class="hero-visual"><img class="hero-photo" src="{h(img(main_photo,'/assets/wine-scene.svg'))}" alt="{('Интерьер ресторана BRAVIS' if main_photo else 'Авторская иллюстрация винного вечера в BRAVIS')}" width="800" height="940" fetchpriority="high"><div class="hero-visual__frame"></div><div class="hero-visual__stamp"><span>BRAVIS</span><small>МЕСТО ДЛЯ<br>ВАШИХ ВСТРЕЧ</small></div></div></div><div class="hero-index" aria-hidden="true">01 / BRAVIS</div></section>
 {offers_section(welcome_bonus, lunch_price, loona_join_url, whatsapp_url, reserve_button())}
+{render_restaurant_life_today(life_data)}
 {experiences_section(whatsapp_url)}
+{render_restaurant_life_news(life_data, compact=True)}
 <section class="intro section" id="about"><div class="wrap intro-grid"><div class="section-label"><span class="line"></span> НАША ФИЛОСОФИЯ</div><div><h2>Не просто ужин.<br><em>Повод встретиться.</em></h2><p>Bravis — про вечера, которые складываются из мелочей: знакомых вкусов, неспешных разговоров и тёплого света. Здесь уютно вдвоём, с семьёй и большой компанией.</p><a class="text-link" href="/contacts/">Найти нас {arrow_up_right}</a></div></div></section>
 <section class="feature-section"><div class="wrap feature-grid"><div class="feature-photo"><img src="{h(img(food,'/assets/cuisine.svg'))}" alt="{('Блюда ресторана BRAVIS' if food else 'Авторская иллюстрация блюда')}" width="640" height="520" loading="lazy"></div><div class="feature-copy"><div class="section-label section-label--light"><span class="line"></span> КУХНЯ И ВИНО</div><h2>Вкусы, к которым<br><em>возвращаются.</em></h2><p>Армянские гастрономические традиции и европейская классика. Блюда для общего стола, бокал вина и удовольствие быть вместе.</p>{button('Открыть меню','/menu/',False,'menu_from_feature')}<div class="feature-folio">BRAVIS · FOOD & WINE</div></div></div></section>
 <section class="delivery-section" id="delivery" aria-labelledby="delivery-heading">
@@ -260,7 +267,7 @@ home=f'''{welcome_strip(welcome_bonus)}
       <div class="delivery-visual" aria-hidden="true">
         <span class="delivery-visual__arc delivery-visual__arc--one"></span>
         <span class="delivery-visual__arc delivery-visual__arc--two"></span>
-        <div class="delivery-visual__circle"><span class="delivery-visual__icon">B</span><span>ВКУС ВСТРЕЧ</span></div>
+        <div class="delivery-visual__circle"><img class="delivery-dish-art" src="/assets/cuisine.svg" width="260" height="210" alt="Иллюстрация блюда BRAVIS"><span>ВКУС ВСТРЕЧ</span></div>
         <div class="delivery-visual__eyebrow">BRAVIS <i>×</i> ЯНДЕКС ЕДА</div>
       </div>
     </div>
@@ -270,15 +277,15 @@ home=f'''{welcome_strip(welcome_bonus)}
   <div class="wrap loyalty-grid">
     <div class="loyalty-copy">
       <div class="section-label"><span class="line"></span> BRAVIS · ПРОГРАММА ЛОЯЛЬНОСТИ</div>
-      <h2 id="loyalty-heading">{welcome_bonus} бонусов<br><em>или фирменный десерт?</em></h2>
-      <p class="loyalty-choice">А можно и то, и другое.</p><p>Оформите и установите карту гостя BRAVIS в программе Loona — получите {welcome_bonus} бонусных баллов. Фирменный десерт — по отдельному приглашению на назначенный день.</p>
+      <h2 id="loyalty-heading">{welcome_bonus} бонусов<br><em>и фирменный десерт.</em></h2>
+      <p class="loyalty-choice">Два повода стать ближе.</p><p>{welcome_bonus} бонусных баллов — за установку карты гостя BRAVIS. А фирменный десерт станет сладким поводом заглянуть к нам в выходные. Подробности — в персональном предложении.</p>
       <p class="loyalty-subtext">Карта всегда под рукой — в вашем смартфоне. Узнавайте о персональных предложениях и специальных событиях ресторана.</p>
       {loona_registration_cta}
-      <small class="loyalty-smallprint">Баланс и правила использования бонусов — на вашей карте. Дата визита и условия подарочного десерта — в индивидуальном приглашении. При регистрации действуют условия Loona.</small>
+      <small class="loyalty-smallprint">Баланс и правила использования бонусов — на вашей карте. Приглашение на десерт, дни визита и условия подарка уточняйте в персональном предложении.</small>
     </div>
     <div class="loyalty-art" aria-hidden="true">
-      <div class="loyalty-card"><span class="loyalty-card__top">BRAVIS <i>LOONA</i></span><span class="loyalty-card__center">{welcome_bonus}<small>БОНУСНЫХ БАЛЛОВ</small></span><span class="loyalty-card__bottom">КАРТА ГОСТЯ <i>•</i> PRIVILEGE CARD</span></div>
-      <span class="loyalty-art__caption">ПОДАРОК ЗА УСТАНОВКУ КАРТЫ</span>
+      {gift_art()}
+      <span class="loyalty-art__caption">ПРИВИЛЕГИИ ГОСТЕЙ BRAVIS</span>
     </div>
   </div>
 </section>
@@ -311,9 +318,9 @@ for day in LUNCH['days']:
 lunch += f'''<p class="lunch-included"><strong>К каждому заказу:</strong> {h(' и '.join(LUNCH['included']).lower())}.</p><details class="lunch-original"><summary>Посмотреть оригинальное меню бизнес-ланча</summary><div class="lunch-original__body"><a href="{h(lunch_image)}" target="_blank" rel="noopener noreferrer" data-track="lunch_print_open" aria-label="Открыть оригинальное меню бизнес-ланча крупно в новой вкладке"><img src="{h(lunch_image)}" alt="Печатное меню бизнес-ланча BRAVIS: комплекс {lunch_price} рублей и блюда по будням" width="1344" height="1875" loading="lazy"></a><p>Нажмите на изображение, чтобы открыть его крупно.</p></div></details></div></section>
 <section class="lunch-visit"><div class="wrap lunch-visit__grid"><div><div class="section-label"><span class="line"></span> ЖДЁМ НА ОБЕД</div><h2>Ваш перерыв.<br><em>Наше гостеприимство.</em></h2><p>{h(address)}</p></div><div><p>Время подачи ланча, наличие блюд, актуальные цены и информацию об аллергенах уточняйте у команды ресторана.</p><div class="hero-actions">{reserve_button()}{button('Позвонить в BRAVIS',phone_url,True,'lunch_phone_click')}</div></div></div></section><script src="/assets/lunch.js" defer></script>'''
 
-menu_top=f'''<section class="page-hero page-hero--light"><div class="wrap"><div class="section-label"><span class="line"></span> BRAVIS · КУХНЯ И ВИНО</div><h1>Наше <em>меню.</em></h1><p>Армянские традиции, европейские вкусы и вино, которое дополняет встречу.</p></div></section>{menu_campaign(whatsapp_url, reserve_button())}<section class="section menu-section"><div class="wrap">'''
+menu_top=f'''<section class="page-hero page-hero--light"><div class="wrap"><div class="section-label"><span class="line"></span> BRAVIS · КУХНЯ И ВИНО</div><h1>Наше <em>меню.</em></h1><p>Армянские традиции, европейские вкусы и вино, которое дополняет встречу.</p></div><div class="wrap menu-hero-offer"><span>ГОРЯЧИЙ ПОВОД СОБРАТЬСЯ</span><h2>Хинкальный <em>безлимит.</em></h2><p>Любимые хинкали — свежими горячими порциями. Действующие условия уточним перед бронированием.</p><div class="hero-actions">{reserve_button()}{button('Узнать условия',whatsapp_url,True,'khinkali_menu_contact',ext=True)}</div></div></section><section class="section menu-section"><div class="wrap">'''
 menu_top += '<a class="lunch-link" href="/lunch/" data-track="lunch_from_menu">Бизнес-ланч: посмотреть меню по дням недели ↗</a>'
-sections=MENU.get('sections',[])
+sections=[section for section in MENU.get('sections',[]) if section.get('id') != 'seasonal-dishes']
 available=[s for s in sections if s.get('items')]
 if available:
     bar_sections=[s for s in available if s.get('id','').startswith('bar-')]
@@ -340,7 +347,15 @@ menu_top+=f'''<div class="menu-bottom-note">Состав и наличие бл�
 
 banquet=f'''<section class="page-hero page-hero--dark"><div class="wrap page-hero-grid"><div><div class="section-label section-label--light"><span class="line"></span> СОБЫТИЯ В BRAVIS</div><h1>Встречи,<br><em>которые помнят.</em></h1><p>Дни рождения, камерные праздники, семейные ужины и встречи с коллегами — в атмосфере тепла и гостеприимства.</p>{button('Обсудить банкет в WhatsApp',whatsapp_url,ext=True,tracking='banquet_contact_click')}</div><div class="page-hero-photo"><img src="{h(img(event_photo,'/assets/ambience.svg'))}" alt="{'Зал ресторана BRAVIS' if event_photo else 'Иллюстрация ресторанного зала'}" width="640" height="520"></div></div></section>
 {banquet_details(whatsapp_url)}
+<section class="section"><div class="wrap"><div class="section-label"><span class="line"></span> ВАШ ФОРМАТ</div><h2>Не только меню.<br><em>Время вместе.</em></h2><p>Обсудим, что нужно вашей встрече: праздничный стол, приватность или пространство для съёмок. Стоимость и доступность согласуем по заявке.</p><div class="banquet-options"><article><h3>Праздничный стол</h3><p>Подберём блюда, подачу и обслуживание под ваш повод.</p>{button('Обсудить условия',whatsapp_url+'?text='+quote('Хочу обсудить банкетное меню и стоимость мероприятия.'),True,'banquet_format_contact',ext=True)}</article><article><h3>Аренда и приватность</h3><p>Обсудим возможность аренды, время и условия проведения закрытой встречи.</p>{button('Обсудить условия',whatsapp_url+'?text='+quote('Хочу обсудить возможность аренды и приватный формат встречи.'),True,'banquet_format_contact',ext=True)}</article><article><h3>Встречи и съёмки</h3><p>Расскажите о деловой встрече или съёмочном дне — обсудим формат и требования к площадке.</p>{button('Обсудить условия',whatsapp_url+'?text='+quote('Хочу обсудить площадку BRAVIS для встречи или съёмок.'),True,'banquet_format_contact',ext=True)}</article></div></div></section>
 <section class="banner-dark"><div class="wrap banner-inner"><div><span class="overline">BRAVIS · ВАШЕ СОБЫТИЕ</span><h2>Начнём<br><em>с ваших пожеланий.</em></h2><p>Дату, меню и стоимость согласуем с вами до подтверждения мероприятия.</p></div><div>{button('Обсудить банкет в WhatsApp',whatsapp_url,ext=True,tracking='banquet_contact_click')}</div></div></section>'''
+
+events = render_restaurant_life_page(life_data)
+events += '<section class="section life-gallery"><div class="wrap"><div class="section-label"><span class="line"></span> АТМОСФЕРА В КАДРЕ</div><h2>Место для <em>ваших историй.</em></h2><p>Залы и детали BRAVIS. Фотографии интерьера ресторана.</p><div class="gallery-grid">'
+for i, photo in enumerate(photos[:3]):
+    events += f'<a class="gallery-item gallery-item--{i+1}" href="{h(img(photo, "/assets/ambience.svg"))}" target="_blank" rel="noopener noreferrer"><img src="{h(img(photo, "/assets/ambience.svg"))}" alt="Интерьер BRAVIS — фотография {i+1}" width="650" height="650" loading="lazy"></a>'
+events += '</div><a class="text-link" href="https://rutube.ru/video/c2c357acb4f02a17b8ac298d603e38be/" target="_blank" rel="noopener noreferrer">Посмотреть видеосюжет о BRAVIS ↗</a><p class="subtle">Архивный сюжет о ресторане. Фотографии выше показывают интерьер, а не съёмки фильма.</p></div></section>'
+events += '<section class="banner-dark"><div class="wrap banner-inner"><div><span class="overline">ВАШ ПОВОД ДЛЯ ВСТРЕЧИ</span><h2>Пусть следующая история<br><em>будет вашей.</em></h2></div><div>' + reserve_button() + '</div></div></section>'
 
 contacts=f'''<section class="page-hero page-hero--light"><div class="wrap"><div class="section-label"><span class="line"></span> КОНТАКТЫ И МАРШРУТ</div><h1>До <em>встречи.</em></h1><p>Находите время для близких. А мы найдём для вас место.</p></div></section><section class="section"><div class="wrap contacts-grid"><div class="contacts-info"><div class="contact-row"><span>АДРЕС</span><h2>{h(address)}</h2></div><div class="contact-row"><span>ТЕЛЕФОН</span><a class="contact-big contact-value--phone" href="{h(phone_url)}" data-track="contacts_phone_click">{h(phone)}</a></div><div class="contact-row"><span>ОФИЦИАЛЬНАЯ ПОЧТА</span><a class="contact-big contact-value--email" href="mailto:{h(official_email)}">{h(official_email)}</a></div><div class="contact-row"><span>ВРЕМЯ РАБОТЫ</span><p>{h(CONFIG.get('hoursText',''))}</p></div><div class="contact-actions">{reserve_button()}{button('Открыть маршрут',yandex_maps_url,True,ext=True)}{button('Карточка BRAVIS в 2ГИС',two_gis_url,True,tracking='two_gis_click',ext=True) if two_gis_url else ''}</div></div><div class="map-card"><div class="map-card__line"></div><div class="map-card__inner"><span>BRAVIS</span><p>МОСКВА</p><p class="map-card__address">РАСКОВОЙ, 20</p><div class="map-pin">⌖</div><a href="{h(yandex_maps_url)}" target="_blank" rel="noopener noreferrer">Открыть на Яндекс Картах ↗</a>{f'<a href="{h(two_gis_url)}" target="_blank" rel="noopener noreferrer" data-track="two_gis_click">Открыть в 2ГИС ↗</a>' if two_gis_url else ''}</div></div></div></section>'''
 
@@ -392,6 +407,7 @@ PAGES={
   'menu/index.html':page(menu_top,'Меню и цены — армянская и европейская кухня','Меню ресторана BRAVIS в Москве: армянская и европейская кухня, винная карта. Актуальные блюда и информация.','/menu/','menu','menu-page'),
   'lunch/index.html':page(lunch,'Бизнес-ланч за 690 ₽ на Расковой, 20','Бизнес-ланч в BRAVIS на Расковой, 20: меню по будням, суп, горячее и напиток. Оригинальное меню и бронирование стола.','/lunch/','lunch','lunch-page'),
   'banquets/index.html':page(banquet,'Банкеты и мероприятия','Праздники, камерные банкеты, дни рождения и семейные встречи в ресторане BRAVIS, Москва, улица Расковой, 20.','/banquets/','banquets'),
+  'events/index.html':page(events,'Жизнь ресторана — события и новости','События и новости BRAVIS: дегустации, гастроужины, встречи и жизнь ресторана на Расковой, 20.','/events/','events','events-page'),
   'contacts/index.html':page(contacts,'Адрес и контакты','Ресторан BRAVIS: Москва, улица Расковой, 20. Телефон +7 (989) 571-99-77. Как добраться и забронировать стол.','/contacts/','contacts'),
   '404.html':page(not_found,'Страница не найдена','Страница не найдена. Меню, контакты и бронирование ресторана BRAVIS.','/404.html','','not-found-page',noindex=True),
   'privacy/index.html':page(privacy,privacy_title,'Сведения об обработке персональных данных на сайте ресторана BRAVIS.','/privacy/','privacy')
@@ -418,6 +434,8 @@ def version_asset(match):
     return match.group(1) + path + '?v=' + asset_versions[path] + match.group(3)
 
 for filename,content in PAGES.items():
+    if filename in ('index.html', 'events/index.html'):
+        content = content.replace('</body>', '<script type="application/json" id="restaurant-life-data">' + restaurant_life_json(life_data) + '</script><script src="/assets/restaurant-life.js" defer></script></body>')
     # Fresh HTML requests the matching stylesheet/script even in a warm browser cache.
     content = re.sub(r"((?:href|src)=[\"'])(/assets/[A-Za-z0-9_./-]+\.(?:css|js))([\"'])", version_asset, content)
     target=DIST/filename
@@ -426,9 +444,10 @@ for filename,content in PAGES.items():
 # Don't enable indexing before owner authorizes publication and sets domain/legal data.
 (DIST/'robots.txt').write_text(('User-agent: *\nAllow: /\nSitemap: '+site_url('/sitemap.xml')+'\n') if published else 'User-agent: *\nDisallow: /\n', encoding='utf-8')
 if published:
-    uris=['/','/menu/','/lunch/','/banquets/','/contacts/','/privacy/','/go/']
+    uris=['/','/menu/','/lunch/','/banquets/','/events/','/contacts/','/privacy/','/go/']
     sitemap='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join('<url><loc>'+h(site_url(uri))+'</loc></url>' for uri in uris)+'</urlset>'
     (DIST/'sitemap.xml').write_text(sitemap,encoding='utf-8')
+(DIST/'assets/restaurant-life.json').write_text(restaurant_life_json(life_data), encoding='utf-8')
 (DIST/'.nojekyll').write_text('',encoding='utf-8')
 print('Built',len(PAGES),'pages in',DIST)
 print('Publication:', 'PUBLIC' if published else 'PREVIEW ONLY (noindex)')

@@ -29,7 +29,7 @@ def _wa(base, public_message):
 
 
 ARROW = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-GIFT = '<svg aria-hidden="true" width="44" height="44" viewBox="0 0 48 48" fill="none"><path d="M8 23h32v19H8V23Zm-3-8h38v8H5v-8Zm19 0v27M24 15c-8 0-13-1-13-6 0-7 12-5 13 6Zm0 0c8 0 13-1 13-6 0-7-12-5-13 6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>'
+GIFT_ART = '<svg class="bravis-gift-art" aria-hidden="true" focusable="false" width="240" height="216" viewBox="0 0 200 180" fill="none"><circle cx="100" cy="90" r="79" stroke="currentColor" stroke-width=".8" stroke-opacity=".2"/><circle cx="100" cy="90" r="68" stroke="currentColor" stroke-width=".7" stroke-opacity=".12"/><path d="M31 76h55v53H31V76Z" fill="currentColor" fill-opacity=".035" stroke="currentColor" stroke-width="1.4"/><path d="M27 65h63v12H27V65Zm31 0v64M58 65c-13-1-22-3-21-11 1-10 18-5 21 11Zm0 0c13-1 22-3 21-11-1-10-18-5-21 11Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M42 89h8m-8 6h8" stroke="currentColor" stroke-width="1" stroke-opacity=".4"/><ellipse cx="132" cy="134" rx="43" ry="7" stroke="currentColor" stroke-width="1.3"/><path d="M105 97v26c0 10 54 10 54 0V97" fill="currentColor" fill-opacity=".04" stroke="currentColor" stroke-width="1.4"/><ellipse cx="132" cy="97" rx="27" ry="8" fill="#bb946c" fill-opacity=".15" stroke="currentColor" stroke-width="1.3"/><path d="M105 108c12 7 42 7 54 0M105 117c12 7 42 7 54 0" stroke="currentColor" stroke-width="1" stroke-opacity=".45"/><path d="M132 90c-12-10-12-22-4-22l4 3 4-3c8 0 8 12-4 22Z" fill="#9b5965" fill-opacity=".15" stroke="currentColor" stroke-width="1.2"/><path d="m126 70 6 4 6-4m-6 4 1-11M125 79h.1m7 2h.1m5-4h.1M162 48v12m-6-6h12M104 38v8m-4-4h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M48 143c17 6 34 9 52 9" stroke="currentColor" stroke-width=".9" stroke-opacity=".3"/></svg>'
 KHINKALI = '<svg class="bravis-khinkali-art" aria-hidden="true" width="204" height="168" viewBox="0 0 204 168" fill="none"><circle cx="102" cy="83" r="75" stroke="currentColor" stroke-opacity=".25"/><path d="M102 48c-37 8-69 40-68 63 2 25 134 25 136 0 1-23-31-55-68-63Z" fill="currentColor" fill-opacity=".07" stroke="currentColor" stroke-width="2"/><path d="M91 50c-6-12-3-20 3-19l8 7 8-7c6-1 9 7 3 19M102 49v74M96 52c-14 26-18 45-15 68M109 52c14 26 18 45 15 68M91 54c-24 23-34 45-32 61M114 54c24 23 34 45 32 61" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 
 
@@ -39,18 +39,23 @@ def _contact_link(url, label, track='promotion_contact_click', extra_class=''):
             f'{_h(label)} {ARROW}</a>')
 
 
+def gift_art():
+    """A decorative BRAVIS gift and dessert, without a third-party card mockup."""
+    return GIFT_ART
+
+
 def welcome_strip(bonus):
-    return f'''<aside class="bravis-welcome" aria-label="Подарки для гостей BRAVIS"><div class="wrap bravis-welcome__inner"><div class="bravis-welcome__copy"><p><strong>{_h(bonus)} бонусов или фирменный десерт?</strong><span>А можно и то, и другое.</span></p><small>Бонусы — за установку карты, десерт — по отдельному приглашению.</small></div><a href="/#loyalty">Узнать о подарках {ARROW}</a></div></aside>'''
+    return f'''<aside class="bravis-welcome" aria-label="Подарки для гостей BRAVIS"><div class="wrap bravis-welcome__inner"><div class="bravis-welcome__copy"><p><svg class="bravis-welcome__symbol" aria-hidden="true" width="25" height="28" viewBox="0 0 28 30" fill="none"><path d="M4 13h20v14H4V13Zm-2-5h24v6H2V8Zm12 0v19M14 8C3 8 5-2 10 3l4 5Zm0 0c11 0 9-10 4-5l-4 5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><strong>{_h(bonus)} бонусов и фирменный десерт</strong></p><small>Бонусы — за установку карты BRAVIS. Десерт — по приглашению на выходные.</small></div><a href="/#loyalty">Узнайте о подарках {ARROW}</a></div></aside>'''
 
 
 def offers_section(bonus, lunch_price, loona_url, whatsapp_url, reserve_html):
-    dessert = _wa(whatsapp_url, 'Здравствуйте! Подскажите, как получить приглашение на фирменный десерт в BRAVIS.')
+    dessert = _wa(whatsapp_url, 'Здравствуйте! Хочу провести выходные в BRAVIS. Подскажите, как получить приглашение на фирменный десерт.')
     khinkali = _wa(whatsapp_url, 'Здравствуйте! Хочу узнать действующие условия акции «Хинкальный безлимит» в BRAVIS.')
     family = _wa(whatsapp_url, 'Здравствуйте! Подскажите условия «Семейного воскресенья» в BRAVIS.')
     signup = (f'<a class="bravis-promo-link bravis-promo-link--solid" href="{_h(_https(loona_url))}" '
               f'target="_blank" rel="noopener noreferrer" data-track="loona_signup_click">Оформить карту {ARROW}</a>')
     return f'''<section class="section bravis-offers" id="offers" aria-labelledby="bravis-offers-heading"><div class="wrap"><div class="bravis-promo-heading"><div><div class="section-label"><span class="line"></span> ПРЕДЛОЖЕНИЯ ДЛЯ ГОСТЕЙ</div><h2 id="bravis-offers-heading">Больше поводов<br><em>для встречи.</em></h2></div><p>За любимыми блюдами, приятными подарками и временем вместе.</p></div><div class="bravis-offer-grid">
-<article class="bravis-offer bravis-offer--gift"><div class="bravis-offer__top"><span class="bravis-offer__eyebrow">КАРТА ГОСТЯ</span>{GIFT}</div><p class="bravis-offer__value">{_h(bonus)} <span>бонусов</span></p><h3>И приглашение на десерт</h3><p>{_h(bonus)} бонусов — за установку карты BRAVIS. Фирменный десерт — по отдельному приглашению в назначенный день.</p><p class="bravis-offer__note">Баланс и правила использования бонусов — на вашей карте. Условия десерта — в приглашении.</p><div class="bravis-offer__actions">{signup}{_contact_link(dessert, 'Узнать о десерте', 'dessert_invitation_click')}</div></article>
+<article class="bravis-offer bravis-offer--gift"><div class="bravis-offer__top"><span class="bravis-offer__eyebrow">ПОДАРКИ ДЛЯ ВАШИХ ВСТРЕЧ</span>{gift_art()}</div><p class="bravis-offer__value">{_h(bonus)} <span>бонусов</span></p><h3>и фирменный<br>десерт</h3><p>{_h(bonus)} бонусных баллов — за установку карты гостя BRAVIS. А фирменный десерт станет сладким поводом заглянуть к нам в выходные.</p><p class="bravis-offer__note">Баланс и правила использования бонусов — на вашей карте. Подробности десерта — в персональном предложении.</p><div class="bravis-offer__actions">{signup}{_contact_link(dessert, 'Узнать о десерте', 'dessert_invitation_click')}</div></article>
 <article class="bravis-offer bravis-offer--lunch"><div class="bravis-offer__top"><span class="bravis-offer__eyebrow">ОБЕД В ГОРОДЕ</span><span class="bravis-offer__tag">Пн–пт</span></div><p class="bravis-offer__value">{_h(lunch_price)} <span>₽</span></p><h3>Бизнес-ланч</h3><p>С 11:00 до 16:00 — время сделать паузу и пообедать в BRAVIS. Меню на каждый будний день.</p><p class="bravis-offer__note">В праздничные дни уточняйте график у ресторана.</p><div class="bravis-offer__actions"><a class="bravis-promo-link" href="/lunch/" data-track="lunch_from_offers">Посмотреть меню {ARROW}</a></div></article>
 <article class="bravis-offer bravis-offer--khinkali"><div class="bravis-offer__top"><span class="bravis-offer__eyebrow">ГОРЯЧИЙ ПОВОД</span><span class="bravis-offer__number" aria-hidden="true">01</span></div><h3>Хинкальный<br>безлимит</h3><p>Свежие горячие порции к вашему столу. Собирайтесь с теми, кто любит хинкали так же, как вы.</p><p class="bravis-offer__note">Действующие условия акции сообщим перед бронированием.</p><div class="bravis-offer__actions">{_contact_link(khinkali, 'Узнать условия', 'khinkali_offer_contact')}{reserve_html}</div></article>
 <article class="bravis-offer bravis-offer--family"><div class="bravis-offer__top"><span class="bravis-offer__eyebrow">ВЫХОДНОЙ ВМЕСТЕ</span><span class="bravis-offer__number" aria-hidden="true">02</span></div><h3>Семейное<br>воскресенье</h3><p>Детское меню, любимые блюда взрослых и время за общим столом. Приходите в BRAVIS всей семьёй.</p><p class="bravis-offer__note">Условия семейного предложения уточните у ресторана.</p><div class="bravis-offer__actions">{_contact_link(family, 'Спланировать воскресенье', 'family_offer_contact')}</div></article>
@@ -64,8 +69,8 @@ def experiences_section(whatsapp_url):
 
 
 def menu_campaign(whatsapp_url, reserve_html):
-    contact = _wa(whatsapp_url, 'Здравствуйте! Подскажите действующие условия «Хинкального безлимита» в BRAVIS и как забронировать стол.')
-    return f'''<section class="bravis-menu-campaign" aria-labelledby="bravis-khinkali-heading"><div class="wrap bravis-menu-campaign__inner"><div class="bravis-menu-campaign__copy"><div class="section-label"><span class="line"></span> ЕСТЬ ПОВОД СОБРАТЬСЯ</div><h2 id="bravis-khinkali-heading">Хинкальный <em>безлимит.</em></h2><p>Любимые хинкали — свежими горячими порциями. Уточните условия акции и выбирайте время для встречи.</p><div class="bravis-menu-campaign__actions">{_contact_link(contact, 'Узнать условия', 'khinkali_menu_contact')}{reserve_html}</div></div>{KHINKALI}</div></section>'''
+    """The khinkali offer now belongs in the menu hero, without a second banner."""
+    return ''
 
 
 def banquet_details(whatsapp_url):

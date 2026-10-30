@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render an accessible five-section restaurant menu from approved print artwork."""
+"""Render an accessible current restaurant menu from approved print artwork."""
 import html,json,re
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
@@ -17,6 +17,13 @@ def main():
     files=manifest.get('files',[])
     expected=['seasonal','main-front','main-back','business','children']
     assert [x.get('group') for x in files]==expected,"Menu set/category order mismatch"
+    inactive=[entry for entry in files if entry.get("published",True) is False]
+    files=[entry for entry in files if entry.get("published",True) is not False]
+    assert [entry["group"] for entry in files]==["main-front","main-back","business","children"]
+    for entry in inactive:
+        for asset in entry["pages"]:
+            if not re.fullmatch(r"/menu-media/[a-z0-9-]+\.jpg",asset):raise ValueError("Unexpected unpublished menu asset")
+            (DIST/asset.lstrip("/")).unlink(missing_ok=True)
     for obj in files:
         urls=obj.get('pages',[])
         if not urls or len(urls)>8:raise ValueError('Unexpected menu pages')
@@ -44,7 +51,7 @@ def main():
     widget='''<div class="approved-menus" id="approved-menus"><div class="approved-menus__intro">
       <div class="section-label"><span class="line"></span> ОРИГИНАЛЬНЫЕ МЕНЮ BRAVIS</div>
       <h2>Выбирайте то, <em>что нравится.</em></h2>
-      <p>Меню ресторана, сезонные предложения, барная карта, бизнес-ланч и блюда для детей. Откройте раздел, чтобы рассмотреть его крупно.</p>
+      <p>Меню ресторана, барная карта, бизнес-ланч и блюда для детей. Откройте раздел, чтобы рассмотреть его крупно.</p>
     </div><div class="print-menu-grid">'''+''.join(tiles)+'''</div>
     <p class="approved-menus__disclaimer">Изображения меню предоставлены рестораном. Состав блюд, доступность и актуальные цены уточняйте у сотрудников.</p>
     </div><dialog class="menu-lightbox" id="menu-lightbox" aria-labelledby="menu-lightbox-title">
@@ -56,7 +63,7 @@ def main():
         <output id="menu-zoom-level" aria-live="polite" aria-label="Масштаб просмотра">100%</output>
         <button type="button" id="menu-zoom-in" aria-label="Увеличить меню" title="Увеличить (+)" disabled>+</button>
         <button type="button" id="menu-zoom-fit" disabled>Уместить</button>
-        <a id="menu-original" href="/menu-media/seasonal.jpg" target="_blank" rel="noopener noreferrer">Оригинал ↗</a>
+        <a id="menu-original" href="/menu-media/main-front-1.jpg" target="_blank" rel="noopener noreferrer">Оригинал ↗</a>
       </div>
       <p class="menu-lightbox__hint">Увеличьте меню и перемещайте страницу, чтобы рассмотреть детали.</p>
       <p class="menu-lightbox__status" id="menu-lightbox-status" role="status"></p>
@@ -68,6 +75,7 @@ def main():
       </div>
       <button type="button" id="menu-lightbox-next" aria-label="Следующая страница">›</button></div>
     </dialog>'''
+    widget=widget.replace('/menu-media/main-front-1.jpg',h(files[0]['url']))
     if '<div class="menu-placeholder">' in page:
         page,n=re.subn(r'<div class="menu-placeholder">.*?(?=<div class="menu-bottom-note">)',widget,page,count=1,flags=re.S)
         if n!=1:raise RuntimeError('Cannot locate safe insertion point in /menu/')
@@ -83,5 +91,5 @@ def main():
     script='<script type="application/json" id="bravis-menu-data">'+data+'</script><script src="/assets/menu-experience.js" defer></script>'
     page=page.replace('</body>',script+'</body>',1)
     htmlpath.write_text(page,encoding='utf-8')
-    print('PASS: five menu groups with covers, unique raster pages and accessible viewer')
+    print('PASS: four published menu groups with covers, unique raster pages and accessible viewer')
 if __name__=='__main__':main()

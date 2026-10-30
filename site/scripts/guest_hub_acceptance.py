@@ -82,6 +82,10 @@ try:
             assert image.evaluate('(image) => image.naturalWidth > 0')
             assert order(page)[:2] == ['guest_card', 'lunch']
             expect(page.locator('[data-hub-id="guest_card"] a')).to_have_attribute('href', LOONA)
+            assert not re.search(r'loona|luna|луна', page.locator('body').inner_text(), re.I), 'Provider brand leaked into guest-facing hub text'
+            for attribute in ('alt','aria-label','title'):
+                values=page.locator('['+attribute+']').evaluate_all('(items, attr) => items.map(item => item.getAttribute(attr)).join(" ")',attribute)
+                assert not re.search(r'loona|luna|луна',values,re.I), 'Provider brand leaked into hub '+attribute
             assert page.locator('[data-hub-id] a').count() == 7
             expect(page.locator('[data-hub-id="guest_card"] a')).to_have_attribute('data-track', 'loona_signup_click')
             assert page.locator('[data-hub-id] .guest-hub-card__arrow svg').count() == 7
@@ -112,6 +116,7 @@ try:
             ctx.close()
             checks.append(f'Layout, links, no forms, primary action and consent at {width}px')
         ctx, page = context(browser, width=320, js=False)
+        assert not re.search(r'loona|luna|луна',page.locator('body').inner_text(),re.I), 'Static guest-card copy must retain BRAVIS branding'
         assert len(order(page)) == 7 and order(page)[0] == 'guest_card'
         expect(page.locator('[data-lunch-badge]')).to_be_hidden()
         expect(page.locator('[data-promo-variant="evening"]')).to_be_visible()

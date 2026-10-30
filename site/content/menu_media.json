@@ -10,7 +10,8 @@
       "pages": [
         "/menu-media/seasonal.jpg"
       ],
-      "source_name": "Bravis_Меню сезонное_осень_превью.jpg"
+      "source_name": "Bravis_Меню сезонное_осень_превью.jpg",
+      "published": false
     },
     {
       "group": "main-front",
