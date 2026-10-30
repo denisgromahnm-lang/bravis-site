@@ -3,7 +3,12 @@
 Outputs three screenshots in site/browser-report without touching production servers.
 """
 import contextlib
+from copy import deepcopy
+from datetime import datetime, timezone
+from hashlib import sha256
+import json
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -26,10 +31,120 @@ server=subprocess.Popen(
 base=f'http://127.0.0.1:{port}'
 def loaded(img):
     return img.evaluate('(e)=>e.complete && e.naturalWidth > 0')
+
+def accept_public_revision(browser):
+    """Exercise the public menu/editorial change, including an already open page."""
+    def guest_brand(page):
+        text=page.locator('body').inner_text()
+        labels=page.locator('[alt],[aria-label],[title]').evaluate_all(
+            '(nodes)=>nodes.flatMap(node=>["alt","aria-label","title"].map(key=>node.getAttribute(key)||"")).join(" ")')
+        assert not re.search(r'loona|luna|луна',text+' '+labels,re.I), 'Provider name leaked into guest marketing'
+
+    nojs=browser.new_context(viewport={'width':320,'height':720},java_script_enabled=False)
+    nojs.route('**/*',lambda route: route.continue_() if route.request.url.startswith(base+'/') else route.abort())
+    static=nojs.new_page()
+    for route in ('/','/go/','/events/','/menu/'):
+        static.goto(base+route,wait_until='networkidle')
+        guest_brand(static)
+        assert static.evaluate('document.documentElement.scrollWidth<=innerWidth+2'), 'Static page overflow: '+route
+        if route=='/':
+            expect(static.locator('.loyalty-action')).to_have_attribute('href','https://app.loona.ai/4992/create/register?source=qr&tag=none')
+            assert static.locator('a[href="/events/"]').count()>0
+        elif route=='/events/':
+            for part in ('today','formats','news'):
+                expect(static.locator('[data-restaurant-life-part="'+part+'"]').get_by_role('heading',level=2)).to_be_visible()
+            assert static.locator('[data-restaurant-life-part="news"] time[datetime]').count()>0
+        elif route=='/menu/':
+            assert static.locator('.print-card').evaluate_all('(items)=>items.map(item=>item.getAttribute("href"))')==[
+                '/menu-media/'+name+'.jpg' for name in ('main-front','main-back','business','children')]
+            assert '/menu-media/seasonal.jpg' not in static.content()
+    nojs.close()
+
+    data=json.loads((DIST/'assets/restaurant-life.json').read_text(encoding='utf8'))
+    current={'payload':deepcopy(data)}
+    requests=[]
+    context=browser.new_context(viewport={'width':390,'height':844},reduced_motion='reduce',timezone_id='America/Los_Angeles')
+    def intercept(route):
+        request=route.request
+        requests.append((request.method,request.url))
+        if request.url.split('?',1)[0]==base+'/assets/restaurant-life.json':
+            route.fulfill(status=200,content_type='application/json; charset=utf-8',body=json.dumps(current['payload'],ensure_ascii=False))
+        elif request.url.startswith(base+'/'):
+            route.continue_()
+        else:
+            route.abort()
+    context.route('**/*',intercept)
+    live=context.new_page()
+    live.clock.install(time=datetime(2026,11,2,12,59,30,tzinfo=timezone.utc))
+    navigations=[];errors=[]
+    live.on('framenavigated',lambda frame: navigations.append(frame.url) if frame==live.main_frame else None)
+    live.on('pageerror',lambda error: errors.append(str(error)))
+    live.goto(base+'/events/',wait_until='networkidle')
+    guest_brand(live)
+    today=live.locator('[data-restaurant-life-part="today"]')
+    news=live.locator('[data-restaurant-life-part="news"]')
+    expect(today.locator('[data-life-id="lunch"]')).to_have_count(1)
+    assert any(url.split('?',1)[0]==base+'/assets/restaurant-life.json' for _,url in requests), 'Initial live-content fetch missing'
+    if live.locator('[data-consent="no"]').count():live.locator('[data-consent="no"]').click()
+    anchor=live.locator('#bravis-formats-heading')
+    anchor.scroll_into_view_if_needed()
+    live.evaluate('(y)=>scrollTo({top:y,behavior:"instant"})',anchor.bounding_box()['y']+live.evaluate('scrollY')-120)
+    live.locator('.logo').evaluate('(node)=>node.focus({preventScroll:true})')
+    anchor_y=anchor.bounding_box()['y']
+
+    def revised(title):
+        candidate=deepcopy(data)
+        candidate['news'][0]['title']=title
+        candidate.pop('revision',None)
+        encoded=json.dumps(candidate,ensure_ascii=False,sort_keys=True,separators=(',',':'))
+        candidate['revision']=sha256(encoded.encode()).hexdigest()[:20]
+        return candidate
+
+    def refresh():
+        with live.expect_response(lambda response: response.url.split('?',1)[0]==base+'/assets/restaurant-life.json') as response:
+            live.clock.fast_forward(61000)
+        response.value.body()
+        live.clock.run_for(50)
+
+    # A Moscow lunch boundary must refresh even when server content is unchanged.
+    refresh()
+    expect(today.locator('[data-life-id="lunch"]')).to_have_count(0)
+    assert abs(anchor.bounding_box()['y']-anchor_y)<=2, 'Moscow clock refresh moved the visible reading position'
+
+    current['payload']=revised('Новость проверки без перезагрузки')
+    refresh()
+    expect(news.locator('h3').first).to_have_text('Новость проверки без перезагрузки')
+    assert abs(anchor.bounding_box()['y']-anchor_y)<=2, 'Live update moved the visible reading position'
+
+    # Keep a focused link stable while its region receives a newer revision.
+    focused=news.locator('a').first
+    focused.focus()
+    handle=focused.element_handle()
+    current['payload']=revised('Новость после завершения взаимодействия')
+    refresh()
+    expect(news.locator('h3').first).to_have_text('Новость проверки без перезагрузки')
+    assert handle.evaluate('(node)=>node.isConnected && node===document.activeElement'), 'Update replaced the focused news link'
+    live.locator('.logo').evaluate('(node)=>node.focus({preventScroll:true})')
+    live.clock.run_for(50)
+    expect(news.locator('h3').first).to_have_text('Новость после завершения взаимодействия')
+
+    current['payload']={'schemaVersion':999,'revision':'invalid'}
+    refresh()
+    expect(news.locator('h3').first).to_have_text('Новость после завершения взаимодействия')
+    assert len(navigations)==1, 'Live content refreshed by navigating/reloading the document'
+    assert all(method=='GET' for method,_ in requests), 'Editorial refresh made a mutating request'
+    assert not any('app.loona.ai' in url or '5047' in url for _,url in requests), 'Editorial refresh requested a checkout/account service'
+    assert not errors, errors
+    context.close()
+    print('PASS: four public menus, BRAVIS-only marketing, static events, in-place revision/Moscow clock, scroll/focus preservation and malformed-feed fallback')
 try:
     with sync_playwright() as p:
         browser_path=os.environ.get('BRAVIS_CHROMIUM_EXECUTABLE') or shutil.which('chromium')
         browser=p.chromium.launch(executable_path=browser_path,headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+        accept_public_revision(browser)
+        if '--public-revision-only' in sys.argv:
+            browser.close()
+            raise SystemExit(0)
         desktop=browser.new_context(viewport={'width':1440,'height':900},device_scale_factor=1)
         page=desktop.new_page()
         page_errors=[]
@@ -49,7 +164,7 @@ try:
         assert page.locator('.loyalty-action').get_attribute('rel')=='noopener noreferrer'
         page.locator('.loyalty-qr img').scroll_into_view_if_needed()
         page.locator('.loyalty-qr img').evaluate('(image) => image.decode()')
-        assert loaded(page.locator('.loyalty-qr img')),'Loona card enrollment QR did not load'
+        assert loaded(page.locator('.loyalty-qr img')),'Guest card enrollment QR did not load'
         assert page.locator('.loyalty-qr').get_attribute('href')==page.locator('.loyalty-action').get_attribute('href')
         expect(page.locator('#delivery')).to_be_visible()
         expect(page.locator('#loyalty')).to_be_visible()
@@ -66,12 +181,12 @@ try:
         page.screenshot(path=str(REPORT/'home-desktop.png'),full_page=True)
         print('PASS: desktop hero, real gallery and event photos, no broken lazy-loaded images')
         page.goto(base+'/menu/',wait_until='networkidle')
-        expect(page.locator('.print-card')).to_have_count(5)
+        expect(page.locator('.print-card')).to_have_count(4)
         # The owner rejected old dish thumbnails: printed menu covers are retained,
         # but each textual dish is intentionally shown without a food photograph.
         expect(page.locator('.menu-items .dish img')).to_have_count(0)
         assert page.locator('.menu-items .dish').count()>=60, 'Textual menu items missing'
-        for i in range(5):
+        for i in range(4):
             thumb=page.locator('.print-card__image img').nth(i)
             thumb.scroll_into_view_if_needed()
             assert loaded(thumb),f'Menu cover {i+1} broken'
@@ -84,7 +199,7 @@ try:
         expect(page.locator('#menu-lightbox-prev')).to_be_hidden()
         expect(page.locator('#menu-lightbox-next')).to_be_hidden()
         expect(page.locator('#menu-zoom-level')).to_have_text('100%')
-        expect(page.locator('#menu-original')).to_have_attribute('href','/menu-media/seasonal.jpg')
+        expect(page.locator('#menu-original')).to_have_attribute('href','/menu-media/main-front.jpg')
         page.locator('#menu-zoom-in').click()
         expect(page.locator('#menu-zoom-level')).to_have_text('150%')
         stage=page.locator('#menu-lightbox-stage')
@@ -100,7 +215,7 @@ try:
         expect(dialog).not_to_be_visible()
         expect(page.locator('.print-card').first).to_be_focused()
         page.screenshot(path=str(REPORT/'menu-desktop.png'),full_page=True)
-        print('PASS: five actual menu thumbnails and full-screen viewer')
+        print('PASS: four published menu thumbnails and full-screen viewer')
         page.goto(base+'/lunch/',wait_until='networkidle')
         expect(page.get_by_role('heading',level=1)).to_contain_text('Пауза на')
         expect(page.get_by_role('tab',name='Понедельник',exact=True)).to_have_attribute('aria-selected','true')
@@ -137,14 +252,14 @@ try:
         expect(mp.locator('.mobile-nav')).to_be_visible()
         assert mp.locator('.mobile-nav a[href="'+reserve+'"]').count()==1, 'Mobile reserve link missing'
         assert mp.locator('.mobile-bottom-cta__primary[href="'+reserve+'"]').count()==1, 'Mobile booking CTA missing'
-        # The mobile menu must navigate to delivery and Loona without remaining open.
+        # The mobile menu must navigate to delivery and the guest card without remaining open.
         mp.locator('.mobile-nav a[href="/#delivery"]').click()
         expect(mp.locator('.mobile-nav')).not_to_be_visible()
         expect(mp.locator('#delivery')).to_be_visible()
         assert mp.evaluate('document.documentElement.scrollWidth <= window.innerWidth + 2'), 'Horizontal scroll on mobile home'
         mp.locator('.menu-toggle').click()
         mp.locator('.mobile-nav a[href="/menu/"]').click()
-        expect(mp.locator('.print-card')).to_have_count(5)
+        expect(mp.locator('.print-card')).to_have_count(4)
         expect(mp.locator('.menu-items .dish img')).to_have_count(0)
         mp.locator('.print-card').first.click()
         expect(mp.locator('#menu-lightbox')).to_be_visible()
@@ -180,17 +295,17 @@ try:
         expect(mp.locator('.back-to-top')).to_be_visible()
         mp.locator('.back-to-top').click()
         mp.wait_for_function('scrollY <= 1',timeout=5000)
-        print('PASS: mobile delivery navigation, no horizontal scroll or old food images; five menu cards')
+        print('PASS: mobile delivery navigation, no horizontal scroll or old food images; four published menu cards')
         # At minimum supported phone width, content must not force sideways scrolling.
         narrow=browser.new_context(viewport={'width':320,'height':720},is_mobile=True,has_touch=True)
         np=narrow.new_page()
-        for route in ('/','/menu/','/lunch/','/banquets/','/contacts/','/privacy/'):
+        for route in ('/','/menu/','/lunch/','/banquets/','/contacts/','/privacy/','/go/','/events/'):
             np.goto(base+route,wait_until='domcontentloaded')
             np.wait_for_timeout(100)
             dimensions=np.evaluate('({viewport:innerWidth,scroll:document.documentElement.scrollWidth})')
             assert dimensions['scroll'] <= dimensions['viewport']+2, f'Horizontal overflow at 320px on {route}: {dimensions}'
         narrow.close()
-        print('PASS: no horizontal scrolling at 320px across all six pages')
+        print('PASS: no horizontal scrolling at 320px across all eight pages')
         # Long mobile pages keep their header and catalog usable in either scroll direction.
         navigation=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,reduced_motion='reduce')
         navpage=navigation.new_page()
@@ -242,7 +357,7 @@ try:
             expect(navpage.locator('.cookie-banner')).to_be_visible()
             navpage.locator('.header-menu-link').click()
             expect(navpage).to_have_url(base+'/menu/')
-            expect(navpage.locator('.print-card')).to_have_count(5)
+            expect(navpage.locator('.print-card')).to_have_count(4)
             assert navpage.evaluate('document.documentElement.scrollWidth <= innerWidth + 2'), 'Navigation added horizontal overflow'
         navpage.set_viewport_size({'width':390,'height':844})
         navpage.goto(base+'/',wait_until='networkidle')
@@ -326,16 +441,20 @@ try:
         expect(wp.locator('.footer .yandex-award')).to_contain_text('2026')
         expect(wp.locator('.footer .yandex-award')).to_have_attribute('href','https://yandex.ru/maps/org/bravis/120928769508/')
         assert not requested, 'Yandex widgets loaded without visitor action'
-        wp.locator('[data-yandex-widget="rating"] button').click()
-        expect(wp.locator('[data-yandex-widget="rating"] iframe')).to_have_attribute('src','https://yandex.ru/sprav/widget/rating-badge/120928769508?type=rating')
-        wp.locator('[data-yandex-widget="map"] button').click()
+        expect(wp.get_by_role('button',name='Проверить актуальный рейтинг')).to_have_count(0)
+        expect(wp.locator('[data-yandex-widget="rating"]')).to_have_count(0)
+        wp.get_by_role('button',name='Показать карту здесь',exact=True).click()
         expect(wp.locator('[data-yandex-widget="map"] iframe')).to_have_attribute('src','https://yandex.ru/map-widget/v1/?ol=biz&oid=120928769508&z=16')
+        wp.get_by_role('button',name='Закрыть карту',exact=True).click()
+        expect(wp.locator('[data-yandex-widget="map"] iframe')).to_have_count(0)
+        expect(wp.get_by_role('button',name='Показать карту здесь',exact=True)).to_be_visible()
+        assert not any('rating-badge' in url for url in requested), 'Removed rating widget still requested'
         wp.goto(base+'/404.html',wait_until='domcontentloaded')
         expect(wp.locator('h1')).to_contain_text('не найдена')
         expect(wp.locator('meta[name="robots"]')).to_have_attribute('content','noindex, nofollow')
         expect(wp.locator('link[rel="canonical"]')).to_have_count(0)
         widgets.close()
-        print('PASS: verified communities, click-to-load Yandex rating/map and branded noindex 404')
+        print('PASS: verified communities, no rating loader, closeable opt-in map and branded noindex 404')
         consent_context.close()
         desktop.close()
         mobile.close()

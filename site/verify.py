@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """BRAVIS static output checks; no dependencies, network or secrets."""
 import json, re
+import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent
 DIST=ROOT/'dist'
-paths=['index.html','menu/index.html','lunch/index.html','banquets/index.html','contacts/index.html','privacy/index.html','go/index.html']
+paths=['index.html','menu/index.html','lunch/index.html','banquets/index.html','contacts/index.html','privacy/index.html','go/index.html','events/index.html']
 class Links(HTMLParser):
     def __init__(self):
         super().__init__();self.links=[];self.images=[];self.scripts=[]
@@ -34,7 +35,11 @@ assert 'name="robots" content="noindex' in missing, '404 must not be indexed'
 assert 'rel="canonical"' not in missing, '404 must not canonicalize to the home page'
 assert 'Страница <em>не найдена.' in missing
 if (DIST/'sitemap.xml').is_file():
-    assert '/404.html' not in (DIST/'sitemap.xml').read_text(encoding='utf-8')
+    sitemap=ET.parse(DIST/'sitemap.xml')
+    urls=[node.text for node in sitemap.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
+    expected=['https://bravisrest.ru'+('/' if p=='index.html' else '/'+p.removesuffix('index.html')) for p in paths]
+    assert len(urls)==len(set(urls))==8, 'Sitemap must contain eight unique public pages'
+    assert set(urls)==set(expected), 'Sitemap must retain every canonical public route and exclude 404'
 if (ROOT/'site.config.json').exists():
     config=json.loads((ROOT/'site.config.json').read_text(encoding='utf-8'))
     if not config.get('public'):
@@ -42,4 +47,4 @@ if (ROOT/'site.config.json').exists():
             assert 'name="robots" content="noindex' in (DIST/p).read_text(encoding='utf-8'),p
         assert 'Disallow: /' in (DIST/'robots.txt').read_text(encoding='utf-8')
 mode='public indexing' if config.get('public') else 'preview noindex'
-print('PASS: seven BRAVIS pages, accessible links, local media assets, JSON-LD, '+mode)
+print('PASS: eight BRAVIS pages, accessible links, local media assets, JSON-LD, '+mode)

@@ -14,7 +14,7 @@ def render_guest_hub(config, settings, document_head, lunch_price, reserve_link)
     if enabled and loona != LOONA_4992:
         raise ValueError('Guest hub must retain the verified main Loona 4992 URL')
     cards = [
-        ('guest_card', 'Карта гостя Bravis', 'Оформление карты в Loona. Условия программы — на странице оформления.', loona if enabled else '', True),
+        ('guest_card', 'Карта гостя Bravis', 'Карта гостя BRAVIS в вашем смартфоне. Условия программы — на странице оформления.', loona if enabled else '', True),
         ('lunch', 'Меню бизнес-ланча', f'{lunch_price} ₽ · пн–пт · 11:00–16:00 МСК', '/lunch/', False),
         ('menu_evening', 'Меню и вечер в Bravis', 'Посмотрите актуальное меню и выберите повод вернуться.', '/menu/', False),
         ('corporate', 'Корпоратив или семейная встреча', 'Обсудить дату, число гостей и формат.', '/banquets/', False),

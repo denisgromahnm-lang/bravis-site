@@ -27,7 +27,7 @@ with tempfile.TemporaryDirectory(prefix='bravis-release-') as temporary:
         subprocess.run([sys.executable, str(source / script)], cwd=source, check=True)
 
     dist = source / 'dist'
-    for route in ['index.html', 'menu/index.html', 'lunch/index.html', 'banquets/index.html', 'contacts/index.html', 'privacy/index.html', 'go/index.html']:
+    for route in ['index.html', 'menu/index.html', 'lunch/index.html', 'banquets/index.html', 'events/index.html', 'contacts/index.html', 'privacy/index.html', 'go/index.html']:
         text = (dist / route).read_text(encoding='utf-8')
         path = '/' if route == 'index.html' else '/' + route.removesuffix('index.html')
         assert 'content="index, follow, max-image-preview:large"' in text, route

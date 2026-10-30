@@ -35,14 +35,17 @@
     if (typeof window.ym === 'function' && conf.ymId) window.ym(Number(conf.ymId), 'reachGoal', eventName);
     if (typeof window.gtag === 'function' && conf.ga4Id) window.gtag('event', eventName);
   };
-  document.querySelectorAll('[data-track]').forEach(a => a.addEventListener('click', () => track(a.dataset.track)));
-  // Aggregate goals include every menu entry point and every phone link,
-  // while retaining detailed per-button goals for diagnostics.
-  document.querySelectorAll('a[href]').forEach(a => a.addEventListener('click', () => {
-    const href = a.getAttribute('href') || '';
+  // Delegation also covers freshly published restaurant-news links.
+  document.addEventListener('click', event => {
+    const target = event.target instanceof Element ? event.target : null;
+    const tracked = target?.closest('[data-track]');
+    if (tracked) track(tracked.dataset.track);
+    const anchor = target?.closest('a[href]');
+    if (!anchor) return;
+    const href = anchor.getAttribute('href') || '';
     if (href.startsWith('tel:')) track('phone_click');
     if (/^\/(?:bravis-site\/)?menu\/(?:[#?].*)?$/.test(href)) track('menu_open');
-  }));
+  });
   if (!conf.ymId && !conf.ga4Id) return;
   function loadAnalytics() {
     if (conf.ymId) {
@@ -86,24 +89,35 @@
   }
 })();
 
-// Loading a map or a rating is an explicit visitor action, separate from analytics consent.
+// The visitor controls the embedded map; its toolbar stays outside the provider iframe.
 (() => {
-  document.querySelectorAll('[data-yandex-widget]').forEach(container => {
+  document.querySelectorAll('[data-yandex-widget="map"]').forEach(container => {
     const button = container.querySelector('.external-widget-load');
     const id = container.dataset.yandexOrg;
     if (!button || !/^\d+$/.test(id || '')) return;
     button.addEventListener('click', () => {
-      const frame = document.createElement('iframe');
-      const map = container.dataset.yandexWidget === 'map';
-      frame.title = map ? 'Ресторан BRAVIS на Яндекс Картах' : 'Текущий рейтинг BRAVIS на Яндекс Картах';
-      frame.src = map ? 'https://yandex.ru/map-widget/v1/?ol=biz&oid=' + id + '&z=16' : 'https://yandex.ru/sprav/widget/rating-badge/' + id + '?type=rating';
+      if (container.classList.contains('map-is-open')) return;
+      const original = [...container.children].map(node => [node, node.hidden]);
+      original.forEach(([node]) => { node.hidden = true; });
+      const panel = document.createElement('div'); panel.className = 'map-embedded';
+      const toolbar = document.createElement('div'); toolbar.className = 'map-embedded__toolbar';
+      const close = document.createElement('button'); close.type = 'button'; close.textContent = 'Закрыть карту';
+      const route = document.createElement('a'); route.href = 'https://yandex.ru/maps/org/bravis/' + id + '/';
+      route.target = '_blank'; route.rel = 'noopener noreferrer'; route.textContent = 'Открыть маршрут ↗';
+      toolbar.append(close, route);
+      const frame = document.createElement('iframe'); frame.title = 'Ресторан BRAVIS на Яндекс Картах';
+      frame.src = 'https://yandex.ru/map-widget/v1/?ol=biz&oid=' + id + '&z=16';
       frame.referrerPolicy = 'strict-origin-when-cross-origin';
-      if (map) frame.allowFullscreen = true;
-      container.replaceChildren(frame);
-    }, { once: true });
+      panel.append(toolbar, frame); container.append(panel); container.classList.add('map-is-open');
+      close.addEventListener('click', () => {
+        panel.remove(); container.classList.remove('map-is-open');
+        original.forEach(([node, hidden]) => { node.hidden = hidden; });
+        button.focus({preventScroll:true});
+      });
+      close.focus({preventScroll:true});
+    });
   });
 })();
-
 
 // Keep the return-to-top control available on long pages at every screen size.
 (() => {
