@@ -1,0 +1,162 @@
+{
+  "approvedOrderHosts": [
+    "bravis.smartofood.ru"
+  ],
+  "tables": [
+    {
+      "id": "1",
+      "label": "Стол 1",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=4ff25c95-a89a-40be-ae83-0454f569e863"
+    },
+    {
+      "id": "2",
+      "label": "Стол 2",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=4a214f4f-425a-4f09-9de7-69e2feabfc8e"
+    },
+    {
+      "id": "3",
+      "label": "Стол 3",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=2fb08e27-8d20-4315-b197-14b0b4dec084"
+    },
+    {
+      "id": "4",
+      "label": "Стол 4",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=2a629d07-3539-44cf-85e7-d33da50cf020"
+    },
+    {
+      "id": "5",
+      "label": "Стол 5",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=1e78444a-79a2-49f5-95eb-9330b4914505"
+    },
+    {
+      "id": "6",
+      "label": "Стол 6",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=23e72d73-e868-4236-a190-a7f15f9c7bf1"
+    },
+    {
+      "id": "7",
+      "label": "Стол 7",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=61f15975-9a7d-4f5d-a416-d359e6af2207"
+    },
+    {
+      "id": "8",
+      "label": "Стол 8",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=8250a8b1-e953-4c2c-b2f8-e02fa05e0668"
+    },
+    {
+      "id": "9",
+      "label": "Стол 9",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=93e7186f-c333-4aed-8d17-f0fc5376ad5c"
+    },
+    {
+      "id": "10",
+      "label": "Стол 10",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=aef1a902-d9b8-4a4f-b2ef-d3bc51f36717"
+    },
+    {
+      "id": "11",
+      "label": "Стол 11",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=207836d8-ccdc-4811-bb9b-7137f7196adc"
+    },
+    {
+      "id": "12",
+      "label": "Стол 12",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=d9a961d4-343f-42d5-b826-e8e817612985"
+    },
+    {
+      "id": "bar-13",
+      "label": "Бар 13",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=524bc658-ddb0-46f3-8a20-54281949a239"
+    },
+    {
+      "id": "bar-14",
+      "label": "Бар 14",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=43be91ec-0423-4c0f-826c-e35b629597f5"
+    },
+    {
+      "id": "bar-15",
+      "label": "Бар 15",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=c385e055-6a9b-403b-9578-7ad83009d9ab"
+    },
+    {
+      "id": "bar-16",
+      "label": "Бар 16",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=b910e243-6e1f-46e6-b795-4af60ceb64d4"
+    },
+    {
+      "id": "bar-17",
+      "label": "Бар 17",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=3d8b110b-0ec8-4496-b8b3-1b8a474ca832"
+    },
+    {
+      "id": "bar-18",
+      "label": "Бар 18",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=dd888875-4946-4c3e-b08b-c0a8b8b01296"
+    },
+    {
+      "id": "bar-19",
+      "label": "Бар 19",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=a134ceaf-5dec-46a8-a8a5-77fba4f35380"
+    },
+    {
+      "id": "bar-20",
+      "label": "Бар 20",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=7a2f9464-90c3-4854-b365-09c69199c267"
+    },
+    {
+      "id": "20",
+      "label": "Стол 20",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=24e463c0-ec28-42aa-9625-57eb815fdab8"
+    },
+    {
+      "id": "21",
+      "label": "Стол 21",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=42883be4-d05c-49ff-bd20-1bc86e3465bb"
+    },
+    {
+      "id": "22",
+      "label": "Стол 22",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=3acb7b0a-d8c4-437b-aed8-2763c5ebbb91"
+    },
+    {
+      "id": "23",
+      "label": "Стол 23",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=51de15d7-c0e4-424a-bf24-3b7b0e25e0a7"
+    },
+    {
+      "id": "24",
+      "label": "Стол 24",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=3785e46b-60c7-4241-a63b-57b7dff513db"
+    },
+    {
+      "id": "25",
+      "label": "Стол 25",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=c64fe19b-e0b8-4a1b-9421-1c843b3a9b83"
+    },
+    {
+      "id": "26",
+      "label": "Стол 26",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=61a1202c-ef1b-4f76-9149-c85b450f280c"
+    },
+    {
+      "id": "27",
+      "label": "Стол 27",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=e4d0e081-5168-431c-b0c9-11c265f7044c"
+    },
+    {
+      "id": "28",
+      "label": "Стол 28",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=ca56a0f3-521e-412b-9cb0-1c4b3b7f50c3"
+    },
+    {
+      "id": "29",
+      "label": "Стол 29",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=d4140654-43b9-492c-ba01-f2c3d8da8b46"
+    },
+    {
+      "id": "30",
+      "label": "Стол 30",
+      "orderUrl": "https://bravis.smartofood.ru/qr?shop=1&table=6508ac9a-5a75-4d98-91b2-8dab0c4c4a51"
+    }
+  ]
+}
