@@ -440,6 +440,14 @@ PAGES['go/index.html'] = render_guest_hub(
     lunch_item['price'], reserve_link,
 )
 
+from table_hub import verified_tables, render_table_hub
+table_settings = json.loads((ROOT / 'content/table-links.json').read_text(encoding='utf-8'))
+for table in [None] + verified_tables(table_settings):
+    route = '/t/' + (table['id'] + '/' if table else '')
+    PAGES[route.lstrip('/') + 'index.html'] = render_table_hub(
+        CONFIG, head('Заказ со стола и карта гостя', 'Заказ бизнес-ланча и карта гостя BRAVIS.',
+                     route, 'table-page', noindex=True), table)
+
 if DIST.exists():shutil.rmtree(DIST)
 DIST.mkdir()
 shutil.copytree(ROOT/'public', DIST, dirs_exist_ok=True)
