@@ -7,7 +7,7 @@ DIST=ROOT/'dist'
 PREFIX='/bravis-site'
 for page in sorted(DIST.rglob('*.html')):
     data=page.read_text(encoding='utf8')
-    data=re.sub(r'(href|src|content)=(["\'])/(?!/)',lambda m: m.group(1)+'='+m.group(2)+PREFIX+'/',data)
+    data=re.sub(r'(href|src|poster|content)=(["\'])/(?!/)',lambda m: m.group(1)+'='+m.group(2)+PREFIX+'/',data)
     # The lightbox image URLs are embedded in JSON strings, not HTML attributes.
     data=data.replace('"/menu-media/','"'+PREFIX+'/menu-media/')
     assert 'name="robots" content="noindex' in data
