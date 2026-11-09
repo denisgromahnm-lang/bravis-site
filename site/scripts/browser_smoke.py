@@ -363,8 +363,12 @@ def accept_public_revision(browser):
     print('PASS: four public menus, BRAVIS-only marketing, static events, in-place revision/Moscow clock, scroll/focus preservation and malformed-feed fallback')
 try:
     with sync_playwright() as p:
-        browser_path=os.environ.get('BRAVIS_CHROMIUM_EXECUTABLE') or shutil.which('chromium')
+        # GitHub's installed Chrome includes the H.264/AAC codecs used by the
+        # real restaurant clips; Playwright's bundled Chromium may omit them.
+        browser_path=(os.environ.get('BRAVIS_CHROMIUM_EXECUTABLE')
+                      or shutil.which('google-chrome') or shutil.which('chromium'))
         browser=p.chromium.launch(executable_path=browser_path,headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+        print('Browser acceptance:', browser_path or 'Playwright Chromium', browser.version)
         accept_restaurant_videos(browser)
         if '--media-only' in sys.argv:
             browser.close()
