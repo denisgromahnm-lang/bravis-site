@@ -16,6 +16,7 @@ import sys
 import time
 from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
+from analytics_acceptance import accept_analytics
 
 ROOT=Path(__file__).resolve().parents[1]
 DIST=ROOT/'dist'
@@ -373,12 +374,17 @@ try:
                       or shutil.which('google-chrome') or shutil.which('chromium'))
         browser=p.chromium.launch(executable_path=browser_path,headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
         print('Browser acceptance:', browser_path or 'Playwright Chromium', browser.version)
+        if '--analytics-only' in sys.argv:
+            accept_analytics(browser,base,ROOT,REPORT)
+            browser.close()
+            sys.exit(0)
         accept_restaurant_videos(browser)
         if '--media-only' in sys.argv:
             browser.close()
             print('BROWSER MEDIA QA SUCCESS:',REPORT)
             sys.exit(0)
         accept_sticky_header(browser)
+        accept_analytics(browser,base,ROOT,REPORT)
         accept_gallery_and_messengers(browser)
         accept_event_clock(browser)
         accept_public_revision(browser)
