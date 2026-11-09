@@ -103,8 +103,8 @@ jobs:
           home=(base/'dist/index.html').read_text(encoding='utf8')
           assert 'class="mobile-bottom-cta__primary"' in home
           assert re.search(r'class="mobile-bottom-cta__primary"[^>]*data-track="reserve_click"',home), 'Mobile CTA must count in main reservation goal'
-          js=(base/'dist/assets/site.js').read_text(encoding='utf8')
-          assert "track('phone_click')" in js and "track('menu_open')" in js
+          # Goal dispatch and deduplication are exercised by analytics_acceptance.py
+          # in browser QA, rather than matched to the old handler's source text.
 
           if (base/'content/menu_media.json').exists():
               f=json.loads((base/'content/menu_media.json').read_text(encoding='utf8'))['files']
