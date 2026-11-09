@@ -209,7 +209,8 @@ def _card(item, *, news=False):
     date_html = ''
     if news:
         day = _day(item['date'])
-        date_html = f'<time datetime="{_h(item["date"])}">{_date_label(day)} {day.year}</time>'
+        date_html = (f'<span class="restaurant-life__eyebrow">{_h(item["eyebrow"])}</span> · '
+                     f'<time datetime="{_h(item["date"])}">{_date_label(day)} {day.year}</time>')
     elif item.get('eyebrow'):
         date_html = f'<span class="restaurant-life__eyebrow">{_h(item["eyebrow"])}</span>'
     return (f'<article class="restaurant-life__card" data-life-id="{_h(item["id"])}">'
@@ -238,8 +239,11 @@ def _render_formats(data):
             + '</div></section>')
 
 
-def _render_news(data, *, compact=False):
+def _render_news(data, *, compact=False, now=None):
     items = data['news'][:3] if compact else data['news']
+    today = _moscow_now(now).date().isoformat()
+    items = [dict(item, eyebrow='Архив' if item['date'] < today else 'Сегодня' if item['date'] == today else 'Анонс',
+                  linkText='Узнать о новых событиях' if item['date'] < today else item['linkText']) for item in items]
     cards = ''.join(_card(item, news=True) for item in items)
     if not cards:
         cards = '<p class="restaurant-life__notice">Новостями ресторана поделимся здесь.</p>'
@@ -252,7 +256,7 @@ def _render_news(data, *, compact=False):
 
 def render_restaurant_life_home(data, *, now=None):
     """Home fragments; the caller may position the compact today region near hero."""
-    return _render_today(data, now) + _render_formats(data) + _render_news(data, compact=True)
+    return _render_today(data, now) + _render_formats(data) + _render_news(data, compact=True, now=now)
 
 
 def render_restaurant_life_today(data, *, now=None):
@@ -265,8 +269,8 @@ def render_restaurant_life_formats(data):
     return _render_formats(data)
 
 
-def render_restaurant_life_news(data, *, compact=True):
-    return _render_news(data, compact=compact)
+def render_restaurant_life_news(data, *, compact=True, now=None):
+    return _render_news(data, compact=compact, now=now)
 
 
 def render_restaurant_life_page(data, *, now=None, media_html=''):
@@ -275,4 +279,4 @@ def render_restaurant_life_page(data, *, now=None, media_html=''):
             '<div class="section-label"><span class="line"></span> СОБЫТИЯ И НОВОСТИ</div>'
             '<h1>Жизнь <em>BRAVIS.</em></h1>'
             '<p>Поводы для встречи, программы ресторана и новости с точными датами.</p>'
-            '</div></section>' + _render_today(data, now) + media_html + _render_formats(data) + _render_news(data))
+            '</div></section>' + _render_today(data, now) + media_html + _render_formats(data) + _render_news(data, now=now))

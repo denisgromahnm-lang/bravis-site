@@ -199,7 +199,7 @@
       const calendar = day(value.date);
       const time = node('time', '', dateLabel(calendar) + ' ' + calendar.year);
       time.setAttribute('datetime', value.date);
-      result.append(time);
+      result.append(node('span', 'restaurant-life__eyebrow', value.eyebrow), document.createTextNode(' · '), time);
     } else if (value.eyebrow) result.append(node('span', 'restaurant-life__eyebrow', value.eyebrow));
     result.append(node('h3', '', value.title), node('p', '', value.description));
     const action = link('restaurant-life__link', value.href, value.linkText + ' ');
@@ -209,8 +209,15 @@
     result.append(action);
     return result;
   };
-  const viewFor = record => record.part === 'today' ? today(current)
-    : record.part === 'formats' ? current.formats : current.news.slice(0, record.compact ? 3 : 24);
+  const viewFor = record => {
+    if (record.part === 'today') return today(current);
+    if (record.part === 'formats') return current.formats;
+    const date = today(current).date;
+    return current.news.slice(0, record.compact ? 3 : 24).map(value => ({...value,
+      eyebrow: value.date < date ? 'Архив' : value.date === date ? 'Сегодня' : 'Анонс',
+      linkText: value.date < date ? 'Узнать о новых событиях' : value.linkText,
+    }));
+  };
   const render = (record, view) => {
     const wrap = node('div', 'wrap');
     let row;

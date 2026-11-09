@@ -50,8 +50,10 @@ media=ROOT/'content/menu_media.json'
 if media.exists():
     m=json.loads(media.read_text(encoding='utf8'))
     records=m.get('files',[])
-    check('Five approved menu sections', [x.get('group') for x in records]==['seasonal','main-front','main-back','business','children'])
-    check('All approved image files present',all((ROOT/'public'/p.lstrip('/')).is_file() for x in records for p in x.get('pages',[])))
+    published=[x for x in records if x.get('published',True) is not False]
+    check('Four published menu sections', [x.get('group') for x in published]==['main-front','main-back','business','children'])
+    check('Seasonal menu remains unpublished',not any(x.get('group')=='seasonal' for x in published))
+    check('All published image files present',all((ROOT/'public'/p.lstrip('/')).is_file() for x in published for p in x.get('pages',[])))
 else:check('Real owner-approved menu',False)
 gallery=ROOT/'content/gallery.json'
 if gallery.exists():
