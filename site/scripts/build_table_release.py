@@ -34,6 +34,7 @@ def build(baseline, output):
     output.mkdir(parents=True)
     (output / 'assets').mkdir()
     shutil.copy(ROOT / 'public/assets/table-hub.css', output / 'assets/table-hub.css')
+    shutil.copy(ROOT / 'public/assets/wallet-help.css', output / 'assets/wallet-help.css')
     for table in [None] + tables:
         route = '/t/' + (table['id'] + '/' if table else '')
         page = render_table_hub(config, '<!doctype html><html lang="ru"><head>' + metadata + '</head><body class="table-page">', table)

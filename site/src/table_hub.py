@@ -3,6 +3,7 @@ import html
 import re
 from urllib.parse import urlsplit
 from guest_hub import LOONA_4992
+from wallet_help import render_wallet_help
 
 
 def verified_tables(settings):
@@ -49,13 +50,14 @@ def render_table_hub(config, document_head, table=None):
         order = ('<div class="table-action table-action--unavailable" aria-disabled="true">'
                  '<span><strong>Заказать бизнес-ланч</strong><small>Отсканируйте QR-код на вашем столе</small></span></div>')
         note = 'Если QR-код не открывается, обратитесь к официанту.'
-    document_head = document_head.replace('</head>', '<link rel="stylesheet" href="/assets/table-hub.css"></head>')
+    document_head = document_head.replace('</head>', '<link rel="stylesheet" href="/assets/table-hub.css"><link rel="stylesheet" href="/assets/wallet-help.css"></head>')
     return document_head + f'''<a class="skip" href="#main">Перейти к содержимому</a>
 <header class="table-header"><a href="/" aria-label="BRAVIS — основной сайт">BRAVIS</a><span>РЕСТОРАН · МОСКВА</span></header>
 <main class="table-shell" id="main"><span class="table-label">{h(label)}</span>
 <h1>Рады видеть<br><em>вас в BRAVIS.</em></h1><p class="table-intro">Вкусный обед и приятные поводы вернуться.</p>
 <nav class="table-actions" aria-label="Заказ и карта гостя">{order}
 <a class="table-action" href="{h(loyalty)}" data-track="loona_signup_click"><span><strong>Оформить карту гостя</strong><small>Программа лояльности BRAVIS</small></span><span aria-hidden="true">→</span></a></nav>
+{render_wallet_help()}
 <p class="table-note">{h(note)}</p></main>
 <footer class="table-footer"><div class="footer-bottom"><a href="/">Сайт ресторана</a><a href="/privacy/">Политика обработки данных</a></div></footer>
 <script src="/assets/site.js" defer></script></body></html>'''

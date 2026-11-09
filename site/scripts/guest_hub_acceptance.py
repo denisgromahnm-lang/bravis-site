@@ -81,13 +81,13 @@ try:
             image.evaluate('(image) => image.decode()')
             assert image.evaluate('(image) => image.naturalWidth > 0')
             assert order(page)[:2] == ['guest_card', 'lunch']
-            expect(page.locator('[data-hub-id="guest_card"] a')).to_have_attribute('href', LOONA)
+            expect(page.locator('[data-hub-id="guest_card"] > a')).to_have_attribute('href', LOONA)
             assert not re.search(r'loona|luna|луна', page.locator('body').inner_text(), re.I), 'Provider brand leaked into guest-facing hub text'
             for attribute in ('alt','aria-label','title'):
                 values=page.locator('['+attribute+']').evaluate_all('(items, attr) => items.map(item => item.getAttribute(attr)).join(" ")',attribute)
                 assert not re.search(r'loona|luna|луна',values,re.I), 'Provider brand leaked into hub '+attribute
-            assert page.locator('[data-hub-id] a').count() == 7
-            expect(page.locator('[data-hub-id="guest_card"] a')).to_have_attribute('data-track', 'loona_signup_click')
+            assert page.locator('[data-hub-id] > a').count() == 7
+            expect(page.locator('[data-hub-id="guest_card"] > a')).to_have_attribute('data-track', 'loona_signup_click')
             assert page.locator('[data-hub-id] .guest-hub-card__arrow svg').count() == 7
             menu = page.locator('.guest-hub-menu')
             expect(menu).to_have_attribute('href', '/menu/')
@@ -106,10 +106,10 @@ try:
             assert page.locator('form,input,textarea,iframe').count() == 0
             assert page.locator('.mobile-bottom-cta,.site-header').count() == 0
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
-            for link in page.locator('[data-hub-id] a').all():
+            for link in page.locator('[data-hub-id] > a').all():
                 assert link.bounding_box()['height'] >= 44
             # The existing consent banner does not block the first action.
-            card = page.locator('[data-hub-id="guest_card"] a').bounding_box()
+            card = page.locator('[data-hub-id="guest_card"] > a').bounding_box()
             banner = page.locator('.cookie-banner').bounding_box()
             assert card['y'] + card['height'] <= banner['y'] if banner else True
             page.screenshot(path=str(REPORT / f'guest-hub-{width}.png'), full_page=True)
@@ -124,7 +124,7 @@ try:
         expect(page.locator('[data-promo-variant="evening"]')).to_have_attribute('href', '/banquets/')
         expect(page.locator('[data-promo-variant="lunch"]')).to_be_hidden()
         expect(page.locator('[data-lunch-note]')).to_contain_text('праздничные')
-        assert page.locator('[data-hub-id] a').count() == 7
+        assert page.locator('[data-hub-id] > a').count() == 7
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
         page.screenshot(path=str(REPORT / 'guest-hub-nojs-320.png'), full_page=True)
         ctx.close()
@@ -175,7 +175,7 @@ try:
         config = json.loads((ROOT / 'site.config.json').read_text())
         disabled = render_guest_hub(config, {**settings, 'loonaEnabled': False}, head, 690, 'https://reservation.yandex.ru/partner-reserve/forms/' + config['smartReserveId'])
         ctx, page = context(browser, body=disabled)
-        assert page.locator('[data-hub-id] a').count() == 6
+        assert page.locator('[data-hub-id] > a').count() == 6
         expect(page.locator('[data-hub-id="guest_card"]')).to_contain_text('временно недоступно')
         expect(page.locator('[data-hub-id="public_review"] a')).to_be_visible()
         assert page.locator('form,input,textarea').count() == 0
@@ -187,7 +187,7 @@ try:
             assert page.evaluate("localStorage.getItem('bravis_analytics_consent_v1')") == consent
             page.reload(wait_until='networkidle')
             assert page.locator('.cookie-banner').count() == 0
-            assert page.locator('[data-hub-id] a').count() == 7
+            assert page.locator('[data-hub-id] > a').count() == 7
             page.evaluate('window.testGoals=[];window.ym=(...args)=>window.testGoals.push(args);')
             link = page.locator('[data-hub-id="future_booking"] a')
             link.evaluate("(a)=>a.addEventListener('click',event=>event.preventDefault())")
@@ -199,11 +199,13 @@ try:
             checks.append('Existing consent persisted; reserve goal gated by ' + consent)
         ctx, page = context(browser, width=320)
         page.locator('[data-consent="no"]').click()
-        page.locator('[data-hub-id="guest_card"] a').focus()
+        page.locator('[data-hub-id="guest_card"] > a').focus()
         page.keyboard.press('Tab')
         page.keyboard.press('Shift+Tab')
-        expect(page.locator('[data-hub-id="guest_card"] a')).to_be_focused()
-        assert page.locator('[data-hub-id="guest_card"] a').evaluate("(a)=>getComputedStyle(a).outlineStyle") != 'none'
+        expect(page.locator('[data-hub-id="guest_card"] > a')).to_be_focused()
+        assert page.locator('[data-hub-id="guest_card"] > a').evaluate("(a)=>getComputedStyle(a).outlineStyle") != 'none'
+        page.keyboard.press('Tab')
+        expect(page.locator('[data-hub-id="guest_card"] .bravis-wallet-help summary')).to_be_focused()
         page.keyboard.press('Tab')
         expect(page.locator('[data-hub-id="lunch"] a')).to_be_focused()
         page.locator('body').evaluate("(e)=>e.style.fontSize='200%'")
@@ -224,7 +226,7 @@ try:
         page.goto(base + '/go/?phone=PRIVATE_TEST', wait_until='networkidle')
         assert page.evaluate("Object.keys(window.BRAVIS_ANALYTICS).length") == 0
         assert page.evaluate("localStorage.getItem('bravis_analytics_consent_v1')") == 'yes'
-        assert page.locator('[data-hub-id] a').count() == 7
+        assert page.locator('[data-hub-id] > a').count() == 7
         ctx.close()
         checks.append('Untrusted URL cleared before opted-in analytics; saved consent unchanged')
         checks.append('Blocked history cleanup disables only analytics, not guest links or saved consent')
