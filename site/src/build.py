@@ -10,6 +10,7 @@ from guest_promotions import (welcome_strip, offers_section, experiences_section
                               menu_campaign, banquet_details, contact_invitation, gift_art, lunch_reward_strip)
 from restaurant_gallery import render_restaurant_gallery
 from event_media import render_event_media, render_restaurant_videos
+from wallet_help import render_wallet_help
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / 'dist'
@@ -61,6 +62,7 @@ loona_registration_cta = (
     f'<a class="loyalty-qr" href="{h(loona_join_url)}" data-track="loona_signup_click" target="_blank" rel="noopener noreferrer" aria-label="Оформить карту гостя BRAVIS">'
     f'<img src="/assets/loona-register.svg" alt="QR-код для регистрации в программе лояльности BRAVIS" width="156" height="156" loading="lazy">'
     f'<span>Откройте камеру телефона и сканируйте QR-код для получения карты гостя.</span></a>'
+    f'{render_wallet_help()}'
     f'</div>'
     if loona_join_url else
     '<p class="loyalty-pending">Онлайн-регистрация скоро появится здесь. Пока оформить карту можно по QR-коду в ресторане.</p>'
@@ -212,6 +214,7 @@ def head(title, desc, route, body_class, noindex=False):
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 <link rel="preload" href="/assets/site.css" as="style">
 <link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/wallet-help.css">
 <link rel="stylesheet" href="/assets/lunch.css">
 <link rel="stylesheet" href="/assets/promotions.css">
 <link rel="stylesheet" href="/assets/restaurant-life.css"><link rel="stylesheet" href="/assets/restaurant-gallery.css"><link rel="stylesheet" href="/assets/event-media.css">

@@ -1,6 +1,7 @@
 """Static in-restaurant guest hub; no forms, checkout or new analytics."""
 import html
 import json
+from wallet_help import render_wallet_help
 
 ARROW = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 
@@ -31,7 +32,8 @@ def render_guest_hub(config, settings, document_head, lunch_price, reserve_link)
             card = f'<a class="guest-hub-card{modifier}" href="{escape(href)}"{track}>{content}<span class="guest-hub-card__arrow" aria-hidden="true">{ARROW}</span></a>'
         else:
             card = f'<div class="guest-hub-card guest-hub-card--unavailable">{content}<span class="guest-hub-card__description">Оформление временно недоступно. Обратитесь к сотруднику ресторана.</span></div>'
-        rows.append(f'<li data-hub-id="{key}">{card}</li>')
+        help_html = render_wallet_help() if key == 'guest_card' and enabled else ''
+        rows.append(f'<li data-hub-id="{key}">{card}{help_html}</li>')
     # One promotional block: a conservative static evening variant, enhanced by the same lunch clock.
     promos = []
     for key in ('evening', 'lunch'):
@@ -55,7 +57,7 @@ def render_guest_hub(config, settings, document_head, lunch_price, reserve_link)
     promo_html = '<section class="guest-hub-promo" aria-label="Предложение Bravis">' + ''.join(promos) + '</section>'
     runtime = {'holidayOverrides': settings.get('holidayOverrides', {}), 'lunchPrice': str(lunch_price)}
     payload = json.dumps(runtime, ensure_ascii=False).replace('<', '\\u003c')
-    document_head = document_head.replace('</head>', '<link rel="stylesheet" href="/assets/guest-hub.css"></head>')
+    document_head = document_head.replace('</head>', '<link rel="stylesheet" href="/assets/guest-hub.css"><link rel="stylesheet" href="/assets/wallet-help.css"></head>')
     return document_head + f'''<a class="skip" href="#main">Перейти к содержимому</a>
 <header class="guest-hub-header" id="top"><a class="guest-hub-brand logo" href="/" aria-label="BRAVIS — основной сайт">BRAVIS</a><span>Расковой, 20</span><a class="guest-hub-menu" href="/menu/" data-track="menu_from_header">Меню</a></header>
 <main class="guest-hub-shell" id="main" data-guest-hub>
