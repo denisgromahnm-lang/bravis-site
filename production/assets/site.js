@@ -1,4 +1,13 @@
 (() => {
+  const header = document.querySelector('.site-header');
+  if (header) {
+    const fitHeader = () => {
+      document.documentElement.style.setProperty('--site-header-height', Math.ceil(header.getBoundingClientRect().height) + 'px');
+    };
+    fitHeader();
+    window.addEventListener('resize', fitHeader, {passive:true});
+    if (typeof ResizeObserver === 'function') new ResizeObserver(fitHeader).observe(header);
+  }
   const toggle = document.querySelector('.menu-toggle');
   const nav = document.querySelector('.mobile-nav');
   if (toggle && nav) {
@@ -20,7 +29,7 @@
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && !nav.hidden) { close(); toggle.focus(); }
     });
-    window.matchMedia('(max-width: 960px)').addEventListener('change', event => {
+    window.matchMedia('(max-width: 1199px)').addEventListener('change', event => {
       if (!event.matches) close();
     });
   }
