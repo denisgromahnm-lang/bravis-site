@@ -269,10 +269,10 @@ def render_restaurant_life_news(data, *, compact=True):
     return _render_news(data, compact=compact)
 
 
-def render_restaurant_life_page(data, *, now=None):
+def render_restaurant_life_page(data, *, now=None, media_html=''):
     """Page body only; the build supplies the existing head/header/footer."""
     return ('<section class="page-hero page-hero--light"><div class="wrap">'
             '<div class="section-label"><span class="line"></span> СОБЫТИЯ И НОВОСТИ</div>'
             '<h1>Жизнь <em>BRAVIS.</em></h1>'
             '<p>Поводы для встречи, программы ресторана и новости с точными датами.</p>'
-            '</div></section>' + _render_today(data, now) + _render_formats(data) + _render_news(data))
+            '</div></section>' + _render_today(data, now) + media_html + _render_formats(data) + _render_news(data))

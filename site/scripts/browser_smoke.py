@@ -32,6 +32,91 @@ base=f'http://127.0.0.1:{port}'
 def loaded(img):
     return img.evaluate('(e)=>e.complete && e.naturalWidth > 0')
 
+def accept_restaurant_videos(browser):
+    """Real clips stay unloaded until a guest starts the native video player."""
+    manifest=ROOT/'content/event-media.json'
+    videos=json.loads(manifest.read_text(encoding='utf8')).get('videos',[]) if manifest.is_file() else []
+    if not videos:
+        print('SKIP: restaurant video acceptance awaits approved local clips')
+        return
+    expected_sources=[video['src'] for video in videos]
+    expected_posters=[video['poster'] for video in videos]
+    cases=[]
+    def is_video(url):
+        return url.split('?',1)[0].lower().endswith(('.mp4','.webm'))
+    for width in (320,768,1440):
+        context=browser.new_context(viewport={'width':width,'height':900},reduced_motion='reduce')
+        context.add_init_script("localStorage.setItem('bravis_analytics_consent_v1','no')")
+        requests=[];external=[]
+        def intercept(route):
+            url=route.request.url
+            requests.append(url)
+            if url.startswith(base+'/'):
+                route.continue_()
+            else:
+                external.append(url)
+                route.abort()
+        context.route('**/*',intercept)
+        page=context.new_page()
+        for route in ('/events/','/gallery/'):
+            page.goto(base+route,wait_until='networkidle')
+            players=page.locator('.restaurant-videos video')
+            expect(players).to_have_count(len(videos))
+            assert players.evaluate_all('(nodes)=>nodes.map(e=>e.getAttribute("src"))')==expected_sources
+            assert players.evaluate_all('(nodes)=>nodes.map(e=>e.getAttribute("poster"))')==expected_posters
+            for player in players.all():
+                expect(player).to_have_attribute('preload','none')
+                assert player.evaluate('(e)=>e.controls && e.playsInline && !e.autoplay && !e.hasAttribute("autoplay")'), 'Video controls or playback policy changed'
+                player.scroll_into_view_if_needed()
+                assert player.evaluate('(e)=>e.getBoundingClientRect().width<=innerWidth && getComputedStyle(e).objectFit==="contain"'), 'Video exceeds viewport or crops its frame'
+                assert player.evaluate('''(e)=>new Promise((resolve,reject)=>{
+                    const image=new Image();
+                    image.onload=()=>resolve(image.naturalWidth>0 && image.naturalHeight>0);
+                    image.onerror=()=>reject(new Error('Restaurant video poster did not decode'));
+                    image.src=e.poster;
+                })'''), 'Restaurant video poster did not decode'
+            assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+2'), 'Restaurant video page overflow at '+str(width)
+            assert not any(is_video(url) for url in requests), 'Restaurant clip fetched before a guest started playback'
+            assert not external, 'Restaurant video view requested an external service: '+str(external)
+            players.first.screenshot(path=str(REPORT/f'restaurant-video-{route.strip("/")}-{width}.png'))
+            page.locator('.restaurant-videos').screenshot(path=str(REPORT/f'restaurant-videos-{route.strip("/")}-{width}.png'))
+            cases.append({'route':route,'width':width,'poster_decode':True,'initial_video_requests':0})
+        context.close()
+
+    # Use a real keyboard gesture, then require a decoded and advancing frame.
+    context=browser.new_context(viewport={'width':390,'height':844},reduced_motion='reduce')
+    context.add_init_script("localStorage.setItem('bravis_analytics_consent_v1','no')")
+    requests=[];external=[]
+    def playback_route(route):
+        url=route.request.url;requests.append(url)
+        if url.startswith(base+'/'):
+            route.continue_()
+        else:
+            external.append(url);route.abort()
+    context.route('**/*',playback_route)
+    page=context.new_page();page.goto(base+'/events/',wait_until='networkidle')
+    first=page.locator('.restaurant-videos video').first
+    first.scroll_into_view_if_needed()
+    assert not any(is_video(url) for url in requests), 'Video preloaded before the keyboard gesture'
+    first.focus();page.keyboard.press('Space')
+    page.wait_for_function('''()=>{
+        const video=document.querySelector('.restaurant-videos video');
+        return video && !video.paused && video.readyState>=2 && video.currentTime>.08
+            && video.videoWidth>0 && video.videoHeight>0;
+    }''',timeout=15000)
+    assert any(url.split('?',1)[0]==base+expected_sources[0] for url in requests), 'Starting playback did not request the real first clip'
+    first.screenshot(path=str(REPORT/'restaurant-video-playing-390.png'))
+    first.press('Space')
+    expect(first).to_have_js_property('paused',True)
+    assert not external, 'Native video playback requested an external service'
+    playback=first.evaluate('(e)=>({time:e.currentTime,width:e.videoWidth,height:e.videoHeight,paused:e.paused})')
+    context.close()
+    (REPORT/'restaurant-video-acceptance.json').write_text(json.dumps({
+        'status':'PASS','cases':cases,'real_first_clip_playback':playback,
+        'sources':expected_sources,'external_requests':0,
+    },ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+    print('PASS: real restaurant clips/posters at 320/768/1440, no preload/external calls, first clip decodes and plays after Space')
+
 def accept_sticky_header(browser):
     """Scrolling and native section links keep navigation available on every layout."""
     context=browser.new_context(viewport={'width':1440,'height':900},reduced_motion='reduce')
@@ -280,6 +365,11 @@ try:
     with sync_playwright() as p:
         browser_path=os.environ.get('BRAVIS_CHROMIUM_EXECUTABLE') or shutil.which('chromium')
         browser=p.chromium.launch(executable_path=browser_path,headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+        accept_restaurant_videos(browser)
+        if '--media-only' in sys.argv:
+            browser.close()
+            print('BROWSER MEDIA QA SUCCESS:',REPORT)
+            sys.exit(0)
         accept_sticky_header(browser)
         accept_gallery_and_messengers(browser)
         accept_event_clock(browser)

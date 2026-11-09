@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "events": [],
+  "videos": [
+    {
+      "src": "/media/bravis-hall-20261023.mp4",
+      "poster": "/media/bravis-hall-20261023.webp",
+      "title": "Зал BRAVIS",
+      "description": "Арки, тёплый свет и детали нашего ресторана.",
+      "width": 720,
+      "height": 1280
+    },
+    {
+      "src": "/media/bravis-bar-20261023.mp4",
+      "poster": "/media/bravis-bar-20261023.webp",
+      "title": "Бар BRAVIS",
+      "description": "Загляните к нам перед встречей.",
+      "width": 720,
+      "height": 1280
+    }
+  ]
+}

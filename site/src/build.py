@@ -309,7 +309,7 @@ home=f'''{welcome_strip(welcome_bonus)}
     </div>
   </div>
 </section>
-<section class="section gallery-section" id="atmosphere"><div class="wrap"><div class="gallery-heading"><div><div class="section-label"><span class="line"></span> АТМОСФЕРА</div><h2>Здесь хорошо<br><em>быть вместе.</em></h2></div><p>Каждая встреча — своя история. А место для неё уже есть.</p></div><div class="gallery-grid">'''
+<section class="section gallery-section" id="atmosphere"><div class="wrap"><div class="gallery-heading"><div><div class="section-label"><span class="line"></span> АТМОСФЕРА</div><h2>Здесь хорошо<br><em>быть вместе.</em></h2></div><p>Каждая встреча — своя история. А место для неё уже есть.<br><a class="text-link" href="/gallery/">Посмотреть фото и видео {arrow_up_right}</a></p></div><div class="gallery-grid">'''
 for i,p in enumerate(photos[:3]):
     home+=f'<div class="gallery-item gallery-item--{i+1}"><img src="{h(img(p,"/assets/ambience.svg"))}" alt="{h(("Фотография ресторана BRAVIS" if ("/uploads/" in p) else "Иллюстрация атмосферы ресторана BRAVIS")+" — "+str(i+1))}" loading="lazy" width="650" height="650"></div>'
 home+='''</div><p class="gallery-caption">BRAVIS · МОСКВА · РАСКОВОЙ, 20</p></div></section>'''
@@ -370,7 +370,7 @@ banquet=f'''<section class="page-hero page-hero--dark"><div class="wrap page-her
 <section class="section"><div class="wrap"><div class="section-label"><span class="line"></span> ВАШ ФОРМАТ</div><h2>Не только меню.<br><em>Время вместе.</em></h2><p>Обсудим, что нужно вашей встрече: праздничный стол, приватность или пространство для съёмок. Стоимость и доступность согласуем по заявке.</p><div class="banquet-options"><article><h3>Праздничный стол</h3><p>Подберём блюда, подачу и обслуживание под ваш повод.</p>{banquet_messengers('Обсудить условия', 'Хочу обсудить банкетное меню и стоимость мероприятия.', 'banquet_format_contact')}</article><article><h3>Аренда и приватность</h3><p>Обсудим возможность аренды, время и условия проведения закрытой встречи.</p>{banquet_messengers('Обсудить условия', 'Хочу обсудить возможность аренды и приватный формат встречи.', 'banquet_format_contact')}</article><article><h3>Встречи и съёмки</h3><p>Расскажите о деловой встрече или съёмочном дне — обсудим формат и требования к площадке.</p>{banquet_messengers('Обсудить условия', 'Хочу обсудить площадку BRAVIS для встречи или съёмок.', 'banquet_format_contact')}</article></div></div></section>
 <section class="banner-dark"><div class="wrap banner-inner"><div><span class="overline">BRAVIS · ВАШЕ СОБЫТИЕ</span><h2>Начнём<br><em>с ваших пожеланий.</em></h2><p>Дату, меню и стоимость согласуем с вами до подтверждения мероприятия.</p></div><div>{banquet_messengers()}</div></div></section>'''
 
-events = render_restaurant_life_page(life_data) + render_event_media(EVENT_MEDIA) + render_restaurant_videos(EVENT_MEDIA)
+events = render_restaurant_life_page(life_data, media_html=render_event_media(EVENT_MEDIA) + render_restaurant_videos(EVENT_MEDIA))
 events += '<section class="section life-gallery"><div class="wrap"><div class="section-label"><span class="line"></span> АТМОСФЕРА В КАДРЕ</div><h2>Место для <em>ваших историй.</em></h2><p>Залы и детали BRAVIS. Фотографии интерьера ресторана.</p><div class="gallery-grid">'
 for i, photo in enumerate(photos[:3]):
     events += f'<a class="gallery-item gallery-item--{i+1}" href="{h(img(photo, "/assets/ambience.svg"))}" target="_blank" rel="noopener noreferrer"><img src="{h(img(photo, "/assets/ambience.svg"))}" alt="Интерьер BRAVIS — фотография {i+1}" width="650" height="650" loading="lazy"></a>'
@@ -422,13 +422,15 @@ privacy+='''<h3>2. Сведения, возникающие при исполь�
 if CONFIG.get('legalPolicyApproved'):
     privacy = (ROOT / 'content/privacy.approved.html').read_text(encoding='utf-8')
 
+gallery_body = render_restaurant_gallery(GALLERY).replace('<section class="restaurant-gallery"', render_restaurant_videos(EVENT_MEDIA) + '<section class="restaurant-gallery"', 1)
+
 PAGES={
   'index.html':page(home,'','Ресторан BRAVIS на Расковой, 20 в Москве: армянская и европейская кухня, бизнес-ланч за 690 ₽ и 500 бонусов за установку карты гостя. Меню и бронирование.','/','home','home-page'),
   'menu/index.html':page(menu_top,'Меню и цены — армянская и европейская кухня','Меню ресторана BRAVIS в Москве: армянская и европейская кухня, винная карта. Актуальные блюда и информация.','/menu/','menu','menu-page'),
   'lunch/index.html':page(lunch,'Бизнес-ланч за 690 ₽ на Расковой, 20','Бизнес-ланч в BRAVIS на Расковой, 20: меню по будням, суп, горячее и напиток. Оригинальное меню и бронирование стола.','/lunch/','lunch','lunch-page'),
   'banquets/index.html':page(banquet,'Банкеты и мероприятия','Праздники, камерные банкеты, дни рождения и семейные встречи в ресторане BRAVIS, Москва, улица Расковой, 20.','/banquets/','banquets'),
   'events/index.html':page(events,'Жизнь ресторана — события и новости','События и новости BRAVIS: дегустации, гастроужины, встречи и жизнь ресторана на Расковой, 20.','/events/','events','events-page'),
-  'gallery/index.html':page(render_restaurant_gallery(GALLERY) + render_restaurant_videos(EVENT_MEDIA),'Интерьер ресторана — фотогалерея','Фотографии интерьера BRAVIS на Расковой, 20: залы, столы и детали ресторана. Посмотрите атмосферу перед визитом.','/gallery/','gallery','gallery-page'),
+  'gallery/index.html':page(gallery_body,'Интерьер ресторана — фотогалерея','Фотографии интерьера BRAVIS на Расковой, 20: залы, столы и детали ресторана. Посмотрите атмосферу перед визитом.','/gallery/','gallery','gallery-page'),
   'contacts/index.html':page(contacts,'Адрес и контакты','Ресторан BRAVIS: Москва, улица Расковой, 20. Телефон +7 (989) 571-99-77. Как добраться и забронировать стол.','/contacts/','contacts'),
   '404.html':page(not_found,'Страница не найдена','Страница не найдена. Меню, контакты и бронирование ресторана BRAVIS.','/404.html','','not-found-page',noindex=True),
   'privacy/index.html':page(privacy,privacy_title,'Сведения об обработке персональных данных на сайте ресторана BRAVIS.','/privacy/','privacy')
