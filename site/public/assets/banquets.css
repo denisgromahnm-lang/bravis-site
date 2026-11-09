@@ -1,0 +1,11 @@
+.page-hero .banquet-capacity{margin:24px 0;color:#f6e7da}
+.banquet-capacity strong{display:block;font-family:var(--serif);font-size:clamp(30px,3.2vw,44px);font-weight:400;line-height:1.15}
+.banquet-capacity span{display:block;font-size:14px;line-height:1.7;margin-top:10px;max-width:450px}
+.banquet-faq{background:#f5eee4}
+.banquet-faq h2{margin-bottom:30px}
+.banquet-faq__items{max-width:900px}
+.banquet-faq details{border-top:1px solid #d8c6b2;padding:0 4px}
+.banquet-faq details:last-child{border-bottom:1px solid #d8c6b2}
+.banquet-faq summary{cursor:pointer;padding:20px 0;min-height:44px;font-size:17px;font-weight:600;line-height:1.5;scroll-margin-block:calc(var(--site-header-height,100px) + 16px) 110px}
+.banquet-faq summary:focus-visible{outline:3px solid #965c64;outline-offset:3px}
+.banquet-faq details p{margin:0 0 22px;font-size:15px;line-height:1.8;color:#705b56;max-width:760px}

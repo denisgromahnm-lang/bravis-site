@@ -11,6 +11,7 @@ from guest_promotions import (welcome_strip, offers_section, experiences_section
 from restaurant_gallery import render_restaurant_gallery
 from event_media import render_event_media, render_restaurant_videos
 from wallet_help import render_wallet_help
+from banquet_info import load_banquet_info, capacity_notice, banquet_questions
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / 'dist'
@@ -19,6 +20,7 @@ MENU = json.loads((ROOT / 'content/menu.json').read_text(encoding='utf-8'))
 LUNCH = json.loads((ROOT / 'content/lunch.json').read_text(encoding='utf-8'))
 GALLERY = json.loads((ROOT / 'content/gallery.json').read_text(encoding='utf-8')) if (ROOT / 'content/gallery.json').exists() else {}
 EVENT_MEDIA = json.loads((ROOT / 'content/event-media.json').read_text(encoding='utf-8')) if (ROOT / 'content/event-media.json').exists() else {}
+BANQUETS = load_banquet_info(ROOT / 'content/banquets.json')
 
 h = lambda s: html.escape(str(s or ''), quote=True)
 name = CONFIG.get('restaurantName','BRAVIS')
@@ -365,9 +367,10 @@ else:
     menu_top+=f'''<div class="menu-placeholder"><div class="menu-placeholder__art"><img src="/assets/cuisine.svg" width="640" height="520" alt="Авторская иллюстрация блюда"></div><div><span class="overline">СКОРО НА САЙТЕ</span><h2>Выбирайте по вкусу.<br><em>Мы подскажем.</em></h2><p>Электронное меню обновляется. Актуальные блюда, винную карту и цены сейчас можно уточнить у команды ресторана по телефону.</p>{button('Позвонить и уточнить меню',phone_url)}</div></div>'''
 menu_top+=f'''<div class="menu-bottom-note">Состав и наличие блюд могут меняться. Уточняйте актуальную информацию и аллергены у сотрудников ресторана. <a href="{h(phone_url)}">{h(phone)}</a></div></div></section>'''
 
-banquet=f'''<section class="page-hero page-hero--dark"><div class="wrap page-hero-grid"><div><div class="section-label section-label--light"><span class="line"></span> СОБЫТИЯ В BRAVIS</div><h1>Встречи,<br><em>которые помнят.</em></h1><p>Дни рождения, камерные праздники, семейные ужины и встречи с коллегами — в атмосфере тепла и гостеприимства.</p>{banquet_messengers()}</div><div class="page-hero-photo"><img src="{h(img(event_photo,'/assets/ambience.svg'))}" alt="{'Зал ресторана BRAVIS' if event_photo else 'Иллюстрация ресторанного зала'}" width="640" height="520"></div></div></section>
+banquet=f'''<section class="page-hero page-hero--dark"><div class="wrap page-hero-grid"><div><div class="section-label section-label--light"><span class="line"></span> СОБЫТИЯ В BRAVIS</div><h1>Встречи,<br><em>которые помнят.</em></h1><p>Дни рождения, камерные праздники, семейные ужины и встречи с коллегами — в атмосфере тепла и гостеприимства.</p>{capacity_notice(BANQUETS)}{banquet_messengers()}</div><div class="page-hero-photo"><img src="{h(img(event_photo,'/assets/ambience.svg'))}" alt="{'Зал ресторана BRAVIS' if event_photo else 'Иллюстрация ресторанного зала'}" width="640" height="520"></div></div></section>
 {banquet_details(whatsapp_url, banquet_messengers('Запросить банкетное меню', track='banquet_menu_request'))}
 <section class="section"><div class="wrap"><div class="section-label"><span class="line"></span> ВАШ ФОРМАТ</div><h2>Не только меню.<br><em>Время вместе.</em></h2><p>Обсудим, что нужно вашей встрече: праздничный стол, приватность или пространство для съёмок. Стоимость и доступность согласуем по заявке.</p><div class="banquet-options"><article><h3>Праздничный стол</h3><p>Подберём блюда, подачу и обслуживание под ваш повод.</p>{banquet_messengers('Обсудить условия', 'Хочу обсудить банкетное меню и стоимость мероприятия.', 'banquet_format_contact')}</article><article><h3>Аренда и приватность</h3><p>Обсудим возможность аренды, время и условия проведения закрытой встречи.</p>{banquet_messengers('Обсудить условия', 'Хочу обсудить возможность аренды и приватный формат встречи.', 'banquet_format_contact')}</article><article><h3>Встречи и съёмки</h3><p>Расскажите о деловой встрече или съёмочном дне — обсудим формат и требования к площадке.</p>{banquet_messengers('Обсудить условия', 'Хочу обсудить площадку BRAVIS для встречи или съёмок.', 'banquet_format_contact')}</article></div></div></section>
+{banquet_questions(BANQUETS)}
 <section class="banner-dark"><div class="wrap banner-inner"><div><span class="overline">BRAVIS · ВАШЕ СОБЫТИЕ</span><h2>Начнём<br><em>с ваших пожеланий.</em></h2><p>Дату, меню и стоимость согласуем с вами до подтверждения мероприятия.</p></div><div>{banquet_messengers()}</div></div></section>'''
 
 events = render_restaurant_life_page(life_data, media_html=render_event_media(EVENT_MEDIA) + render_restaurant_videos(EVENT_MEDIA))
@@ -428,7 +431,7 @@ PAGES={
   'index.html':page(home,'','Ресторан BRAVIS на Расковой, 20 в Москве: армянская и европейская кухня, бизнес-ланч за 690 ₽ и 500 бонусов за установку карты гостя. Меню и бронирование.','/','home','home-page'),
   'menu/index.html':page(menu_top,'Меню и цены — армянская и европейская кухня','Меню ресторана BRAVIS в Москве: армянская и европейская кухня, винная карта. Актуальные блюда и информация.','/menu/','menu','menu-page'),
   'lunch/index.html':page(lunch,'Бизнес-ланч за 690 ₽ на Расковой, 20','Бизнес-ланч в BRAVIS на Расковой, 20 за 690 ₽. По будням с 11:00 до 16:00, каждый шестой бизнес-ланч — бесплатно. Меню и бронирование стола.','/lunch/','lunch','lunch-page'),
-  'banquets/index.html':page(banquet,'Банкеты и мероприятия','Праздники, камерные банкеты, дни рождения и семейные встречи в ресторане BRAVIS, Москва, улица Расковой, 20.','/banquets/','banquets'),
+  'banquets/index.html':page(banquet,'Банкеты и мероприятия','Банкеты, дни рождения и корпоративы в BRAVIS на Расковой, 20. Три зала, до 110 посадочных мест всего. Меню и условия по запросу.','/banquets/','banquets'),
   'events/index.html':page(events,'Жизнь ресторана — события и новости','События и новости BRAVIS: дегустации, гастроужины, встречи и жизнь ресторана на Расковой, 20.','/events/','events','events-page'),
   'gallery/index.html':page(gallery_body,'Интерьер ресторана — фотогалерея','Фотографии интерьера BRAVIS на Расковой, 20: залы, столы и детали ресторана. Посмотрите атмосферу перед визитом.','/gallery/','gallery','gallery-page'),
   'contacts/index.html':page(contacts,'Адрес и контакты','Ресторан BRAVIS: Москва, улица Расковой, 20. Телефон +7 (989) 571-99-77. Как добраться и забронировать стол.','/contacts/','contacts'),
@@ -437,6 +440,8 @@ PAGES={
 }
 
 # Reuse the guest hub prepared by the existing marketing executor.
+PAGES['banquets/index.html'] = PAGES['banquets/index.html'].replace('</head>', '<link rel="stylesheet" href="/assets/banquets.css"></head>')
+
 from guest_hub import render_guest_hub
 hub_settings = json.loads((ROOT / 'content/guest-hub.json').read_text(encoding='utf-8'))
 PAGES['go/index.html'] = render_guest_hub(

@@ -1,0 +1,8 @@
+{
+  "capacity": {
+    "seatedTotal": 110,
+    "banquetHall": 50,
+    "otherHalls": [30, 30]
+  },
+  "corkagePerBottleRub": 600
+}
