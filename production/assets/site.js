@@ -39,21 +39,33 @@
   // Some browser privacy modes block storage. Keep consent for this page in memory.
   let consentValue = null;
   try { consentValue = localStorage.getItem(consentKey); } catch {}
-  const track = (eventName) => {
+  const track = (eventName, params) => {
     if (consentValue !== 'yes') return;
-    if (typeof window.ym === 'function' && conf.ymId) window.ym(Number(conf.ymId), 'reachGoal', eventName);
-    if (typeof window.gtag === 'function' && conf.ga4Id) window.gtag('event', eventName);
+    if (typeof window.ym === 'function' && conf.ymId) window.ym(Number(conf.ymId), 'reachGoal', eventName, params);
+    if (typeof window.gtag === 'function' && conf.ga4Id) window.gtag('event', eventName, params);
   };
   // Delegation also covers freshly published restaurant-news links.
   document.addEventListener('click', event => {
     const target = event.target instanceof Element ? event.target : null;
     const tracked = target?.closest('[data-track]');
-    if (tracked) track(tracked.dataset.track);
     const anchor = target?.closest('a[href]');
-    if (!anchor) return;
-    const href = anchor.getAttribute('href') || '';
-    if (href.startsWith('tel:')) track('phone_click');
-    if (/^\/(?:bravis-site\/)?menu\/(?:[#?].*)?$/.test(href)) track('menu_open');
+    const events = new Set();
+    if (tracked?.dataset.track) events.add(tracked.dataset.track);
+    const href = anchor?.getAttribute('href') || '';
+    if (href.startsWith('tel:')) events.add('phone_click');
+    if (/^\/(?:bravis-site\/)?menu\/(?:[#?].*)?$/.test(href)) events.add('menu_open');
+    // Only known public table IDs and messenger names enter goal parameters.
+    // Original order URLs, UUIDs, phone numbers and query strings stay out.
+    const params = {};
+    const table = location.pathname.match(/^\/(?:bravis-site\/)?t\/(bar-(?:1[3-9]|20)|[1-9]|1[0-2]|2\d|30)\/$/);
+    if (table) params.table_id = table[1];
+    if (anchor) {
+      try {
+        const messenger = {'wa.me':'whatsapp','t.me':'telegram','max.ru':'max'}[new URL(anchor.href).hostname];
+        if (messenger) params.messenger = messenger;
+      } catch {}
+    }
+    events.forEach(name => track(name, params));
   });
   if (!conf.ymId && !conf.ga4Id) return;
   function loadAnalytics() {
