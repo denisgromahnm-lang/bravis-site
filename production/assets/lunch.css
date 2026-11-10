@@ -30,7 +30,7 @@
 .lunch-day + .lunch-day { border-top: 1px solid var(--line); }
 .lunch-day[role=tabpanel] { border: 0; }
 .lunch-day > h3 { font: 400 34px var(--serif); margin: 0 0 30px; }
-.lunch-courses { display: grid; grid-template-columns: 1fr 1.35fr .65fr; gap: 40px; }
+.lunch-courses { display: grid; grid-template-columns: 1fr 1.35fr; gap: 40px; }
 .lunch-course { border-top: 1px solid var(--gold); padding-top: 21px; min-width: 0; }
 .lunch-course h4 { font-size: 10px; letter-spacing: .17em; text-transform: uppercase; color: #926c5b; margin: 0 0 18px; }
 .lunch-course ul { list-style: none; margin: 0; padding: 0; }
@@ -80,3 +80,11 @@
   .lunch-day > h3 { font-size: 30px; }
   .lunch-original summary { font-size: 14px; }
 }
+
+/* Owner-approved lunch: daily salads and clear dish descriptions. */
+.lunch-salad { margin: -12px 0 25px; font-size: 16px; line-height: 1.7; color: var(--muted); }
+.lunch-salad strong, .lunch-day-drinks strong { color: var(--wine); }
+.lunch-dish-name { display: block; }
+.lunch-dish-description { display: block; margin-top: 5px; font-family: var(--sans); font-size: 14px; line-height: 1.65; color: var(--muted); }
+.lunch-day-drinks { grid-column: 1 / -1; margin: 0; font-size: 14px; line-height: 1.7; color: var(--muted); }
+.lunch-original .lunch-pdf { display: inline-block; color: var(--wine); text-decoration: underline; text-underline-offset: 4px; }
