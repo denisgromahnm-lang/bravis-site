@@ -38,16 +38,19 @@ def build(baseline, output):
     target = output / 'lunch/index.html'
     target.parent.mkdir(parents=True)
     target.write_text(document)
-    for relative in ('assets/lunch.css', 'menu-media/business.jpg', lunch['sourceImage'].lstrip('/'), lunch['sourcePdf'].lstrip('/')):
+    media = [p.relative_to(ROOT / 'public').as_posix() for p in sorted((ROOT / 'public/menu-media').glob('business*')) if re.fullmatch(r'business(?:-[0-9]{8})?\.(?:jpg|pdf)', p.name)]
+    for relative in ['assets/lunch.css'] + media:
         target = output / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / 'public' / relative, target)
     menu = (baseline / 'menu/index.html').read_text()
-    if '/menu-media/business.jpg' not in menu:
+    old_images = set(re.findall(r'/menu-media/business(?:-[0-9]{8})?\.jpg', menu))
+    if len(old_images) != 1:
         raise ValueError('Inspect current menu gallery before replacing its lunch artwork')
+    old_image = old_images.pop()
     target = output / 'menu/index.html'
     target.parent.mkdir(parents=True)
-    target.write_text(menu.replace('/menu-media/business.jpg', lunch['sourceImage']))
+    target.write_text(menu.replace(old_image, lunch['sourceImage']))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
