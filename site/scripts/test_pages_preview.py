@@ -19,7 +19,7 @@ match=re.search(r'<script type="application/json" id="bravis-menu-data">(.*?)</s
 assert match,'Menu viewer manifest absent'
 data=json.loads(match.group(1))
 assert len(data)==4, 'Only the four published menus belong in the viewer'
-assert [item['pages'] for item in data]==[[prefix+'menu-media/'+name+'.jpg'] for name in ('main-front','main-back','business-20261110','children')]
+assert [item['pages'] for item in data]==[[prefix+'menu-media/'+name+'.jpg'] for name in ('main-front','main-back','business-brand-v1','children')]
 assert prefix+'menu-media/seasonal.jpg' not in menu, 'Unpublished seasonal menu leaked into Pages'
 for m in data:
     for image in m['pages']:

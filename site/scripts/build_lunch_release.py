@@ -38,13 +38,13 @@ def build(baseline, output):
     target = output / 'lunch/index.html'
     target.parent.mkdir(parents=True)
     target.write_text(document)
-    media = [p.relative_to(ROOT / 'public').as_posix() for p in sorted((ROOT / 'public/menu-media').glob('business*')) if re.fullmatch(r'business(?:-[0-9]{8})?\.(?:jpg|pdf)', p.name)]
+    media = [p.relative_to(ROOT / 'public').as_posix() for p in sorted((ROOT / 'public/menu-media').glob('business*')) if re.fullmatch(r'business(?:-[a-z0-9-]+)?\.(?:jpg|pdf)', p.name)]
     for relative in ['assets/lunch.css'] + media:
         target = output / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / 'public' / relative, target)
     menu = (baseline / 'menu/index.html').read_text()
-    old_images = set(re.findall(r'/menu-media/business(?:-[0-9]{8})?\.jpg', menu))
+    old_images = set(re.findall(r'/menu-media/business(?:-[a-z0-9-]+)?\.jpg', menu))
     if len(old_images) != 1:
         raise ValueError('Inspect current menu gallery before replacing its lunch artwork')
     old_image = old_images.pop()

@@ -285,7 +285,7 @@ def accept_public_revision(browser):
             assert static.locator('[data-restaurant-life-part="news"] time[datetime]').count()>0
         elif route=='/menu/':
             assert static.locator('.print-card').evaluate_all('(items)=>items.map(item=>item.getAttribute("href"))')==[
-                '/menu-media/'+name+'.jpg' for name in ('main-front','main-back','business-20261110','children')]
+                '/menu-media/'+name+'.jpg' for name in ('main-front','main-back','business-brand-v1','children')]
             assert '/menu-media/seasonal.jpg' not in static.content()
     nojs.close()
 
@@ -477,7 +477,7 @@ try:
         original.scroll_into_view_if_needed()
         original.evaluate('(image) => image.decode()')
         assert loaded(original), 'Original lunch menu image failed to load'
-        expect(page.locator('.lunch-original__body > a')).to_have_attribute('href','/menu-media/business-20261110.jpg')
+        expect(page.locator('.lunch-original__body > a')).to_have_attribute('href','/menu-media/business-brand-v1.jpg')
         page.locator('.lunch-original summary').click()
         if page.locator('[data-consent="no"]').count(): page.locator('[data-consent="no"]').click()
         page.get_by_role('tab',name='Понедельник',exact=True).click()
