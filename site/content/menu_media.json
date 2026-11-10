@@ -37,11 +37,12 @@
       "group": "business",
       "title": "Бизнес-ланч",
       "format": "images",
-      "url": "/menu-media/business.jpg",
+      "url": "/menu-media/business-20261109.jpg",
       "pages": [
-        "/menu-media/business.jpg"
+        "/menu-media/business-20261109.jpg"
       ],
-      "source_name": "Меню бизнес-ланч_печатный.pdf"
+      "source_name": "BRAVIS — утверждённое меню бизнес-ланча09.11.2026",
+      "download_pdf": "/menu-media/business-20261109.pdf"
     },
     {
       "group": "children",

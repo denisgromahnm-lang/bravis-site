@@ -285,7 +285,7 @@ def accept_public_revision(browser):
             assert static.locator('[data-restaurant-life-part="news"] time[datetime]').count()>0
         elif route=='/menu/':
             assert static.locator('.print-card').evaluate_all('(items)=>items.map(item=>item.getAttribute("href"))')==[
-                '/menu-media/'+name+'.jpg' for name in ('main-front','main-back','business','children')]
+                '/menu-media/'+name+'.jpg' for name in ('main-front','main-back','business-20261109','children')]
             assert '/menu-media/seasonal.jpg' not in static.content()
     nojs.close()
 
@@ -468,7 +468,7 @@ try:
         page.get_by_role('tab',name='Среда',exact=True).click()
         expect(page.locator('#lunch-wednesday')).to_be_visible()
         expect(page.locator('#lunch-monday')).to_be_hidden()
-        expect(page.locator('#lunch-wednesday')).to_contain_text('Харчо с телятиной и ткемали')
+        expect(page.locator('#lunch-wednesday')).to_contain_text('Харчо по-грузински')
         page.get_by_role('tab',name='Среда',exact=True).press('End')
         expect(page.get_by_role('tab',name='Пятница',exact=True)).to_be_focused()
         expect(page.locator('#lunch-friday')).to_be_visible()
@@ -477,7 +477,7 @@ try:
         original.scroll_into_view_if_needed()
         original.evaluate('(image) => image.decode()')
         assert loaded(original), 'Original lunch menu image failed to load'
-        expect(page.locator('.lunch-original__body > a')).to_have_attribute('href','/menu-media/business.jpg')
+        expect(page.locator('.lunch-original__body > a')).to_have_attribute('href','/menu-media/business-20261109.jpg')
         page.locator('.lunch-original summary').click()
         if page.locator('[data-consent="no"]').count(): page.locator('[data-consent="no"]').click()
         page.get_by_role('tab',name='Понедельник',exact=True).click()
