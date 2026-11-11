@@ -299,11 +299,11 @@ home=f'''{welcome_strip(welcome_bonus)}
   <div class="wrap loyalty-grid">
     <div class="loyalty-copy">
       <div class="section-label"><span class="line"></span> BRAVIS · ПРОГРАММА ЛОЯЛЬНОСТИ</div>
-      <h2 id="loyalty-heading">{welcome_bonus} бонусов<br><em>и фирменный десерт.</em></h2>
-      <p class="loyalty-choice">Два повода стать ближе.</p><p>{welcome_bonus} бонусных баллов — за установку карты гостя BRAVIS. А фирменный десерт станет сладким поводом заглянуть к нам в выходные. Подробности — в персональном предложении.</p>
+      <h2 id="loyalty-heading">{welcome_bonus} бонусов<br><em>для ваших встреч.</em></h2>
+      <p class="loyalty-choice">Карта гостя BRAVIS.</p><p>{welcome_bonus} бонусных баллов — за установку карты гостя BRAVIS.</p>
       <p class="loyalty-subtext">Карта всегда под рукой — в вашем смартфоне. Узнавайте о персональных предложениях и специальных событиях ресторана.</p>
       {loona_registration_cta}
-      <small class="loyalty-smallprint">Баланс и правила использования бонусов — на вашей карте. Приглашение на десерт, дни визита и условия подарка уточняйте в персональном предложении.</small>
+      <small class="loyalty-smallprint">Баланс и правила использования бонусов — на вашей карте.</small>
     </div>
     <div class="loyalty-art" aria-hidden="true">
       {gift_art()}
